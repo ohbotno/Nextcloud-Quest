@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Quest Completion</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        
+        button {
+            padding: 10px 20px;
+            background: #0082c9;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        button:hover {
+            background: #006aa3;
+        }
+        
+        .log {
+            background: #f5f5f5;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 3px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .log-entry {
+            margin: 2px 0;
+            padding: 2px;
+        }
+        
+        .error { color: red; }
+        .success { color: green; }
+        .info { color: blue; }
+    </style>
+</head>
+<body>
+    <h1>Quest Completion Test</h1>
+    
+    <div class="test-section">
+        <h2>Test API Endpoint</h2>
+        <p>This will test if the API endpoint is accessible and working.</p>
+        
+        <button onclick="testEndpoint()">Test API Endpoint</button>
+        <button onclick="testCompletion()">Test Task Completion</button>
+        <button onclick="clearLog()">Clear Log</button>
+        
+        <div id="log" class="log"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Manual Task Completion</h2>
+        <p>Enter task and list IDs to test completion:</p>
+        
+        <label>Task ID: <input type="number" id="taskId" value="1"></label><br>
+        <label>List ID: <input type="number" id="listId" value="1"></label><br>
+        
+        <button onclick="manualComplete()">Complete Task</button>
+    </div>
+    
+    <script>
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const entry = document.createElement('div');
+            entry.className = 'log-entry ' + type;
+            entry.textContent = new Date().toLocaleTimeString() + ' - ' + message;
+            logDiv.appendChild(entry);
+            logDiv.scrollTop = logDiv.scrollHeight;
+            console.log(message);
+        }
+        
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+        }
+        
+        async function testEndpoint() {
+            log('Testing API endpoint...', 'info');
+            
+            try {
+                // Try to get the base URL from Nextcloud
+                const baseUrl = window.location.origin;
+                const testUrl = baseUrl + '/apps/quest/api/test';
+                
+                log('Calling: ' + testUrl, 'info');
+                
+                const response = await fetch(testUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                log('Response status: ' + response.status, response.ok ? 'success' : 'error');
+                
+                const text = await response.text();
+                log('Response body: ' + text, 'info');
+                
+                if (response.ok) {
+                    try {
+                        const data = JSON.parse(text);
+                        log('API is working! Response: ' + JSON.stringify(data), 'success');
+                    } catch (e) {
+                        log('Response is not JSON: ' + text, 'error');
+                    }
+                } else {
+                    log('API returned error: ' + text, 'error');
+                }
+            } catch (error) {
+                log('Error calling API: ' + error.message, 'error');
+            }
+        }
+        
+        async function testCompletion() {
+            log('Testing task completion...', 'info');
+            
+            try {
+                const baseUrl = window.location.origin;
+                const completeUrl = baseUrl + '/apps/quest/api/complete-quest';
+                
+                const requestData = {
+                    task_id: 1,
+                    list_id: 1
+                };
+                
+                log('Calling: ' + completeUrl, 'info');
+                log('Request data: ' + JSON.stringify(requestData), 'info');
+                
+                // Get CSRF token if available
+                let requestToken = '';
+                if (typeof OC !== 'undefined' && OC.requestToken) {
+                    requestToken = OC.requestToken;
+                    log('Using request token: ' + requestToken.substring(0, 10) + '...', 'info');
+                } else {
+                    log('No request token available (OC not defined)', 'warning');
+                }
+                
+                const response = await fetch(completeUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'requesttoken': requestToken
+                    },
+                    body: JSON.stringify(requestData)
+                });
+                
+                log('Response status: ' + response.status, response.ok ? 'success' : 'error');
+                
+                const text = await response.text();
+                log('Response body: ' + text, 'info');
+                
+                if (response.ok) {
+                    try {
+                        const data = JSON.parse(text);
+                        if (data.status === 'success') {
+                            log('Task completed successfully! XP earned: ' + (data.data?.xp_earned || 'unknown'), 'success');
+                        } else {
+                            log('Task completion failed: ' + (data.message || 'Unknown error'), 'error');
+                        }
+                    } catch (e) {
+                        log('Response is not JSON: ' + text, 'error');
+                    }
+                } else {
+                    log('API returned error: ' + text, 'error');
+                }
+            } catch (error) {
+                log('Error calling API: ' + error.message, 'error');
+            }
+        }
+        
+        async function manualComplete() {
+            const taskId = document.getElementById('taskId').value;
+            const listId = document.getElementById('listId').value;
+            
+            log(`Completing task ${taskId} from list ${listId}...`, 'info');
+            
+            try {
+                const baseUrl = window.location.origin;
+                const completeUrl = baseUrl + '/apps/quest/api/complete-quest';
+                
+                const requestData = {
+                    task_id: parseInt(taskId),
+                    list_id: parseInt(listId)
+                };
+                
+                log('Request data: ' + JSON.stringify(requestData), 'info');
+                
+                // Get CSRF token if available
+                let requestToken = '';
+                if (typeof OC !== 'undefined' && OC.requestToken) {
+                    requestToken = OC.requestToken;
+                }
+                
+                const response = await fetch(completeUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'requesttoken': requestToken
+                    },
+                    body: JSON.stringify(requestData)
+                });
+                
+                const text = await response.text();
+                
+                if (response.ok) {
+                    try {
+                        const data = JSON.parse(text);
+                        log('Response: ' + JSON.stringify(data, null, 2), data.status === 'success' ? 'success' : 'error');
+                    } catch (e) {
+                        log('Response: ' + text, 'info');
+                    }
+                } else {
+                    log('Error ' + response.status + ': ' + text, 'error');
+                }
+            } catch (error) {
+                log('Error: ' + error.message, 'error');
+            }
+        }
+        
+        // Auto-test on load
+        window.onload = function() {
+            log('Test page loaded. Ready to test Quest completion.', 'info');
+            log('Current URL: ' + window.location.href, 'info');
+        };
+    </script>
+</body>
+</html>

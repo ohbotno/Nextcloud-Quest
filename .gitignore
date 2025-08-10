@@ -1,0 +1,94 @@
+# Claude-related files
+.claude/
+CLAUDE.md
+PLANNING.md
+.claude*
+claude*
+*.claude
+
+# Dependencies and build files
+node_modules/
+vendor/
+build/
+dist/
+package-lock.json
+composer.lock
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+*.sublime-*
+
+# Nextcloud specific
+.nextcloud/
+*.tar.gz
+*.zip
+/config/
+/data/
+/apps/
+*.crt
+*.key
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+error.log
+access.log
+
+# Environment files
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+config.local.php
+
+# Test coverage
+coverage/
+.nyc_output/
+*.lcov
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+*.bak
+*.backup
+*.old
+~*
+
+# Cache
+.cache/
+*.cache
+.sass-cache/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Private/sensitive files
+secrets/
+private/
+*.pem
+*.p12
+*.pfx

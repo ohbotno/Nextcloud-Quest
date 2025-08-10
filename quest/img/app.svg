@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="32" height="32" version="1.1" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#0082c9;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#0066a0;stop-opacity:1" />
+        </linearGradient>
+    </defs>
+    <rect width="32" height="32" rx="4" fill="url(#gradient)"/>
+    <g transform="translate(4,4)" fill="#ffffff">
+        <!-- Trophy icon representing achievements -->
+        <path d="M12 2C11.5 2 11 2.5 11 3V4H6C5.5 4 5 4.5 5 5V7C5 9.5 6.5 11 9 11C9.5 11 10 10.9 10.5 10.7C11 12 12 12.8 13 13V15H10C9.5 15 9 15.5 9 16V18C9 18.5 9.5 19 10 19H14C14.5 19 15 18.5 15 18V16C15 15.5 14.5 15 14 15H11V13C12 12.8 13 12 13.5 10.7C14 10.9 14.5 11 15 11C17.5 11 19 9.5 19 7V5C19 4.5 18.5 4 18 4H13V3C13 2.5 12.5 2 12 2M7 6H9V8.9C7.8 8.5 7 7.4 7 6M15 6H17C17 7.4 16.2 8.5 15 8.9V6Z"/>
+        <!-- Star overlay for quest/achievement feeling -->
+        <path d="M12 7L13 9L15 9L13.5 10.5L14 12.5L12 11.5L10 12.5L10.5 10.5L9 9L11 9Z" opacity="0.8"/>
+    </g>
+</svg>

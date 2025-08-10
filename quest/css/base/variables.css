@@ -1,0 +1,121 @@
+/**
+ * CSS Variables - Desktop-First Design
+ * Core design tokens for Quest
+ */
+
+:root {
+    /* Layout dimensions */
+    --sidebar-width: 280px;
+    --sidebar-collapsed-width: 80px;
+    --content-max-width: 1600px;
+    --header-height: 60px;
+    --nextcloud-topbar-height: 0px;
+    
+    /* Grid system */
+    --grid-columns: 3;
+    --card-width: 380px;
+    --grid-gap: 12px;
+    --container-padding: 16px;
+    
+    /* Nextcloud colors */
+    --color-primary: #0082c9;
+    --color-primary-light: rgba(0, 130, 201, 0.1);
+    --color-primary-dark: #0066a0;
+    --color-success: #46ba61;
+    --color-warning: #f6a502;
+    --color-warning-text: #2c1810; /* Dark brown text for warning backgrounds */
+    --color-warning-contrast: #cc5500; /* Darker warning color for light backgrounds */
+    --color-error: #e9322d;
+    
+    /* Background colors */
+    --color-main-background: #ffffff;
+    --color-background-hover: #f5f5f5;
+    --color-background-dark: #ededed;
+    
+    /* Text colors */
+    --color-main-text: #222222;
+    --color-text-light: #767676;
+    --color-text-lighter: #999999;
+    
+    /* Border colors */
+    --color-border: #e1e1e1;
+    --color-border-dark: #d5d5d5;
+    
+    /* Task list colors - User customizable */
+    --task-list-color-1: #0082c9;
+    --task-list-color-2: #46ba61;
+    --task-list-color-3: #e9322d;
+    --task-list-color-4: #8b5cf6;
+    --task-list-color-5: #f6a502;
+    --task-list-color-6: #ec407a;
+    --task-list-color-7: #00bcd4;
+    --task-list-color-8: #795548;
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.12);
+    --shadow-xl: 0 8px 32px rgba(0, 0, 0, 0.15);
+    
+    /* Border radius */
+    --radius-small: 4px;
+    --radius-medium: 8px;
+    --radius-large: 12px;
+    --radius-round: 50%;
+    
+    /* Transitions */
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Typography */
+    --font-face: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', Arial, sans-serif;
+    --font-size-small: 13px;
+    --font-size-normal: 15px;
+    --font-size-large: 17px;
+    --font-size-xlarge: 20px;
+    --font-size-xxlarge: 24px;
+    --font-size-huge: 32px;
+    
+    /* Z-index layers */
+    --z-normal: 1;
+    --z-dropdown: 100;
+    --z-sidebar: 50;
+    --z-modal-backdrop: 1000;
+    --z-modal: 1001;
+    --z-notification: 2000;
+}
+
+/* Large screens (1920px+) */
+@media (min-width: 1920px) {
+    :root {
+        --grid-columns: 5;
+        --card-width: 320px;
+    }
+}
+
+/* Ultra-wide screens (2560px+) */
+@media (min-width: 2560px) {
+    :root {
+        --grid-columns: 6;
+        --card-width: 360px;
+    }
+}
+
+/* Extra-wide screens (3440px+) */
+@media (min-width: 3440px) {
+    :root {
+        --grid-columns: 8;
+        --card-width: 380px;
+    }
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    :root {
+        --sidebar-width: 280px;
+        --grid-columns: 1;
+        --container-padding: 12px;
+        --grid-gap: 8px;
+    }
+}
