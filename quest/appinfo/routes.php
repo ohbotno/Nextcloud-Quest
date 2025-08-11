@@ -55,6 +55,14 @@ return [
         ['name' => 'progressAnalytics#getLevelProgressionData', 'url' => '/api/progress/level-progression', 'verb' => 'GET'],
         ['name' => 'progressAnalytics#getCharacterTimelineData', 'url' => '/api/progress/character-timeline', 'verb' => 'GET'],
         
+        // Adventure Path System API routes
+        ['name' => 'adventureWorld#getWorlds', 'url' => '/api/adventure/worlds', 'verb' => 'GET'],
+        ['name' => 'adventureWorld#getCurrentPath', 'url' => '/api/adventure/current-path/{worldNumber}', 'verb' => 'GET'],
+        ['name' => 'adventureWorld#completeLevel', 'url' => '/api/adventure/complete-level/{levelId}', 'verb' => 'POST'],
+        ['name' => 'adventureWorld#getBossChallenge', 'url' => '/api/adventure/boss-challenge/{worldNumber}', 'verb' => 'GET'],
+        ['name' => 'adventureWorld#completeBoss', 'url' => '/api/adventure/complete-boss/{worldNumber}', 'verb' => 'POST'],
+        ['name' => 'adventureWorld#getProgress', 'url' => '/api/adventure/progress', 'verb' => 'GET'],
+
         // Settings routes
         ['name' => 'settings#get', 'url' => '/api/settings', 'verb' => 'GET'],
         ['name' => 'settings#update', 'url' => '/api/settings', 'verb' => 'PUT'],
