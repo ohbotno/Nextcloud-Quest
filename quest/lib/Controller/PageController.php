@@ -216,6 +216,54 @@ class PageController extends Controller {
     }
     
     /**
+     * Adventure Map page
+     * 
+     * @NoAdminRequired
+     * @NoCSRFRequired
+     * @return TemplateResponse
+     */
+    public function adventure() {
+        $user = $this->userSession->getUser();
+        
+        // Add CSS and JavaScript files
+        Util::addStyle('quest', 'nextcloud-quest-unified');
+        Util::addStyle('quest', 'adventure-map');
+        Util::addScript('quest', 'nextcloud-quest-unified');
+        Util::addScript('quest', 'navigation');
+        Util::addScript('quest', 'task-list-manager');
+        Util::addScript('quest', 'adventure-map');
+        
+        // Provide initial state for the frontend
+        $this->initialStateService->provideInitialState(
+            'quest',
+            'user',
+            [
+                'uid' => $user->getUID(),
+                'displayName' => $user->getDisplayName()
+            ]
+        );
+        
+        // Provide app configuration as initial state
+        $this->initialStateService->provideInitialState(
+            'quest',
+            'config',
+            [
+                'active_page' => 'adventure',
+                'language' => \OC::$server->getL10NFactory()->get('quest')->getLanguageCode()
+            ]
+        );
+        
+        // Pass template variables
+        $templateVars = [
+            'active_page' => 'adventure',
+            'user_displayname' => $user->getDisplayName(),
+            'language' => \OC::$server->getL10NFactory()->get('quest')->getLanguageCode()
+        ];
+        
+        return new TemplateResponse('quest', 'adventure', $templateVars);
+    }
+
+    /**
      * Dedicated settings page
      * 
      * @NoAdminRequired

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OCA\Quest\Service;
+namespace OCA\NextcloudQuest\Service;
 
 /**
  * Path Generator Service - Creates diamond-pattern paths within worlds

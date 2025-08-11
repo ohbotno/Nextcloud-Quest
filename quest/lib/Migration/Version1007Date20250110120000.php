@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OCA\Quest\Migration;
+namespace OCA\NextcloudQuest\Migration;
 
 use Closure;
 use OCP\DB\ISchemaWrapper;
@@ -27,8 +27,8 @@ class Version1007Date20250110120000 extends SimpleMigrationStep {
         $schema = $schemaClosure();
 
         // Adventure Worlds Table - Defines the 8 themed worlds
-        if (!$schema->hasTable('*PREFIX*adventure_worlds')) {
-            $table = $schema->createTable('*PREFIX*adventure_worlds');
+        if (!$schema->hasTable('adventure_worlds')) {
+            $table = $schema->createTable('adventure_worlds');
             $table->addColumn('id', Types::BIGINT, [
                 'autoincrement' => true,
                 'notnull' => true,
@@ -75,12 +75,12 @@ class Version1007Date20250110120000 extends SimpleMigrationStep {
             ]);
 
             $table->setPrimaryKey(['id']);
-            $table->addUniqueIndex(['world_number'], 'adv_worlds_number_unique');
+            $table->addUniqueIndex(['world_number'], 'adv_world_num_uniq');
         }
 
         // Adventure Boss Levels Table - Global boss challenges same for all players
-        if (!$schema->hasTable('*PREFIX*adventure_boss_levels')) {
-            $table = $schema->createTable('*PREFIX*adventure_boss_levels');
+        if (!$schema->hasTable('adventure_boss_levels')) {
+            $table = $schema->createTable('adventure_boss_levels');
             $table->addColumn('id', Types::BIGINT, [
                 'autoincrement' => true,
                 'notnull' => true,
@@ -118,21 +118,20 @@ class Version1007Date20250110120000 extends SimpleMigrationStep {
                 'length' => 10,
             ]);
             $table->addColumn('is_active', Types::BOOLEAN, [
-                'notnull' => true,
-                'default' => true,
+                'notnull' => false,
             ]);
             $table->addColumn('created_at', Types::DATETIME, [
                 'notnull' => true,
             ]);
 
             $table->setPrimaryKey(['id']);
-            $table->addIndex(['world_number'], 'adv_boss_world_idx');
-            $table->addIndex(['boss_type'], 'adv_boss_type_idx');
+            $table->addIndex(['world_number'], 'adv_boss_world');
+            $table->addIndex(['boss_type'], 'adv_boss_type');
         }
 
         // Adventure Paths Table - Generated paths with world references
-        if (!$schema->hasTable('*PREFIX*adventure_paths')) {
-            $table = $schema->createTable('*PREFIX*adventure_paths');
+        if (!$schema->hasTable('adventure_paths')) {
+            $table = $schema->createTable('adventure_paths');
             $table->addColumn('id', Types::BIGINT, [
                 'autoincrement' => true,
                 'notnull' => true,
@@ -176,14 +175,14 @@ class Version1007Date20250110120000 extends SimpleMigrationStep {
             ]);
 
             $table->setPrimaryKey(['id']);
-            $table->addIndex(['user_id'], 'adv_paths_user_idx');
-            $table->addIndex(['world_number'], 'adv_paths_world_idx');
-            $table->addUniqueIndex(['user_id', 'world_number'], 'adv_paths_user_world_unique');
+            $table->addIndex(['user_id'], 'adv_paths_user');
+            $table->addIndex(['world_number'], 'adv_paths_world');
+            $table->addUniqueIndex(['user_id', 'world_number'], 'adv_paths_uniq');
         }
 
         // Adventure Levels Table - Individual level data with boss_type field
-        if (!$schema->hasTable('*PREFIX*adventure_levels')) {
-            $table = $schema->createTable('*PREFIX*adventure_levels');
+        if (!$schema->hasTable('adventure_levels')) {
+            $table = $schema->createTable('adventure_levels');
             $table->addColumn('id', Types::BIGINT, [
                 'autoincrement' => true,
                 'notnull' => true,
@@ -250,8 +249,7 @@ class Version1007Date20250110120000 extends SimpleMigrationStep {
                 'length' => 10,
             ]);
             $table->addColumn('is_global', Types::BOOLEAN, [
-                'notnull' => true,
-                'default' => false,
+                'notnull' => false,
             ]);
             $table->addColumn('completed_at', Types::DATETIME, [
                 'notnull' => false,
@@ -264,16 +262,16 @@ class Version1007Date20250110120000 extends SimpleMigrationStep {
             ]);
 
             $table->setPrimaryKey(['id']);
-            $table->addIndex(['path_id'], 'adv_levels_path_idx');
-            $table->addIndex(['user_id'], 'adv_levels_user_idx');
-            $table->addIndex(['world_number'], 'adv_levels_world_idx');
-            $table->addIndex(['level_type'], 'adv_levels_type_idx');
-            $table->addIndex(['status'], 'adv_levels_status_idx');
+            $table->addIndex(['path_id'], 'adv_levels_path');
+            $table->addIndex(['user_id'], 'adv_levels_user');
+            $table->addIndex(['world_number'], 'adv_levels_world');
+            $table->addIndex(['level_type'], 'adv_levels_type');
+            $table->addIndex(['status'], 'adv_levels_status');
         }
 
         // Adventure Objectives Table - Level goals and requirements
-        if (!$schema->hasTable('*PREFIX*adventure_objectives')) {
-            $table = $schema->createTable('*PREFIX*adventure_objectives');
+        if (!$schema->hasTable('adventure_objectives')) {
+            $table = $schema->createTable('adventure_objectives');
             $table->addColumn('id', Types::BIGINT, [
                 'autoincrement' => true,
                 'notnull' => true,
@@ -302,8 +300,7 @@ class Version1007Date20250110120000 extends SimpleMigrationStep {
                 'length' => 200,
             ]);
             $table->addColumn('is_completed', Types::BOOLEAN, [
-                'notnull' => true,
-                'default' => false,
+                'notnull' => false,
             ]);
             $table->addColumn('completed_at', Types::DATETIME, [
                 'notnull' => false,
@@ -316,15 +313,15 @@ class Version1007Date20250110120000 extends SimpleMigrationStep {
             ]);
 
             $table->setPrimaryKey(['id']);
-            $table->addIndex(['level_id'], 'adv_objectives_level_idx');
-            $table->addIndex(['objective_type'], 'adv_objectives_type_idx');
-            $table->addIndex(['task_id'], 'adv_objectives_task_idx');
-            $table->addIndex(['is_completed'], 'adv_objectives_completed_idx');
+            $table->addIndex(['level_id'], 'adv_obj_level');
+            $table->addIndex(['objective_type'], 'adv_obj_type');
+            $table->addIndex(['task_id'], 'adv_obj_task');
+            $table->addIndex(['is_completed'], 'adv_obj_completed');
         }
 
         // Adventure Player Progress Table - World progression tracking
-        if (!$schema->hasTable('*PREFIX*adventure_player_progress')) {
-            $table = $schema->createTable('*PREFIX*adventure_player_progress');
+        if (!$schema->hasTable('adventure_progress')) {
+            $table = $schema->createTable('adventure_progress');
             $table->addColumn('id', Types::BIGINT, [
                 'autoincrement' => true,
                 'notnull' => true,
@@ -361,12 +358,10 @@ class Version1007Date20250110120000 extends SimpleMigrationStep {
                 'default' => 'locked'
             ]);
             $table->addColumn('boss_defeated', Types::BOOLEAN, [
-                'notnull' => true,
-                'default' => false,
+                'notnull' => false,
             ]);
             $table->addColumn('mini_boss_defeated', Types::BOOLEAN, [
-                'notnull' => true,
-                'default' => false,
+                'notnull' => false,
             ]);
             $table->addColumn('total_xp_earned', Types::INTEGER, [
                 'notnull' => true,
@@ -387,15 +382,15 @@ class Version1007Date20250110120000 extends SimpleMigrationStep {
             ]);
 
             $table->setPrimaryKey(['id']);
-            $table->addIndex(['user_id'], 'adv_progress_user_idx');
-            $table->addIndex(['world_number'], 'adv_progress_world_idx');
-            $table->addIndex(['world_status'], 'adv_progress_status_idx');
-            $table->addUniqueIndex(['user_id', 'world_number'], 'adv_progress_user_world_unique');
+            $table->addIndex(['user_id'], 'adv_prog_user');
+            $table->addIndex(['world_number'], 'adv_prog_world');
+            $table->addIndex(['world_status'], 'adv_prog_status');
+            $table->addUniqueIndex(['user_id', 'world_number'], 'adv_prog_uniq');
         }
 
         // Adventure Boss Completions Table - Global boss completion stats
-        if (!$schema->hasTable('*PREFIX*adventure_boss_completions')) {
-            $table = $schema->createTable('*PREFIX*adventure_boss_completions');
+        if (!$schema->hasTable('adventure_boss_wins')) {
+            $table = $schema->createTable('adventure_boss_wins');
             $table->addColumn('id', Types::BIGINT, [
                 'autoincrement' => true,
                 'notnull' => true,
@@ -435,11 +430,11 @@ class Version1007Date20250110120000 extends SimpleMigrationStep {
             ]);
 
             $table->setPrimaryKey(['id']);
-            $table->addIndex(['user_id'], 'adv_boss_comp_user_idx');
-            $table->addIndex(['world_number'], 'adv_boss_comp_world_idx');
-            $table->addIndex(['boss_type'], 'adv_boss_comp_type_idx');
-            $table->addIndex(['completed_at'], 'adv_boss_comp_date_idx');
-            $table->addUniqueIndex(['user_id', 'world_number', 'boss_type'], 'adv_boss_comp_unique');
+            $table->addIndex(['user_id'], 'adv_boss_user');
+            $table->addIndex(['world_number'], 'adv_boss_world2');
+            $table->addIndex(['boss_type'], 'adv_boss_type2');
+            $table->addIndex(['completed_at'], 'adv_boss_date');
+            $table->addUniqueIndex(['user_id', 'world_number', 'boss_type'], 'adv_boss_uniq');
         }
 
         return $schema;

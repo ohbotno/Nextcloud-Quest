@@ -9,6 +9,7 @@ return [
     'routes' => [
         // Page routes
         ['name' => 'page#index', 'url' => '/', 'verb' => 'GET'],
+        ['name' => 'page#adventure', 'url' => '/adventure', 'verb' => 'GET'],
         ['name' => 'page#quests', 'url' => '/quests', 'verb' => 'GET'],
         ['name' => 'page#achievements', 'url' => '/achievements', 'verb' => 'GET'],
         ['name' => 'page#progress', 'url' => '/progress', 'verb' => 'GET'],
@@ -56,8 +57,14 @@ return [
         ['name' => 'progressAnalytics#getCharacterTimelineData', 'url' => '/api/progress/character-timeline', 'verb' => 'GET'],
         
         // Adventure Path System API routes
+        ['name' => 'adventureWorld#test', 'url' => '/api/adventure/test', 'verb' => 'GET'],
+        ['name' => 'adventureWorld#debugTaskCompletion', 'url' => '/api/adventure/debug-tasks', 'verb' => 'GET'],
+        ['name' => 'adventureWorld#diagnosticPath', 'url' => '/api/adventure/diagnostic-path/{worldNumber}', 'verb' => 'GET'],
         ['name' => 'adventureWorld#getWorlds', 'url' => '/api/adventure/worlds', 'verb' => 'GET'],
         ['name' => 'adventureWorld#getCurrentPath', 'url' => '/api/adventure/current-path/{worldNumber}', 'verb' => 'GET'],
+        ['name' => 'adventureWorld#getLevelObjectivesSimple', 'url' => '/api/adventure/level-objectives', 'verb' => 'GET'],
+        ['name' => 'adventureWorld#startLevel', 'url' => '/api/adventure/start-level', 'verb' => 'POST'],
+        ['name' => 'adventureWorld#checkLevelCompletion', 'url' => '/api/adventure/check-completion', 'verb' => 'GET'],
         ['name' => 'adventureWorld#completeLevel', 'url' => '/api/adventure/complete-level/{levelId}', 'verb' => 'POST'],
         ['name' => 'adventureWorld#getBossChallenge', 'url' => '/api/adventure/boss-challenge/{worldNumber}', 'verb' => 'GET'],
         ['name' => 'adventureWorld#completeBoss', 'url' => '/api/adventure/complete-boss/{worldNumber}', 'verb' => 'POST'],

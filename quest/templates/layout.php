@@ -144,6 +144,14 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a href="<?php print_unescaped(\OC::$server->getURLGenerator()->linkToRoute('quest.page.adventure')); ?>" 
+                           class="nav-link <?php p($_['active_page'] === 'adventure' ? 'active' : ''); ?>"
+                           data-page="adventure">
+                            <span class="nav-icon">🗺️</span>
+                            <span class="nav-text">Adventure</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a href="<?php print_unescaped(\OC::$server->getURLGenerator()->linkToRoute('quest.page.quests')); ?>" 
                            class="nav-link <?php p($_['active_page'] === 'quests' ? 'active' : ''); ?>"
                            data-page="quests">
