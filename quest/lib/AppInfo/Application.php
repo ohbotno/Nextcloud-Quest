@@ -107,8 +107,8 @@ class Application extends App implements IBootstrap {
         
         $context->registerService(\OCA\NextcloudQuest\Service\StreakService::class, function($c) {
             return new \OCA\NextcloudQuest\Service\StreakService(
-                $c->get(\OCA\NextcloudQuest\Db\HistoryMapper::class),
                 $c->get(\OCA\NextcloudQuest\Db\QuestMapper::class),
+                $c->get(\OCA\NextcloudQuest\Db\HistoryMapper::class),
                 $c->get(\Psr\Log\LoggerInterface::class)
             );
         });
