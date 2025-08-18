@@ -528,6 +528,189 @@
         destroy: function() {
             this.initialized = false;
             // Remove event listeners and clean up
+        },
+
+        updateIncludeStatus: function(listId, isIncluded) {
+            
+            // Update the main quest settings (includedLists array)
+            let questSettings = this.loadSavedSettings();
+            if (!questSettings.includedLists) {
+                questSettings.includedLists = [];
+            }
+            
+            const listIdString = String(listId);
+            
+            if (isIncluded) {
+                // Add to included lists if not already there
+                if (!questSettings.includedLists.includes(listIdString)) {
+                    questSettings.includedLists.push(listIdString);
+                }
+            } else {
+                // Remove from included lists
+                questSettings.includedLists = questSettings.includedLists.filter(id => id !== listIdString);
+            }
+            
+            // Save the updated quest settings
+            localStorage.setItem('questSettings', JSON.stringify(questSettings));
+            
+            // Also update the old format for compatibility
+            let settings = JSON.parse(localStorage.getItem('questTaskListSettings') || '{}');
+            if (!settings[listId]) {
+                settings[listId] = {};
+            }
+            settings[listId].includeInQuest = isIncluded;
+            localStorage.setItem('questTaskListSettings', JSON.stringify(settings));
+            
+        },
+
+        autoSaveSettings: function() {
+            
+            if (this.autoSaveTimeout) {
+                clearTimeout(this.autoSaveTimeout);
+            }
+            
+            this.autoSaveTimeout = setTimeout(() => {
+                this.saveSettings();
+                this.showAutoSaveIndicator();
+            }, 500);
+        },
+
+        showAutoSaveIndicator: function() {
+            const indicator = document.createElement('div');
+            indicator.className = 'auto-save-indicator';
+            indicator.textContent = '';
+            indicator.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: var(--color-success);
+                color: white;
+                padding: 8px 16px;
+                border-radius: 4px;
+                z-index: 10000;
+                font-size: 14px;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            `;
+            
+            document.body.appendChild(indicator);
+            
+            // Fade in
+            setTimeout(() => {
+                indicator.style.opacity = '1';
+            }, 10);
+            
+            // Fade out and remove
+            setTimeout(() => {
+                indicator.style.opacity = '0';
+                setTimeout(() => {
+                    if (indicator.parentNode) {
+                        indicator.parentNode.removeChild(indicator);
+                    }
+                }, 300);
+            }, 2000);
+        },
+
+
+        setupTableEventHandlers: function() {
+            console.log('🔧 Setting up table event handlers');
+            
+            // Handle include checkbox changes
+            document.querySelectorAll('.include-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const listId = this.dataset.listId;
+                    const isIncluded = this.checked;
+                    
+                    // Update label
+                    const label = this.nextElementSibling;
+                    if (label) {
+                        label.textContent = isIncluded ? 'Included' : 'Excluded';
+                    }
+                    
+                    window.QuestTaskListManager.updateIncludeStatus(listId, isIncluded);
+                    window.QuestTaskListManager.autoSaveSettings();
+                });
+            });
+            
+            // Handle priority changes
+            document.querySelectorAll('.priority-select').forEach(select => {
+                select.addEventListener('change', function() {
+                    const listId = this.dataset.listId;
+                    const priority = this.value;
+                    
+                    window.QuestTaskListManager.updateListPriority(listId, priority);
+                    window.QuestTaskListManager.autoSaveSettings();
+                });
+            });
+            
+            // Handle color changes
+            document.querySelectorAll('.color-picker').forEach(picker => {
+                picker.addEventListener('change', function() {
+                    const listId = this.dataset.listId;
+                    const color = this.value;
+                    
+                    window.QuestTaskListManager.updateListColor(listId, color);
+                    window.QuestTaskListManager.autoSaveSettings();
+                });
+            });
+            
+            // Handle visibility changes
+            document.querySelectorAll('.visibility-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const listId = this.dataset.listId;
+                    const isVisible = this.checked;
+                    
+                    // Update label
+                    const label = this.nextElementSibling;
+                    if (label) {
+                        label.textContent = isVisible ? 'Visible' : 'Hidden';
+                    }
+                    
+                    window.QuestTaskListManager.updateListVisibility(listId, isVisible);
+                    window.QuestTaskListManager.autoSaveSettings();
+                });
+            });
+            
+            console.log('✅ Table event handlers setup complete');
+        },
+
+        updateListPriority: function(listId, priority) {
+            
+            let settings = JSON.parse(localStorage.getItem('questTaskListSettings') || '{}');
+            if (!settings[listId]) {
+                settings[listId] = {};
+            }
+            settings[listId].priority = priority;
+            localStorage.setItem('questTaskListSettings', JSON.stringify(settings));
+            
+        },
+
+        updateListColor: function(listId, color) {
+            
+            let settings = JSON.parse(localStorage.getItem('questTaskListSettings') || '{}');
+            if (!settings[listId]) {
+                settings[listId] = {};
+            }
+            settings[listId].color = color;
+            localStorage.setItem('questTaskListSettings', JSON.stringify(settings));
+            
+            // Update the icon color immediately
+            const icon = document.querySelector(`tr [data-list-id="${listId}"]`)?.closest('tr')?.querySelector('.list-icon');
+            if (icon) {
+                icon.style.color = color;
+            }
+            
+        },
+
+        updateListVisibility: function(listId, isVisible) {
+            
+            let settings = JSON.parse(localStorage.getItem('questTaskListSettings') || '{}');
+            if (!settings[listId]) {
+                settings[listId] = {};
+            }
+            settings[listId].visibility = isVisible;
+            localStorage.setItem('questTaskListSettings', JSON.stringify(settings));
+            
         }
     };
     
@@ -542,6 +725,10 @@
     
     // Expose to global scope
     window.QuestTaskListManager = QuestTaskListManager;
+    
+    // Debug: Log all methods immediately after object creation
+    console.log('🔍 QuestTaskListManager methods at creation:', Object.getOwnPropertyNames(QuestTaskListManager));
+    console.log('🔍 Methods containing "Include":', Object.getOwnPropertyNames(QuestTaskListManager).filter(m => m.toLowerCase().includes('include')));
     
 })();
 
@@ -586,6 +773,11 @@
             console.log('  - isDashboardPage:', isDashboardPage);
             console.log('  - isProgressPage:', isProgressPage);
             console.log('  - isSettingsPage:', isSettingsPage);
+            console.log('🔍 Element detection details:');
+            console.log('  - taskListsGridElement:', !!taskListsGridElement, taskListsGridElement ? 'found' : 'not found');
+            console.log('  - questStatsElement:', !!questStatsElement, questStatsElement ? 'found' : 'not found');
+            console.log('  - progressStatsElement:', !!progressStatsElement, progressStatsElement ? 'found' : 'not found');
+            console.log('  - adventureMapContainer:', !!adventureMapContainer, adventureMapContainer ? 'found' : 'not found');
             
             // Store page types as instance properties
             this.isQuestsPage = isQuestsPage;
@@ -603,9 +795,32 @@
                 return;
             } else if (isDashboardPage) {
                 console.log('🏠 Initializing Quest Dashboard...');
+                console.log('🔍 Dashboard initialization details:', {
+                    taskListsGridElement: !!taskListsGridElement,
+                    isQuestsPage: isQuestsPage,
+                    progressStatsElement: !!progressStatsElement,
+                    isAdventurePage: isAdventurePage
+                });
                 this.loadPlayerStats(); // Load current user stats for dashboard
-                this.loadTaskLists();
+                
+                // Add a small delay to ensure DOM is fully ready
+                setTimeout(() => {
+                    console.log('🕐 Loading task lists after DOM ready delay...');
+                    
+                    // Double-check grid element exists at this point
+                    const gridCheck = document.getElementById('task-lists-grid');
+                    console.log('🔍 Final grid check before loading:', {
+                        exists: !!gridCheck,
+                        innerHTML: gridCheck ? gridCheck.innerHTML.length : 'N/A'
+                    });
+                    
+                    this.loadTaskLists();
+                }, 100);
+                
                 this.setupEventHandlers();
+                
+                // Register with QuestApp for dashboard stats updates
+                this.registerWithQuestApp('dashboard-page');
             } else if (isProgressPage) {
                 console.log('📊 Initializing Progress Dashboard...');
                 this.initializeProgressPage();
@@ -646,31 +861,34 @@
         registerWithQuestApp: function(consumerId) {
             console.log(`📊 TaskManager: Registering with QuestApp as '${consumerId}'`);
             
+            // Capture the correct 'this' context
+            const self = this;
+            
             // Wait for QuestApp to be ready
-            const connectToQuestApp = () => {
+            const connectToQuestApp = function() {
                 if (typeof window !== 'undefined' && window.QuestApp && window.QuestApp.initialized) {
                     console.log('📊 TaskManager: QuestApp is ready, registering as consumer');
                     
                     window.QuestApp.registerStatsConsumer(consumerId, {
-                        onUpdate: (stats) => {
+                        onUpdate: function(stats) {
                             console.log('📊 TaskManager: Received stats update from QuestApp:', stats);
                             console.log('🔍 Debug - XP from QuestApp:', stats?.level?.xp || 'undefined');
                             console.log('🔍 Debug - Full level data:', stats?.level || 'undefined');
                             
                             // Call debug endpoint to check database state
-                            this.callDebugEndpoint();
+                            self.callDebugEndpoint();
                             
                             // Update the player avatar with the new stats
-                            this.updatePlayerAvatar(stats);
-                        }.bind(this),
-                        onError: (error) => {
+                            self.updatePlayerAvatar(stats);
+                        },
+                        onError: function(error) {
                             console.error('📊 TaskManager: Stats error from QuestApp:', error);
                             // Set default values if loading fails
-                            this.updatePlayerAvatar({
+                            self.updatePlayerAvatar({
                                 level: { level: 1, rank_title: 'Novice', xp: 0, xp_to_next: 100, progress_percentage: 0 }
                             });
-                        }.bind(this),
-                        onLoading: (isLoading) => {
+                        },
+                        onLoading: function(isLoading) {
                             console.log('📊 TaskManager: Stats loading state:', isLoading);
                             // Could show loading UI here if needed
                         }
@@ -680,7 +898,7 @@
                     const currentStats = window.QuestApp.getCurrentStats();
                     if (currentStats) {
                         console.log('📊 TaskManager: Getting current stats immediately from QuestApp');
-                        this.updatePlayerAvatar(currentStats);
+                        self.updatePlayerAvatar(currentStats);
                     }
                     
                 } else {
@@ -1351,14 +1569,15 @@
         },
         
         displayTaskListsSettings: function(taskLists) {
-            const grid = document.getElementById('settings-task-lists-grid');
-            if (!grid) return;
+            console.log('🚨🚨🚨 NEW TABLE VERSION LOADED - Version 2.0 🚨🚨🚨');
+            const container = document.getElementById('settings-task-lists-grid');
+            if (!container) return;
             
             // Clear existing content
-            grid.innerHTML = '';
+            container.innerHTML = '';
             
             if (!taskLists || taskLists.length === 0) {
-                grid.innerHTML = `
+                container.innerHTML = `
                     <div class="task-list-placeholder">
                         <div class="empty-state">
                             <div class="empty-state-icon">📋</div>
@@ -1372,6 +1591,9 @@
             
             // Load saved settings
             const savedSettings = this.loadSavedSettings();
+            console.log('🚨 CRITICAL DEBUG - savedSettings:', JSON.stringify(savedSettings, null, 2));
+            console.log('🚨 CRITICAL DEBUG - savedSettings.includedLists:', savedSettings.includedLists);
+            console.log('🚨 CRITICAL DEBUG - taskLists length:', taskLists.length);
             
             // Apply hideCompletedTasks setting to checkbox
             const hideCompletedCheckbox = document.getElementById('hide-completed-tasks');
@@ -1379,59 +1601,154 @@
                 hideCompletedCheckbox.checked = savedSettings.hideCompletedTasks ?? true;
             }
             
-            taskLists.forEach(list => {
-                console.log('Processing list:', list); // Debug log
-                console.log('List ID type:', typeof list.id, 'Value:', list.id); // Debug log
-                
-                const isIncluded = savedSettings.includedLists ? savedSettings.includedLists.includes(list.id) : true;
-                const color = savedSettings.listColors ? savedSettings.listColors[list.id] : this.getDefaultColor(list.id);
-                
-                const card = document.createElement('div');
-                card.className = 'task-list-card settings-list-card';
-                card.dataset.listId = list.id;
-                
-                card.innerHTML = `
-                    <div class="task-list-header">
-                        <div class="task-list-title">
-                            <div class="list-color-preview" style="background-color: ${color}"></div>
-                            <span class="task-list-name">${this.escapeHtml(list.name || 'Unnamed List')}</span>
-                        </div>
-                        <div class="task-list-meta">
-                            <span class="task-count">${list.total_tasks || 0} tasks</span>
-                            <div class="include-toggle">
-                                <input type="checkbox" id="include-${list.id}" class="include-checkbox" ${isIncluded ? 'checked' : ''}>
-                                <label for="include-${list.id}" class="toggle-label">Include in Quest</label>
-                            </div>
-                        </div>
-                    </div>
+            // Create table
+            const table = document.createElement('table');
+            table.className = 'task-lists-table';
+            
+            // Create table header
+            const thead = document.createElement('thead');
+            thead.innerHTML = `
+                <tr>
+                    <th class="col-task-list">Task List</th>
+                    <th class="col-priority">Priority</th>
+                    <th class="col-color">Color</th>
+                    <th class="col-visibility">Visibility</th>
+                    <th class="col-task-count">Tasks</th>
+                    <th class="col-include">Include in Quest</th>
+                </tr>
+            `;
+            table.appendChild(thead);
+            
+            // Create table body
+            const tbody = document.createElement('tbody');
+            
+            console.log('🚨 STARTING FOREACH LOOP');
+            taskLists.forEach((list, index) => {
+                try {
+                    console.log(`🔍 Processing list ${index + 1}:`, list); // Debug log
+                    console.log(`🔍 List ${index + 1} ID type:`, typeof list.id, 'Value:', list.id); // Debug log
                     
-                    <div class="task-list-content">
-                        <div class="settings-controls">
-                            <div class="color-control">
-                                <label for="color-${list.id}">List Color:</label>
-                                <input type="color" id="color-${list.id}" class="color-picker" value="${color}">
+                    // Fix the logic: if includedLists doesn't exist or is null/undefined, default to true (all included)
+                    // if includedLists exists as an array, only include if the list ID is in the array
+                    // if includedLists is an empty array, exclude all lists
+                    let isIncluded;
+                    if (!savedSettings.includedLists || !Array.isArray(savedSettings.includedLists)) {
+                        isIncluded = true; // Default: include all if no array exists
+                    } else {
+                        isIncluded = savedSettings.includedLists.includes(String(list.id));
+                    }
+                    
+                    // Debug the checkbox state - CRITICAL DEBUG
+                    console.log(`🚨 CRITICAL - List "${list.name}" checkbox state:`, {
+                        listId: list.id,
+                        listIdString: String(list.id),
+                        includedLists: savedSettings.includedLists,
+                        includedListsExists: !!savedSettings.includedLists,
+                        includedListsType: Array.isArray(savedSettings.includedLists) ? 'array' : typeof savedSettings.includedLists,
+                        includesTest: savedSettings.includedLists ? savedSettings.includedLists.includes(String(list.id)) : 'no includedLists',
+                        isIncluded: isIncluded
+                    });
+                    const color = savedSettings.listColors ? savedSettings.listColors[list.id] : this.getDefaultColor(list.id);
+                    const priority = savedSettings.listPriorities ? savedSettings.listPriorities[list.id] || 'normal' : 'normal';
+                    
+                    console.log(`🔍 Creating row ${index + 1} for list: ${list.name}`);
+                    console.log(`🚨 CHECKBOX DEBUG - About to create HTML with isIncluded=${isIncluded}`);
+                    
+                    const row = document.createElement('tr');
+                    row.className = isIncluded ? 'included' : 'excluded';
+                    row.dataset.listId = list.id;
+                    
+                    row.innerHTML = `
+                        <td class="col-task-list">
+                            <span class="task-list-name">${this.escapeHtml(list.name || 'Unnamed List')}</span>
+                        </td>
+                        <td class="col-priority">
+                            <select id="priority-${list.id}" class="priority-select">
+                                <option value="high" ${priority === 'high' ? 'selected' : ''}>High</option>
+                                <option value="normal" ${priority === 'normal' ? 'selected' : ''}>Normal</option>
+                                <option value="low" ${priority === 'low' ? 'selected' : ''}>Low</option>
+                            </select>
+                        </td>
+                        <td class="col-color">
+                            <div class="table-color-preview" style="background-color: ${color}">
+                                <input type="color" id="color-${list.id}" class="table-color-picker color-picker" value="${color}" title="Choose list color">
                             </div>
-                            
-                            <div class="priority-control">
-                                <label for="priority-${list.id}">Priority:</label>
-                                <select id="priority-${list.id}" class="priority-select">
-                                    <option value="high">High</option>
-                                    <option value="normal" selected>Normal</option>
-                                    <option value="low">Low</option>
-                                </select>
-                            </div>
-                            
-                            <div class="visibility-control">
-                                <span class="visibility-label">Visibility: ${isIncluded ? '✅ Included' : '❌ Excluded'}</span>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                
-                grid.appendChild(card);
+                        </td>
+                        <td class="col-visibility">
+                            <span class="visibility-badge ${isIncluded ? 'included' : 'excluded'}">
+                                ${isIncluded ? 'Included' : 'Excluded'}
+                            </span>
+                        </td>
+                        <td class="col-task-count">${list.total_tasks || 0}</td>
+                        <td class="col-include">
+                            <input type="checkbox" id="include-${list.id}" class="table-checkbox include-checkbox" ${isIncluded ? 'checked' : ''}>
+                        </td>
+                    `;
+                    
+                    tbody.appendChild(row);
+                    console.log(`✅ Row ${index + 1} created successfully`);
+                } catch (error) {
+                    console.error(`❌ Error creating row for list ${list.name}:`, error);
+                    console.error('❌ Error stack:', error.stack);
+                }
             });
             
-            console.log('✅ Task lists displayed for settings');
+            table.appendChild(tbody);
+            container.appendChild(table);
+            
+            // Set up event handlers for the newly created table
+            this.setupTableEventHandlers();
+            
+            console.log('✅ Task lists displayed for settings in table format');
+            console.log('🔍 Table created with', taskLists.length, 'rows');
+            console.log('🔍 Container now contains:', container.innerHTML.substring(0, 200) + '...');
+        },
+        
+        setupTableEventHandlers: function() {
+            console.log('🎯 Setting up table-specific event handlers...');
+            
+            const self = this; // Preserve context
+            
+            // Add direct event listeners to all checkboxes
+            const checkboxes = document.querySelectorAll('.task-lists-table .include-checkbox');
+            console.log('🔍 Found checkboxes:', checkboxes.length);
+            
+            checkboxes.forEach(function(checkbox, index) {
+                console.log(`🔍 Setting up checkbox ${index + 1}:`, checkbox.id);
+                checkbox.addEventListener('change', function(e) {
+                    console.log('🔄 CHECKBOX CLICKED! Include checkbox changed:', e.target.checked);
+                    console.log('🔍 Checkbox ID:', e.target.id);
+                    // Use the correct object reference - this method is part of QuestDashboard
+                    window.QuestDashboard.updateIncludeStatus(e.target);
+                });
+            });
+            
+            // Add direct event listeners to all color pickers
+            const colorPickers = document.querySelectorAll('.task-lists-table .color-picker');
+            console.log('🔍 Found color pickers:', colorPickers.length);
+            
+            colorPickers.forEach(function(colorPicker, index) {
+                console.log(`🔍 Setting up color picker ${index + 1}:`, colorPicker.id);
+                colorPicker.addEventListener('change', function(e) {
+                    console.log('🔄 COLOR CHANGED! Color changed:', e.target.value);
+                    window.QuestDashboard.updateListColor(e.target);
+                });
+            });
+            
+            // Add direct event listeners to all priority selects
+            const prioritySelects = document.querySelectorAll('.task-lists-table .priority-select');
+            console.log('🔍 Found priority selects:', prioritySelects.length);
+            
+            prioritySelects.forEach(function(select, index) {
+                console.log(`🔍 Setting up priority select ${index + 1}:`, select.id);
+                select.addEventListener('change', function(e) {
+                    console.log('🔄 PRIORITY CHANGED! Priority changed:', e.target.value);
+                    window.QuestDashboard.updateSettingsStatsFromUI();
+                    window.QuestDashboard.autoSaveSettings();
+                });
+            });
+            
+            console.log('✅ Table event handlers set up for', checkboxes.length, 'checkboxes,', colorPickers.length, 'color pickers,', prioritySelects.length, 'priority selects');
         },
         
         setupSettingsEventHandlers: function() {
@@ -1469,13 +1786,7 @@
                 });
             }
             
-            // Hide completed tasks checkbox
-            const hideCompletedCheckbox = document.getElementById('hide-completed-tasks');
-            if (hideCompletedCheckbox) {
-                hideCompletedCheckbox.addEventListener('change', (e) => {
-                    this.updateHideCompletedSetting(e.target.checked);
-                });
-            }
+            // Hide completed tasks checkbox (handled in global change listener above)
             
             // Status filter
             const statusFilter = document.getElementById('status-filter');
@@ -1492,18 +1803,19 @@
                     this.applyColorPreset(preset);
                 }
                 
-                // Handle include checkbox changes
-                if (e.target.classList.contains('include-checkbox')) {
-                    this.updateIncludeStatus(e.target);
-                }
-                
             });
             
-            // Handle color picker changes with proper event delegation
+            // Handle global settings changes (non-table elements only)
             document.addEventListener('change', (e) => {
-                if (e.target.classList.contains('color-picker')) {
-                    this.updateListColor(e.target);
+                // Handle hide completed tasks checkbox (not in table)
+                if (e.target.id === 'hide-completed-tasks') {
+                    console.log('🔄 Hide completed changed:', e.target.checked);
+                    this.updateHideCompletedSetting(e.target.checked);
+                    this.autoSaveSettings();
+                    return;
                 }
+                
+                // Note: Table-specific handlers are set up in setupTableEventHandlers()
             });
         },
         
@@ -1543,34 +1855,50 @@
         },
         
         updateIncludeStatus: function(checkbox) {
+            console.log('🚨🚨🚨 VERSION 3.0 - updateIncludeStatus called!', {
+                checkboxId: checkbox.id,
+                checked: checkbox.checked,
+                timestamp: new Date().toISOString(),
+                stackTrace: new Error().stack
+            });
+            
             const listId = checkbox.id.replace('include-', '');
-            const card = checkbox.closest('.settings-list-card');
-            const visibilityLabel = card.querySelector('.visibility-label');
+            const row = checkbox.closest('tr');
+            const visibilityBadge = row.querySelector('.visibility-badge');
             
             if (checkbox.checked) {
-                visibilityLabel.textContent = '✅ Included';
-                card.classList.remove('excluded');
-                card.classList.add('included');
+                row.classList.remove('excluded');
+                row.classList.add('included');
+                visibilityBadge.textContent = 'Included';
+                visibilityBadge.className = 'visibility-badge included';
             } else {
-                visibilityLabel.textContent = '❌ Excluded';
-                card.classList.remove('included');
-                card.classList.add('excluded');
+                row.classList.remove('included');
+                row.classList.add('excluded');
+                visibilityBadge.textContent = 'Excluded';
+                visibilityBadge.className = 'visibility-badge excluded';
             }
             
             this.updateSettingsStatsFromUI();
+            
+            console.log('🚨 About to call autoSaveSettings...');
+            // Auto-save settings
+            this.autoSaveSettings();
         },
         
         updateListColor: function(colorPicker) {
             const listId = colorPicker.id.replace('color-', '');
             const color = colorPicker.value;
             
-            // Update preview
-            const preview = document.querySelector(`[data-list-id="${listId}"] .list-color-preview`);
-            if (preview) {
+            // Update preview in table
+            const preview = colorPicker.parentElement;
+            if (preview && preview.classList.contains('table-color-preview')) {
                 preview.style.backgroundColor = color;
             }
             
             this.updateSettingsStatsFromUI();
+            
+            // Auto-save settings
+            this.autoSaveSettings();
         },
         
         saveSettings: function() {
@@ -1584,24 +1912,25 @@
                 lastSaved: new Date().toISOString()
             };
             
-            // Collect settings from UI
-            document.querySelectorAll('.settings-list-card').forEach(card => {
-                const listId = card.dataset.listId;
+            // Collect settings from UI table
+            document.querySelectorAll('.task-lists-table tbody tr').forEach(row => {
+                const listId = row.dataset.listId;
                 
                 // Include status
-                const checkbox = card.querySelector('.include-checkbox');
+                const checkbox = row.querySelector('.include-checkbox');
                 if (checkbox && checkbox.checked) {
-                    settings.includedLists.push(listId);
+                    // Ensure consistent string type for list IDs
+                    settings.includedLists.push(String(listId));
                 }
                 
                 // Color
-                const colorPicker = card.querySelector('.color-picker');
+                const colorPicker = row.querySelector('.color-picker');
                 if (colorPicker) {
                     settings.listColors[listId] = colorPicker.value;
                 }
                 
                 // Priority
-                const prioritySelect = card.querySelector('.priority-select');
+                const prioritySelect = row.querySelector('.priority-select');
                 if (prioritySelect) {
                     settings.listPriorities[listId] = prioritySelect.value;
                 }
@@ -1610,13 +1939,73 @@
             // Save to localStorage
             localStorage.setItem('questSettings', JSON.stringify(settings));
             
+            // Debug what was saved
+            console.log('💾 Settings saved:', settings);
+            console.log('💾 Included lists saved:', settings.includedLists);
+            
             // Update UI
             this.updateElement('last-saved-time', this.formatTime(new Date()));
             
             // Show success message
             this.showSettingsSaved();
             
-            console.log('✅ Settings saved successfully');
+        },
+        
+        autoSaveSettings: function() {
+            // Debounced auto-save to prevent excessive saves
+            if (this.autoSaveTimeout) {
+                clearTimeout(this.autoSaveTimeout);
+            }
+            
+            this.autoSaveTimeout = setTimeout(() => {
+                console.log('🔄 Auto-saving settings...');
+                this.saveSettings();
+                
+                // Show subtle auto-save indicator
+                this.showAutoSaveIndicator();
+                
+                // Trigger refresh of other pages that might be affected
+                this.notifySettingsChanged();
+            }, 500); // Wait 500ms after last change before saving
+        },
+        
+        notifySettingsChanged: function() {
+            console.log('📢 Notifying other components that settings changed...');
+            
+            // If there are other instances of task list displays, refresh them
+            if (typeof window.QuestDashboard !== 'undefined' && window.QuestDashboard.loadTaskLists) {
+                console.log('🔄 Refreshing dashboard task lists...');
+                window.QuestDashboard.loadTaskLists();
+            }
+            
+            // Trigger a custom event for other components to listen to
+            window.dispatchEvent(new CustomEvent('questSettingsChanged', {
+                detail: { timestamp: Date.now() }
+            }));
+        },
+        
+        showAutoSaveIndicator: function() {
+            // Create or update auto-save indicator
+            let indicator = document.getElementById('auto-save-indicator');
+            if (!indicator) {
+                indicator = document.createElement('div');
+                indicator.id = 'auto-save-indicator';
+                indicator.className = 'auto-save-indicator';
+                indicator.innerHTML = '✅ Auto-saved';
+                document.body.appendChild(indicator);
+            }
+            
+            // Show the indicator
+            indicator.style.display = 'block';
+            indicator.classList.remove('fade-out');
+            
+            // Hide it after 2 seconds
+            setTimeout(() => {
+                indicator.classList.add('fade-out');
+                setTimeout(() => {
+                    indicator.style.display = 'none';
+                }, 300);
+            }, 2000);
         },
         
         updateHideCompletedSetting: function(hideCompleted) {
@@ -1636,7 +2025,9 @@
         loadSavedSettings: function() {
             try {
                 const saved = localStorage.getItem('questSettings');
-                return saved ? JSON.parse(saved) : {};
+                const settings = saved ? JSON.parse(saved) : {};
+                console.log('📋 Loading saved settings:', settings);
+                return settings;
             } catch (error) {
                 console.error('❌ Error loading saved settings:', error);
                 return {};
@@ -1670,9 +2061,9 @@
         },
         
         updateSettingsStatsFromUI: function() {
-            const total = document.querySelectorAll('.settings-list-card').length;
-            const included = document.querySelectorAll('.include-checkbox:checked').length;
-            const colored = document.querySelectorAll('.color-picker').length;
+            const total = document.querySelectorAll('.task-lists-table tbody tr').length;
+            const included = document.querySelectorAll('.task-lists-table .include-checkbox:checked').length;
+            const colored = document.querySelectorAll('.task-lists-table .color-picker').length;
             
             this.updateElement('total-lists-count', total);
             this.updateElement('included-lists-count', included);
@@ -1707,7 +2098,7 @@
             // Create and show a temporary notification
             const notification = document.createElement('div');
             notification.className = 'settings-notification';
-            notification.textContent = '✅ Settings saved successfully!';
+            // notification.textContent = '✅ Settings saved successfully!';
             
             document.body.appendChild(notification);
             
@@ -1726,19 +2117,19 @@
         },
         
         filterTaskLists: function(query) {
-            // Implement search filtering
-            const cards = document.querySelectorAll('.settings-list-card');
-            cards.forEach(card => {
-                const name = card.querySelector('.task-list-name').textContent.toLowerCase();
+            // Implement search filtering for table rows
+            const rows = document.querySelectorAll('.task-lists-table tbody tr');
+            rows.forEach(row => {
+                const name = row.querySelector('.task-list-name').textContent.toLowerCase();
                 const matches = name.includes(query.toLowerCase());
-                card.style.display = matches ? '' : 'none';
+                row.style.display = matches ? '' : 'none';
             });
         },
         
         filterByStatus: function(status) {
-            const cards = document.querySelectorAll('.settings-list-card');
-            cards.forEach(card => {
-                const checkbox = card.querySelector('.include-checkbox');
+            const rows = document.querySelectorAll('.task-lists-table tbody tr');
+            rows.forEach(row => {
+                const checkbox = row.querySelector('.include-checkbox');
                 const isIncluded = checkbox.checked;
                 
                 let show = true;
@@ -1748,7 +2139,7 @@
                     show = !isIncluded;
                 }
                 
-                card.style.display = show ? '' : 'none';
+                row.style.display = show ? '' : 'none';
             });
         },
         
@@ -2420,8 +2811,25 @@
         
         loadTaskLists: function() {
             console.log('📋 Loading task lists...');
+            console.log('🔍 Current page context:', {
+                isDashboardPage: this.isDashboardPage,
+                isQuestsPage: this.isQuestsPage,
+                isAdventurePage: this.isAdventurePage,
+                url: window.location.href
+            });
             
-            fetch(OC.generateUrl('/apps/quest/api/quest-lists'), {
+            // Check if we have the grid element before making API call
+            const grid = document.getElementById('task-lists-grid');
+            console.log('🎯 Grid element check before API call:', {
+                exists: !!grid,
+                id: grid ? grid.id : 'N/A',
+                innerHTML: grid ? grid.innerHTML.substring(0, 50) + '...' : 'N/A'
+            });
+            
+            const apiUrl = OC.generateUrl('/apps/quest/api/quest-lists');
+            console.log('🌐 API URL:', apiUrl);
+            
+            fetch(apiUrl, {
                 method: 'GET',
                 headers: {
                     'requesttoken': OC.requestToken
@@ -2429,6 +2837,7 @@
             })
                 .then(response => {
                     console.log('📡 Response status:', response.status, response.statusText);
+                    console.log('📡 Response headers:', response.headers);
                     if (!response.ok) {
                         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                     }
@@ -2436,28 +2845,60 @@
                 })
                 .then(data => {
                     console.log('✅ Task lists response:', data);
+                    console.log('✅ Data type:', typeof data);
+                    console.log('✅ Data structure:', {
+                        status: data.status,
+                        dataLength: data.data ? data.data.length : 'undefined',
+                        message: data.message
+                    });
                     
                     if (data.status === 'success') {
                         this.taskLists = data.data;
+                        console.log('📝 Stored task lists:', this.taskLists);
                         this.displayTaskLists(data.data);
                     } else {
+                        console.error('❌ API returned error status:', data);
                         throw new Error(data.message || 'Failed to load task lists');
                     }
                 })
                 .catch(error => {
                     console.error('❌ Error loading task lists:', error);
+                    console.error('❌ Error stack:', error.stack);
                     this.showTaskListError('Failed to load task lists: ' + error.message);
                 });
         },
         
         displayTaskLists: function(taskLists) {
+            console.log('🎨 displayTaskLists called with:', taskLists);
+            
             const grid = document.getElementById('task-lists-grid');
-            if (!grid) return;
+            console.log('🎯 task-lists-grid element:', grid);
+            console.log('🎯 grid exists:', !!grid);
+            console.log('🎯 grid innerHTML before:', grid ? grid.innerHTML.substring(0, 100) + '...' : 'N/A');
+            
+            if (!grid) {
+                console.error('❌ task-lists-grid element not found!');
+                console.log('🔍 Available elements with "grid" in ID:', 
+                    Array.from(document.querySelectorAll('[id*="grid"]')).map(el => el.id)
+                );
+                console.log('🔍 All elements with "task" in ID:', 
+                    Array.from(document.querySelectorAll('[id*="task"]')).map(el => el.id)
+                );
+                return;
+            }
             
             // Store task lists for later use (e.g., dynamic loading)
             this.taskLists = taskLists;
             
+            console.log('📊 Task lists analysis:', {
+                isArray: Array.isArray(taskLists),
+                length: taskLists ? taskLists.length : 'undefined',
+                type: typeof taskLists,
+                firstItem: taskLists && taskLists.length > 0 ? taskLists[0] : 'none'
+            });
+            
             if (!taskLists || taskLists.length === 0) {
+                console.log('📋 No task lists to display, showing placeholder');
                 grid.innerHTML = `
                     <div class="task-list-placeholder">
                         <div class="empty-state">
@@ -2510,13 +2951,29 @@
             // Filter task lists based on included lists setting
             let filteredLists = taskLists;
             
+            console.log('🔍 Checking includedLists filter:', {
+                hasIncludedLists: !!savedSettings.includedLists,
+                includedListsLength: savedSettings.includedLists ? savedSettings.includedLists.length : 'N/A',
+                includedLists: savedSettings.includedLists
+            });
+            
             if (savedSettings.includedLists && savedSettings.includedLists.length > 0) {
+                console.log('🔍 Applying includedLists filter...');
+                console.log('🔍 Saved includedLists:', savedSettings.includedLists);
                 filteredLists = taskLists.filter(list => {
                     const listId = String(list.id);
                     const isIncluded = savedSettings.includedLists.includes(listId);
-                    console.log(`  List "${list.name}" (${listId}): ${isIncluded ? 'Included' : 'Excluded'}`);
+                    console.log(`  List "${list.name}" (ID: ${listId}, type: ${typeof listId}): ${isIncluded ? 'Included' : 'Excluded'}`);
                     return isIncluded;
                 });
+                console.log(`🔍 Filter result: ${filteredLists.length} of ${taskLists.length} lists included`);
+            } else if (savedSettings.includedLists && savedSettings.includedLists.length === 0) {
+                console.log('⚠️ includedLists is empty array - this will exclude ALL lists!');
+                console.log('💡 Treating empty includedLists as "include all" to prevent total exclusion');
+                // Don't filter if includedLists is explicitly empty - treat as "show all"
+                filteredLists = taskLists;
+            } else {
+                console.log('🔍 No includedLists filter set - showing all lists');
             }
             
             // Apply custom colors to the filtered lists
@@ -2602,9 +3059,17 @@
         },
         
         showTaskListError: function(message) {
-            const grid = document.getElementById('task-lists-grid');
-            if (!grid) return;
+            console.log('🚨 showTaskListError called with message:', message);
             
+            const grid = document.getElementById('task-lists-grid');
+            console.log('🎯 Error display - grid element:', grid);
+            
+            if (!grid) {
+                console.error('❌ Cannot show error - task-lists-grid element not found!');
+                return;
+            }
+            
+            console.log('📝 Setting error HTML in grid');
             grid.innerHTML = `
                 <div class="task-list-error">
                     <div class="empty-state">
@@ -2615,6 +3080,7 @@
                     </div>
                 </div>
             `;
+            console.log('✅ Error HTML set successfully');
         },
         
         refresh: function() {
@@ -2647,6 +3113,135 @@
     
     // Create alias for backward compatibility
     window.QuestManager = QuestDashboard;
+    
+    // Add debugging helpers
+    window.debugTaskLoading = function() {
+        console.log('🔧 Debug Task Loading Helper');
+        console.log('🔍 Current page detection:', {
+            isDashboardPage: QuestDashboard.isDashboardPage,
+            isQuestsPage: QuestDashboard.isQuestsPage,
+            isAdventurePage: QuestDashboard.isAdventurePage,
+            initialized: QuestDashboard.initialized
+        });
+        
+        console.log('🔍 DOM Element Analysis:');
+        const allGrids = document.querySelectorAll('[id*="grid"]');
+        const allTasks = document.querySelectorAll('[id*="task"]');
+        console.log('  - Elements with "grid" in ID:', Array.from(allGrids).map(el => el.id));
+        console.log('  - Elements with "task" in ID:', Array.from(allTasks).map(el => el.id));
+        
+        const grid = document.getElementById('task-lists-grid');
+        console.log('🎯 task-lists-grid element:', grid);
+        console.log('🎯 grid innerHTML:', grid ? grid.innerHTML.substring(0, 200) + '...' : 'N/A');
+        
+        console.log('🔍 Current URL:', window.location.href);
+        console.log('🔍 Current page:', window.location.pathname);
+        
+        if (QuestDashboard.isDashboardPage) {
+            console.log('🔧 Manually triggering loadTaskLists...');
+            QuestDashboard.loadTaskLists();
+        } else {
+            console.log('❌ Not on dashboard page, cannot load task lists');
+            console.log('❌ Reason:', {
+                hasTaskGrid: !!document.getElementById('task-lists-grid'),
+                isQuests: !!document.getElementById('quest-stats'),
+                isProgress: !!document.getElementById('progress-stats'),
+                isAdventure: !!document.getElementById('adventure-map-container')
+            });
+        }
+    };
+    
+    window.testTaskListAPI = function() {
+        console.log('🔧 Testing API directly...');
+        const apiUrl = OC.generateUrl('/apps/quest/api/quest-lists');
+        console.log('🌐 API URL:', apiUrl);
+        
+        fetch(apiUrl, {
+            method: 'GET',
+            headers: {
+                'requesttoken': OC.requestToken
+            }
+        })
+        .then(response => {
+            console.log('📡 API Response status:', response.status);
+            console.log('📡 API Response headers:', response.headers);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('✅ API Response data:', data);
+            
+            if (data.status === 'success') {
+                console.log('✅ API Success! Found', data.data.length, 'task lists');
+                data.data.forEach((list, index) => {
+                    console.log(`  ${index + 1}. ${list.name} (${list.total_tasks} tasks)`);
+                });
+                
+                // Test displayTaskLists with this data
+                if (typeof QuestDashboard !== 'undefined' && QuestDashboard.displayTaskLists) {
+                    console.log('🎨 Testing displayTaskLists with API data...');
+                    QuestDashboard.displayTaskLists(data.data);
+                }
+            } else {
+                console.error('❌ API Error:', data.message);
+            }
+        })
+        .catch(error => {
+            console.error('❌ API Call failed:', error);
+        });
+    };
+    
+    window.resetQuestSettings = function() {
+        console.log('🔧 Resetting Quest Settings...');
+        
+        try {
+            const currentSettings = localStorage.getItem('questSettings');
+            console.log('Current settings:', currentSettings);
+            
+            localStorage.removeItem('questSettings');
+            console.log('✅ Settings cleared from localStorage');
+            
+            // Reload task lists if on dashboard
+            if (typeof QuestDashboard !== 'undefined' && QuestDashboard.isDashboardPage) {
+                console.log('🔄 Reloading task lists...');
+                QuestDashboard.loadTaskLists();
+            }
+            
+            console.log('💡 Settings reset complete! Task lists should now appear.');
+        } catch (error) {
+            console.error('❌ Error resetting settings:', error);
+        }
+    };
+    
+    window.debugQuestSettings = function() {
+        console.log('🔧 Debug Quest Settings...');
+        
+        try {
+            const saved = localStorage.getItem('questSettings');
+            const settings = saved ? JSON.parse(saved) : {};
+            
+            console.log('📋 Current settings:', settings);
+            console.log('🔍 Settings analysis:', {
+                hasIncludedLists: !!settings.includedLists,
+                includedListsLength: settings.includedLists ? settings.includedLists.length : 'N/A',
+                includedLists: settings.includedLists,
+                hasListColors: !!settings.listColors,
+                hasListPriorities: !!settings.listPriorities,
+                hideCompletedTasks: settings.hideCompletedTasks
+            });
+            
+            if (settings.includedLists && settings.includedLists.length === 0) {
+                console.warn('⚠️ includedLists is empty array - this will hide all task lists!');
+                console.log('💡 Run resetQuestSettings() to fix this issue');
+            }
+            
+        } catch (error) {
+            console.error('❌ Error reading settings:', error);
+        }
+    };
     
 })();
 

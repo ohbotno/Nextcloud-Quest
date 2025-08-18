@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Task Loading Debug</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .debug-section { margin: 20px 0; padding: 15px; background: #f5f5f5; border-radius: 5px; }
+        .debug-output { background: #fff; padding: 10px; border: 1px solid #ddd; max-height: 300px; overflow-y: auto; }
+        .error { color: red; }
+        .success { color: green; }
+        .info { color: blue; }
+    </style>
+</head>
+<body>
+    <h1>Nextcloud Quest - Task Loading Debug</h1>
+    
+    <div class="debug-section">
+        <h3>1. DOM Elements Check</h3>
+        <div id="dom-check" class="debug-output">Checking...</div>
+    </div>
+    
+    <div class="debug-section">
+        <h3>2. API Test</h3>
+        <button onclick="testAPI()">Test /apps/quest/api/quest-lists API</button>
+        <div id="api-test" class="debug-output">Ready to test...</div>
+    </div>
+    
+    <div class="debug-section">
+        <h3>3. Mock Dashboard Elements</h3>
+        <div id="task-lists-grid" style="border: 2px solid #ccc; padding: 10px; min-height: 100px;">
+            <div class="task-list-placeholder">
+                <div class="empty-state">
+                    <div class="empty-state-icon">📋</div>
+                    <div class="empty-state-title">No task lists found</div>
+                    <div class="empty-state-text">This should be replaced when task lists load</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mock OC object for testing
+        window.OC = {
+            generateUrl: function(url) {
+                // For local testing, this would need to point to actual Nextcloud instance
+                return '/nextcloud' + url;
+            },
+            requestToken: 'mock-token'
+        };
+
+        // Check DOM elements
+        function checkDOM() {
+            const output = document.getElementById('dom-check');
+            const checks = [
+                { name: 'task-lists-grid', element: document.getElementById('task-lists-grid') },
+                { name: 'quest-stats', element: document.getElementById('quest-stats') },
+                { name: 'progress-stats', element: document.getElementById('progress-stats') },
+                { name: 'adventure-map-container', element: document.getElementById('adventure-map-container') }
+            ];
+            
+            let html = '';
+            checks.forEach(check => {
+                const status = check.element ? 'FOUND' : 'NOT FOUND';
+                const className = check.element ? 'success' : 'error';
+                html += `<div class="${className}">${check.name}: ${status}</div>`;
+            });
+            
+            // Page detection logic
+            const questStatsElement = document.getElementById('quest-stats');
+            const taskListsGridElement = document.getElementById('task-lists-grid');
+            const progressStatsElement = document.getElementById('progress-stats');
+            const adventureMapContainer = document.getElementById('adventure-map-container');
+            
+            const isQuestsPage = questStatsElement !== null;
+            const isAdventurePage = adventureMapContainer !== null;
+            const isDashboardPage = taskListsGridElement !== null && !isQuestsPage && !progressStatsElement && !isAdventurePage;
+            const isProgressPage = progressStatsElement !== null;
+            
+            html += '<hr><strong>Page Detection:</strong><br>';
+            html += `<div class="info">isDashboardPage: ${isDashboardPage}</div>`;
+            html += `<div class="info">isQuestsPage: ${isQuestsPage}</div>`;
+            html += `<div class="info">isAdventurePage: ${isAdventurePage}</div>`;
+            html += `<div class="info">isProgressPage: ${isProgressPage}</div>`;
+            
+            output.innerHTML = html;
+        }
+
+        // Test API endpoint
+        function testAPI() {
+            const output = document.getElementById('api-test');
+            output.innerHTML = '<div class="info">Testing API...</div>';
+            
+            const apiUrl = OC.generateUrl('/apps/quest/api/quest-lists');
+            console.log('Testing API URL:', apiUrl);
+            
+            fetch(apiUrl, {
+                method: 'GET',
+                headers: {
+                    'requesttoken': OC.requestToken
+                }
+            })
+            .then(response => {
+                output.innerHTML += `<div class="info">Response Status: ${response.status} ${response.statusText}</div>`;
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                output.innerHTML += '<div class="success">✅ API Response received</div>';
+                output.innerHTML += `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+                
+                // Test the displayTaskLists logic
+                if (data.status === 'success') {
+                    testDisplayTaskLists(data.data);
+                }
+            })
+            .catch(error => {
+                output.innerHTML += `<div class="error">❌ API Error: ${error.message}</div>`;
+                console.error('API Error:', error);
+            });
+        }
+
+        // Test displayTaskLists function
+        function testDisplayTaskLists(taskLists) {
+            console.log('Testing displayTaskLists with:', taskLists);
+            
+            const grid = document.getElementById('task-lists-grid');
+            if (!grid) {
+                console.error('❌ task-lists-grid element not found!');
+                return;
+            }
+            
+            if (!taskLists || taskLists.length === 0) {
+                console.log('📋 No task lists to display, showing placeholder');
+                grid.innerHTML = `
+                    <div class="task-list-placeholder">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📋</div>
+                            <div class="empty-state-title">No task lists found</div>
+                            <div class="empty-state-text">Install and configure the Nextcloud Tasks app to see your task lists here.</div>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Mock task list rendering
+            grid.innerHTML = '<h4>✅ Task Lists Loaded:</h4>';
+            taskLists.forEach(list => {
+                grid.innerHTML += `
+                    <div style="border: 1px solid #ccc; margin: 10px 0; padding: 10px;">
+                        <strong>${list.name}</strong> (${list.total_tasks} tasks)
+                        <br>Color: ${list.color}
+                        <br>Completed: ${list.completed_tasks}/${list.total_tasks}
+                    </div>
+                `;
+            });
+        }
+
+        // Run checks on load
+        document.addEventListener('DOMContentLoaded', function() {
+            checkDOM();
+        });
+    </script>
+</body>
+</html>
