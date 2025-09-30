@@ -714,12 +714,14 @@
         }
     };
     
-    // Initialize when DOM is ready
+    // Initialize when DOM is ready (service layer)
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => {
+            console.log('🚀 QuestTaskListManager: Initializing service layer...');
             QuestTaskListManager.init();
         });
     } else {
+        console.log('🚀 QuestTaskListManager: Initializing service layer...');
         QuestTaskListManager.init();
     }
     
@@ -741,6 +743,9 @@
     const QuestDashboard = {
         initialized: false,
         taskLists: [],
+        lastQuestListLoad: 0,
+        isLoadingQuestLists: false,
+        isUpdatingStats: false, // Flag to prevent quest list reloads during stats updates
         
         init: function() {
             if (this.initialized) return;
@@ -875,11 +880,21 @@
                             console.log('🔍 Debug - XP from QuestApp:', stats?.level?.xp || 'undefined');
                             console.log('🔍 Debug - Full level data:', stats?.level || 'undefined');
                             
+                            // Set flag to prevent quest list reloads during stats update
+                            self.isUpdatingStats = true;
+                            
                             // Call debug endpoint to check database state
-                            self.callDebugEndpoint();
+                            // TEMP: Disable debug endpoint call to see if it's causing conflicts
+                            // self.callDebugEndpoint();
                             
                             // Update the player avatar with the new stats
                             self.updatePlayerAvatar(stats);
+                            
+                            // Clear flag after update (with delay to ensure DOM updates complete)
+                            setTimeout(() => {
+                                self.isUpdatingStats = false;
+                                console.log('📊 TaskManager: Stats update completed, quest list reloads re-enabled');
+                            }, 2000); // 2 second delay
                         },
                         onError: function(error) {
                             console.error('📊 TaskManager: Stats error from QuestApp:', error);
@@ -890,7 +905,13 @@
                         },
                         onLoading: function(isLoading) {
                             console.log('📊 TaskManager: Stats loading state:', isLoading);
-                            // Could show loading UI here if needed
+                            console.log('📊 CACHE TEST: This is the NEW onLoading callback [TIMESTAMP:' + Date.now() + ']');
+                            // Set flag to prevent quest list reloads while stats are loading
+                            if (isLoading) {
+                                self.isUpdatingStats = true;
+                                console.log('📊 TaskManager: BLOCKING ACTIVATED - Stats loading started, blocking quest list reloads');
+                            }
+                            // Note: flag cleared in onUpdate callback after successful load
                         }
                     });
                     
@@ -950,7 +971,7 @@
         },
         
         updatePlayerAvatar: function(playerData) {
-            console.log('🔍 updatePlayerAvatar called with:', playerData);
+            console.log('🔍 [DEBUG] updatePlayerAvatar called [VERSION 2025-08-20-FINAL-DEBUG]:', playerData);
             
             // Handle both getUserStats format (data.level) and task completion format (data.user_stats)
             const level = playerData.level || playerData.user_stats || {};
@@ -985,23 +1006,9 @@
                     progress: progressPercentage
                 });
             } else {
-                // Dashboard page IDs (fallback)
-                this.updateStatCard('stat-level', level.level || 1);
-                this.updateStatCard('stat-level-change', level.rank_title || 'Novice');
-                this.updateStatCard('stat-total-xp', level.xp || 0);
-                
-                const progressPercentage = Math.round(level.progress_percentage || 0);
-                this.updateStatCard('stat-xp-change', `${progressPercentage}% to next level`);
-                
-                // Update streak stats
-                this.updateStatCard('stat-streak', streak.current_streak || 0);
-                this.updateStatCard('stat-streak-change', `${streak.current_streak || 0} days`);
-                
-                // Update task count stats
-                this.updateStatCard('stat-tasks-today', stats.tasks_today || 0);
-                this.updateStatCard('stat-tasks-today-target', `of 5 target`);
-                this.updateStatCard('stat-weekly-tasks', stats.tasks_this_week || 0);
-                this.updateStatCard('stat-weekly-change', 'tasks completed');
+                // Dashboard page stat cards are now handled by the unified QuestApp system
+                // DISABLED: This was causing conflicts with the unified stats system
+                console.log('🔍 TaskManager: Dashboard stat cards are handled by QuestApp - skipping duplicate updates');
             }
             
             // Update sidebar avatar
@@ -1110,16 +1117,50 @@
         },
         
         updateStatCard: function(elementId, value) {
+            // DEBUG: Track ALL calls to this function (keeping for future debugging)
+            console.log(`🔍 [DEBUG] updateStatCard called with elementId: ${elementId}, value:`, value);
+            
+            // COMPLETELY BLOCK all stat- elements 
+            if (elementId.startsWith('stat-')) {
+                console.log(`🚫 [BLOCKED] Dashboard stat card update for ${elementId} - handled by QuestApp`);
+                return;
+            }
+            
+            // Only allow non-dashboard stat card updates (like quest page elements)
             const element = document.getElementById(elementId);
             if (element) {
-                console.log(`📊 Updating stat card ${elementId} with value:`, value);
+                console.log(`✅ [ALLOWED] Updating non-dashboard element ${elementId} with value:`, value);
                 element.textContent = value;
             } else {
-                console.warn(`⚠️ Stat card element not found: ${elementId}`);
+                console.warn(`⚠️ Element not found: ${elementId}`);
             }
         },
         
         loadQuestLists: function() {
+            console.log('🔥 DEBUGGING: loadQuestLists() called - NEW VERSION [' + Date.now() + ']');
+            
+            // Prevent reloads during stats updates (caused by quest completion)
+            if (this.isUpdatingStats) {
+                console.log('⚔️ BLOCKED: Quest list reload during stats update (quest completion)');
+                return;
+            }
+            
+            // Prevent rapid reloads - only allow reload after 5 seconds
+            const now = Date.now();
+            if (this.lastQuestListLoad && (now - this.lastQuestListLoad) < 5000) {
+                console.log('⚔️ BLOCKED: Quest list reload - too soon after last load');
+                return;
+            }
+            
+            // Prevent concurrent loads
+            if (this.isLoadingQuestLists) {
+                console.log('⚔️ BLOCKED: Quest lists already loading, skipping...');
+                return;
+            }
+            
+            this.isLoadingQuestLists = true;
+            this.lastQuestListLoad = now;
+            
             console.log('⚔️ Loading quest lists for quests page...');
             console.log('🔍 Quest lists container check:', document.getElementById('quest-lists-container'));
             
@@ -1138,29 +1179,66 @@
                 })
                 .then(data => {
                     console.log('✅ Quest lists response:', data);
+                    console.log('📊 Response status:', data.status);
+                    console.log('📋 Response data type:', typeof data.data);
+                    console.log('📋 Response data length:', Array.isArray(data.data) ? data.data.length : 'N/A');
+                    console.log('💬 Response message:', data.message);
                     
                     if (data.status === 'success') {
                         this.taskLists = data.data;
+                        console.log('🎯 Calling displayQuestLists with', data.data.length, 'lists');
                         this.displayQuestLists(data.data);
                         this.showMainInterface();
                     } else {
+                        console.error('❌ API returned error status:', data.status, data.message);
                         throw new Error(data.message || 'Failed to load quest lists');
                     }
+                    
+                    // Reset loading flag on success
+                    this.isLoadingQuestLists = false;
                 })
                 .catch(error => {
                     console.error('❌ Error loading quest lists:', error);
                     this.showQuestListError('Failed to load quest lists: ' + error.message);
+                    
+                    // Reset loading flag on error
+                    this.isLoadingQuestLists = false;
                 });
         },
         
         displayQuestLists: function(questLists) {
+            console.log('🔥 DEBUGGING: displayQuestLists() called - NEW VERSION [' + Date.now() + ']');
+            console.log('🎨 displayQuestLists called with:', questLists);
+            console.log('🎨 questLists type:', typeof questLists);
+            console.log('🎨 questLists length:', Array.isArray(questLists) ? questLists.length : 'N/A');
+
+            // Log detailed task information for each list
+            if (Array.isArray(questLists)) {
+                questLists.forEach((list, index) => {
+                    console.log(`📋 List ${index + 1}: "${list.name}"`);
+                    console.log(`  - ID: ${list.id}`);
+                    console.log(`  - tasks property exists: ${list.hasOwnProperty('tasks')}`);
+                    console.log(`  - tasks value:`, list.tasks);
+                    console.log(`  - tasks type: ${typeof list.tasks}`);
+                    console.log(`  - tasks length: ${Array.isArray(list.tasks) ? list.tasks.length : 'N/A'}`);
+                    console.log(`  - total_tasks: ${list.total_tasks}`);
+                    console.log(`  - pending_tasks: ${list.pending_tasks}`);
+                    console.log(`  - completed_tasks: ${list.completed_tasks}`);
+                    if (Array.isArray(list.tasks) && list.tasks.length > 0) {
+                        console.log(`  - First task:`, list.tasks[0]);
+                    }
+                });
+            }
+
             const container = document.getElementById('quest-lists-container');
             if (!container) {
                 console.warn('⚠️ Quest lists container not found');
                 return;
             }
-            
+            console.log('📦 Container found:', container);
+
             if (!questLists || questLists.length === 0) {
+                console.log('📋 No quest lists to display - showing empty state');
                 container.innerHTML = `
                     <div class="task-list-placeholder">
                         <div class="empty-state">
@@ -1172,19 +1250,19 @@
                 `;
                 return;
             }
-            
+
             // Clear the container
             container.innerHTML = '';
-            
+
             // Create quest list cards using dashboard task-list-card format
             questLists.forEach((questList, index) => {
                 const listCard = this.createQuestListCard(questList, index);
                 container.appendChild(listCard);
             });
-            
+
             // Update quest stats
             this.updateQuestStats(questLists);
-            
+
             console.log(`⚔️ Displayed ${questLists.length} quest lists`);
         },
         
@@ -1277,19 +1355,39 @@
         },
         
         showQuestListError: function(message) {
+            console.log('💥 showQuestListError called with message:', message);
             const container = document.getElementById('quest-lists-container');
-            if (!container) return;
+            if (!container) {
+                console.warn('⚠️ Quest lists container not found in showQuestListError');
+                return;
+            }
+            
+            // Provide more helpful error messages based on common issues
+            let helpText = '';
+            if (message.includes('Tasks integration not available')) {
+                helpText = 'The Quest app is not properly configured. Please check server logs.';
+            } else if (message.includes('Tasks app not installed')) {
+                helpText = 'Please install and enable the Nextcloud Tasks app, then refresh this page.';
+            } else if (message.includes('HTTP 500')) {
+                helpText = 'There was a server error. Please check the Nextcloud logs for details.';
+            } else if (message.includes('HTTP 404')) {
+                helpText = 'The Quest app API is not available. Please ensure the app is properly installed.';
+            } else {
+                helpText = 'Please try refreshing the page or check if the Tasks app is installed and configured.';
+            }
             
             container.innerHTML = `
                 <div class="quest-error-state">
                     <div class="error-state-icon">⚠️</div>
                     <div class="error-state-title">Error Loading Quests</div>
                     <div class="error-state-text">${message}</div>
+                    <div class="error-state-help">${helpText}</div>
                     <button class="btn btn-primary" data-action="retry-quest-load">Try Again</button>
                 </div>
             `;
             
             this.showMainInterface();
+            console.log('💥 Error state displayed in container');
         },
         
         setupQuestsEventHandlers: function() {
@@ -1972,11 +2070,16 @@
         notifySettingsChanged: function() {
             console.log('📢 Notifying other components that settings changed...');
             
-            // If there are other instances of task list displays, refresh them
-            if (typeof window.QuestDashboard !== 'undefined' && window.QuestDashboard.loadTaskLists) {
-                console.log('🔄 Refreshing dashboard task lists...');
-                window.QuestDashboard.loadTaskLists();
-            }
+            // DISABLED: This was causing unnecessary quest list reloads after quest completion
+            // Quest completion triggered auto-save → notifySettingsChanged → loadTaskLists reload
+            // Only reload if actual display settings changed (colors, visibility, etc.)
+            console.log('🚫 DISABLED automatic quest list reload - preventing unnecessary reload after quest completion');
+            
+            // TODO: Re-enable with smarter logic that only reloads when display settings actually changed
+            // if (typeof window.QuestDashboard !== 'undefined' && window.QuestDashboard.loadTaskLists) {
+            //     console.log('🔄 Refreshing dashboard task lists...');
+            //     window.QuestDashboard.loadTaskLists();
+            // }
             
             // Trigger a custom event for other components to listen to
             window.dispatchEvent(new CustomEvent('questSettingsChanged', {
@@ -2187,6 +2290,19 @@
             console.log('Debug - taskId type:', typeof taskId, 'value:', taskId);
             console.log('Debug - listId type:', typeof listId, 'value:', listId);
             
+            // Prevent double completion if task is already being processed
+            const completionKey = `${taskId}-${listId}`;
+            if (this.completingTasks && this.completingTasks.has(completionKey)) {
+                console.log('⚠️ Quest completion already in progress, skipping...');
+                return;
+            }
+            
+            // Track completion in progress
+            if (!this.completingTasks) {
+                this.completingTasks = new Set();
+            }
+            this.completingTasks.add(completionKey);
+            
             // Show loading state on the button/checkbox
             const button = document.querySelector(`[data-task-id="${taskId}"].complete-quest-btn`);
             const checkbox = document.querySelector(`[data-task-id="${taskId}"].task-checkbox`);
@@ -2208,7 +2324,7 @@
             console.log('📤 Request data:', requestData);
             console.log('📤 Request token:', OC.requestToken ? 'Present' : 'Missing');
             
-            // Call the API to complete the task (using the correct endpoint)
+            // Call the API to complete the task (using the QuestController endpoint)
             fetch(OC.generateUrl('/apps/quest/api/complete-quest'), {
                 method: 'POST',
                 headers: {
@@ -2289,22 +2405,91 @@
                         
                         // Show completion celebration
                         this.showQuestCompletionCelebration(data.data);
-                        
-                        // Refresh the quest lists to show updated state
-                        setTimeout(() => {
-                            this.loadQuestLists();
-                        }, 2000); // Wait 2 seconds to show celebration
-                        
-                        // Update player stats if provided
-                        if (data.data.user_stats) {
-                            this.updatePlayerAvatar(data.data);
+
+                        // Note: Quest lists no longer need to reload as the UI is already updated
+
+                        // IMMEDIATE STATS UPDATE: Inject fresh stats into cache for instant feedback
+                        if (window.QuestApp && window.QuestApp.statsService && data.data.user_stats) {
+                            console.log('⚡ Immediately updating stats cache with task completion response');
+
+                            // Get current stats to preserve fields we don't update
+                            const currentStats = window.QuestApp.statsService.getCurrentStats();
+                            const currentXpToday = currentStats?.level?.xp_gained_today || 0;
+
+                            // Convert task completion response format to match /api/stats format
+                            // Note: normalizeStatsData expects mixed structure (some under data, some not)
+                            const freshStats = {
+                                data: {
+                                    level: {
+                                        level: data.data.user_stats.level,
+                                        rank_title: data.data.user_stats.rank_title,
+                                        current_xp: data.data.user_stats.xp,
+                                        lifetime_xp: data.data.stats?.total_xp || data.data.user_stats.xp,
+                                        xp_to_next_level: data.data.user_stats.xp_to_next,
+                                        xp_progress: data.data.user_stats.progress_percentage,
+                                        xp_gained_today: currentXpToday + data.data.xp_earned
+                                    }
+                                },
+                                // These are at root level, not under data!
+                                health: {
+                                    current_health: 100,
+                                    max_health: 100,
+                                    health_percentage: 100
+                                },
+                                streak: {
+                                    current_streak: data.data.streak?.current_streak || 0,
+                                    longest_streak: data.data.streak?.longest_streak || 0
+                                },
+                                tasks: {
+                                    completed_today: data.data.stats?.tasks_today || 0,
+                                    completed_this_week: data.data.stats?.tasks_this_week || 0,
+                                    total_completed: data.data.stats?.total_xp || 0
+                                },
+                                achievements: {
+                                    total: 50,
+                                    unlocked: 0,
+                                    percentage: 0
+                                }
+                            };
+
+                            console.log('📊 Constructed fresh stats:', freshStats);
+
+                            // Immediately update cache and notify all consumers
+                            window.QuestApp.statsService.updateCache(freshStats);
+                            console.log('✅ Stats cache updated immediately - UI should reflect changes now');
+
+                            // DISABLED: Background refresh was overwriting good data with stale server data
+                            // The immediate update above is sufficient and accurate
+                            // If we need to verify, we should do it after a longer delay (e.g., 5 seconds)
+                            // to allow the server to process the task completion fully
+                        } else {
+                            console.warn('⚠️ QuestApp or statsService not available for immediate update');
+                            // Fallback: Update player avatar directly
+                            if (data.data.user_stats) {
+                                this.updatePlayerAvatar(data.data);
+                            }
+
+                            // Only do background refresh if immediate update failed
+                            setTimeout(() => {
+                                if (window.QuestApp && window.QuestApp.statsService) {
+                                    console.log('🔄 Background refresh (fallback path)');
+                                    window.QuestApp.statsService.refresh();
+                                } else {
+                                    console.warn('⚠️ QuestApp or statsService not available for refresh');
+                                    this.loadPlayerStats();
+                                }
+                            }, 1000);
                         }
                         
-                        // Also refresh player stats from server to ensure consistency
-                        setTimeout(() => {
-                            this.loadPlayerStats();
-                        }, 1000);
+                        // Clear completion tracking
+                        if (this.completingTasks) {
+                            this.completingTasks.delete(completionKey);
+                        }
                     } else {
+                        // Clear completion tracking on failure
+                        if (this.completingTasks) {
+                            this.completingTasks.delete(completionKey);
+                        }
                         throw new Error(data.message || 'Failed to complete quest');
                     }
                 })
@@ -2322,6 +2507,11 @@
                     if (checkbox) {
                         checkbox.disabled = false;
                         checkbox.checked = false;
+                    }
+                    
+                    // Clear completion tracking on error
+                    if (this.completingTasks) {
+                        this.completingTasks.delete(completionKey);
                     }
                     
                     // Show error notification
@@ -2512,6 +2702,19 @@
             
             console.log('🎯 Quest completion triggered for task:', taskId, 'in list:', listId);
             
+            // Prevent double completion if task is already being processed
+            const completionKey = `${taskId}-${listId}`;
+            if (this.completingTasks && this.completingTasks.has(completionKey)) {
+                console.log('⚠️ Quest completion already in progress via handleQuestCompletion, skipping...');
+                return;
+            }
+            
+            // Track completion in progress
+            if (!this.completingTasks) {
+                this.completingTasks = new Set();
+            }
+            this.completingTasks.add(completionKey);
+            
             // Disable button and show loading state
             button.disabled = true;
             button.textContent = 'Completing...';
@@ -2533,16 +2736,29 @@
                 if (data.status === 'success') {
                     console.log('✅ Quest completed successfully!', data);
                     
-                    // Show success and refresh the quest lists
+                    // Show success (no need to reload quest lists)
                     this.showQuestCompletionSuccess(data);
-                    setTimeout(() => this.loadQuestLists(), 1500);
+                    
+                    // Clear completion tracking
+                    if (this.completingTasks) {
+                        this.completingTasks.delete(completionKey);
+                    }
                     
                 } else {
+                    // Clear completion tracking on failure
+                    if (this.completingTasks) {
+                        this.completingTasks.delete(completionKey);
+                    }
                     throw new Error(data.message || 'Failed to complete quest');
                 }
             })
             .catch(error => {
                 console.error('❌ Error completing quest:', error);
+                
+                // Clear completion tracking on error
+                if (this.completingTasks) {
+                    this.completingTasks.delete(completionKey);
+                }
                 
                 // Reset button state
                 button.disabled = false;
@@ -2870,26 +3086,45 @@
         
         displayTaskLists: function(taskLists) {
             console.log('🎨 displayTaskLists called with:', taskLists);
-            
+
+            // Log detailed task information for each list
+            if (Array.isArray(taskLists)) {
+                taskLists.forEach((list, index) => {
+                    console.log(`📋 Dashboard List ${index + 1}: "${list.name}"`);
+                    console.log(`  - ID: ${list.id}`);
+                    console.log(`  - tasks property exists: ${list.hasOwnProperty('tasks')}`);
+                    console.log(`  - tasks type: ${typeof list.tasks}`);
+                    console.log(`  - tasks length: ${Array.isArray(list.tasks) ? list.tasks.length : 'N/A'}`);
+                    console.log(`  - total_tasks: ${list.total_tasks}`);
+                    console.log(`  - pending_tasks: ${list.pending_tasks}`);
+                    console.log(`  - completed_tasks: ${list.completed_tasks}`);
+                    if (Array.isArray(list.tasks) && list.tasks.length > 0) {
+                        console.log(`  - First task sample:`, list.tasks[0]);
+                    } else {
+                        console.warn(`  ⚠️ No tasks in this list!`);
+                    }
+                });
+            }
+
             const grid = document.getElementById('task-lists-grid');
             console.log('🎯 task-lists-grid element:', grid);
             console.log('🎯 grid exists:', !!grid);
             console.log('🎯 grid innerHTML before:', grid ? grid.innerHTML.substring(0, 100) + '...' : 'N/A');
-            
+
             if (!grid) {
                 console.error('❌ task-lists-grid element not found!');
-                console.log('🔍 Available elements with "grid" in ID:', 
+                console.log('🔍 Available elements with "grid" in ID:',
                     Array.from(document.querySelectorAll('[id*="grid"]')).map(el => el.id)
                 );
-                console.log('🔍 All elements with "task" in ID:', 
+                console.log('🔍 All elements with "task" in ID:',
                     Array.from(document.querySelectorAll('[id*="task"]')).map(el => el.id)
                 );
                 return;
             }
-            
+
             // Store task lists for later use (e.g., dynamic loading)
             this.taskLists = taskLists;
-            
+
             console.log('📊 Task lists analysis:', {
                 isArray: Array.isArray(taskLists),
                 length: taskLists ? taskLists.length : 'undefined',
@@ -3089,22 +3324,37 @@
         }
     };
     
-    // Initialize when DOM is ready and CSS has loaded
+    // Initialize when DOM is ready and QuestTaskListManager is available
     function initializeWhenReady() {
-        // Ensure CSS has loaded by waiting for next frame
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => {
+        function checkAndInit() {
+            // Wait for QuestTaskListManager to be ready
+            if (window.QuestTaskListManager && window.QuestTaskListManager.initialized) {
+                console.log('🚀 QuestDashboard: QuestTaskListManager ready, initializing...');
                 requestAnimationFrame(() => {
                     setTimeout(() => QuestDashboard.init(), 50);
                 });
-            });
+            } else {
+                console.log('🚀 QuestDashboard: Waiting for QuestTaskListManager...');
+                setTimeout(checkAndInit, 100);
+            }
+        }
+        
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', checkAndInit);
         } else {
-            // If DOM is already ready, still wait a bit for CSS
+            checkAndInit();
+        }
+    }
+    
+    // Also listen for the taskListManagerReady event
+    document.addEventListener('taskListManagerReady', () => {
+        console.log('🚀 QuestDashboard: Received taskListManagerReady event');
+        if (!QuestDashboard.initialized) {
             requestAnimationFrame(() => {
                 setTimeout(() => QuestDashboard.init(), 50);
             });
         }
-    }
+    });
     
     initializeWhenReady();
     

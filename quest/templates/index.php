@@ -14,13 +14,25 @@ ob_start();
 <div class="page-header">
     <h1 class="page-title">Dashboard</h1>
     <p class="page-subtitle">Welcome back! Track your progress and complete tasks to level up.</p>
+    
+    <!-- Quick Stats Bar (moved from sidebar) -->
+    <div class="quick-stats-bar">
+        <div class="quick-stat">
+            <span class="stat-label">Today</span>
+            <span class="stat-value" id="header-tasks-today">0</span>
+        </div>
+        <div class="quick-stat">
+            <span class="stat-label">This Week</span>
+            <span class="stat-value" id="header-tasks-week">0</span>
+        </div>
+    </div>
 </div>
 
 <!-- Dashboard Stats Cards -->
 <section class="content-section">
-    <div class="dashboard-stats" id="dashboard-stats">
+    <div class="dashboard-stats primary-stats" id="dashboard-stats">
         <!-- Level Card -->
-        <div class="stat-card" id="level-card">
+        <div class="stat-card primary" id="level-card">
             <div class="stat-card-icon">⭐</div>
             <div class="stat-card-label">Level</div>
             <div class="stat-card-value" id="stat-level">1</div>
@@ -28,7 +40,7 @@ ob_start();
         </div>
         
         <!-- Total XP Card -->
-        <div class="stat-card" id="xp-card">
+        <div class="stat-card primary" id="xp-card">
             <div class="stat-card-icon">✨</div>
             <div class="stat-card-label">Total XP</div>
             <div class="stat-card-value" id="stat-total-xp">0</div>
@@ -36,7 +48,7 @@ ob_start();
         </div>
         
         <!-- Current Streak Card -->
-        <div class="stat-card" id="streak-card">
+        <div class="stat-card primary" id="streak-card">
             <div class="stat-card-icon">🔥</div>
             <div class="stat-card-label">Current Streak</div>
             <div class="stat-card-value" id="stat-streak">0</div>
@@ -44,15 +56,25 @@ ob_start();
         </div>
         
         <!-- Tasks Today Card -->
-        <div class="stat-card" id="tasks-today-card">
+        <div class="stat-card primary" id="tasks-today-card">
             <div class="stat-card-icon">✅</div>
             <div class="stat-card-label">Tasks Today</div>
             <div class="stat-card-value" id="stat-tasks-today">0</div>
             <div class="stat-card-change" id="stat-tasks-today-target">of 5 target</div>
         </div>
-        
+    </div>
+    
+    <!-- Secondary Stats - Collapsible -->
+    <div class="secondary-stats-toggle">
+        <button class="stats-toggle-btn" id="secondary-stats-toggle" aria-expanded="false">
+            <span class="toggle-text">Show More Stats</span>
+            <span class="toggle-arrow">▼</span>
+        </button>
+    </div>
+    
+    <div class="dashboard-stats secondary-stats collapsed" id="secondary-stats">
         <!-- Weekly Progress Card -->
-        <div class="stat-card" id="weekly-card">
+        <div class="stat-card secondary" id="weekly-card">
             <div class="stat-card-icon">📅</div>
             <div class="stat-card-label">This Week</div>
             <div class="stat-card-value" id="stat-weekly-tasks">0</div>
@@ -60,7 +82,7 @@ ob_start();
         </div>
         
         <!-- Achievement Points Card -->
-        <div class="stat-card" id="achievement-card">
+        <div class="stat-card secondary" id="achievement-card">
             <div class="stat-card-icon">🏆</div>
             <div class="stat-card-label">Achievements</div>
             <div class="stat-card-value" id="stat-achievements">0</div>

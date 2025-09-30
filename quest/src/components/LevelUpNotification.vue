@@ -125,7 +125,7 @@ export default {
         playLevelUpSound() {
             // In a real implementation, you'd play a celebratory sound
             try {
-                // Example: new Audio('/apps/nextcloudquest/sounds/levelup.mp3').play()
+                // Example: new Audio('/apps/quest/sounds/levelup.mp3').play()
             } catch (error) {
                 // Sound playing failed, continue silently
             }

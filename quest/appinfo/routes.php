@@ -12,19 +12,20 @@ return [
         ['name' => 'page#adventure', 'url' => '/adventure', 'verb' => 'GET'],
         ['name' => 'page#quests', 'url' => '/quests', 'verb' => 'GET'],
         ['name' => 'page#achievements', 'url' => '/achievements', 'verb' => 'GET'],
-        ['name' => 'page#progress', 'url' => '/progress', 'verb' => 'GET'],
         ['name' => 'page#settings', 'url' => '/settings', 'verb' => 'GET'],
         
-        // Test routes (simplified)
-        ['name' => 'test#minimal', 'url' => '/api/minimal', 'verb' => 'GET'],
-        ['name' => 'simpleQuest#test', 'url' => '/api/test', 'verb' => 'GET'],
-        ['name' => 'simpleQuest#debugDB', 'url' => '/api/debug-db', 'verb' => 'GET'],
-        
         // API routes for quest functionality
-        ['name' => 'simpleQuest#getUserStats', 'url' => '/api/user/stats', 'verb' => 'GET'],
-        ['name' => 'simpleQuest#getUserStats', 'url' => '/api/user-stats', 'verb' => 'GET'],
-        ['name' => 'simpleQuest#getQuestLists', 'url' => '/api/quest-lists', 'verb' => 'GET'],
-        ['name' => 'simpleQuest#completeTaskFromList', 'url' => '/api/complete-quest', 'verb' => 'POST'],
+        // Stats endpoints (from QuestStatsController)
+        ['name' => 'questStats#getStats', 'url' => '/api/stats', 'verb' => 'GET'],
+        ['name' => 'questStats#getUserStats', 'url' => '/api/user/stats', 'verb' => 'GET'],
+        ['name' => 'questStats#getUserStats', 'url' => '/api/user-stats', 'verb' => 'GET'],
+        // Task list endpoints (using quest controller)
+        ['name' => 'quest#getQuestLists', 'url' => '/api/quest-lists', 'verb' => 'GET'],
+        // Task completion endpoints (using quest controller)
+        ['name' => 'quest#testEndpoint', 'url' => '/api/test-quest', 'verb' => 'GET'],
+        ['name' => 'quest#testPost', 'url' => '/api/test-post', 'verb' => 'POST'],
+        ['name' => 'quest#completeTaskFromList', 'url' => '/api/complete-quest', 'verb' => 'POST'],
+        ['name' => 'quest#testAchievements', 'url' => '/api/achievements/test', 'verb' => 'GET'],
         ['name' => 'quest#getAchievements', 'url' => '/api/achievements', 'verb' => 'GET'],
         ['name' => 'quest#getAchievementsByCategory', 'url' => '/api/achievements/categories', 'verb' => 'GET'],
         ['name' => 'quest#getRecentAchievements', 'url' => '/api/achievements/recent', 'verb' => 'GET'],
@@ -32,7 +33,6 @@ return [
         ['name' => 'quest#getAchievementsByRarity', 'url' => '/api/achievements/rarity/{rarity}', 'verb' => 'GET'],
         ['name' => 'quest#getAchievementProgress', 'url' => '/api/achievements/progress/{achievementKey}', 'verb' => 'GET'],
         ['name' => 'quest#completeTask', 'url' => '/api/complete-task', 'verb' => 'POST'],
-        ['name' => 'quest#completeTaskFromList', 'url' => '/api/complete-task-from-list', 'verb' => 'POST'],
         ['name' => 'quest#getHistory', 'url' => '/api/history', 'verb' => 'GET'],
         ['name' => 'quest#getLeaderboard', 'url' => '/api/leaderboard', 'verb' => 'GET'],
         
@@ -58,10 +58,11 @@ return [
         
         // Adventure Path System API routes
         ['name' => 'adventureWorld#test', 'url' => '/api/adventure/test', 'verb' => 'GET'],
-        ['name' => 'adventureWorld#debugTaskCompletion', 'url' => '/api/adventure/debug-tasks', 'verb' => 'GET'],
         ['name' => 'adventureWorld#diagnosticPath', 'url' => '/api/adventure/diagnostic-path/{worldNumber}', 'verb' => 'GET'],
+        ['name' => 'adventureWorld#debugTaskCompletion', 'url' => '/api/adventure/debug-tasks', 'verb' => 'GET'],
         ['name' => 'adventureWorld#getWorlds', 'url' => '/api/adventure/worlds', 'verb' => 'GET'],
         ['name' => 'adventureWorld#getCurrentPath', 'url' => '/api/adventure/current-path/{worldNumber}', 'verb' => 'GET'],
+        ['name' => 'adventureWorld#getInfiniteLevels', 'url' => '/api/adventure/infinite-levels/{worldNumber}', 'verb' => 'GET'],
         ['name' => 'adventureWorld#getLevelObjectivesSimple', 'url' => '/api/adventure/level-objectives', 'verb' => 'GET'],
         ['name' => 'adventureWorld#startLevel', 'url' => '/api/adventure/start-level', 'verb' => 'POST'],
         ['name' => 'adventureWorld#checkLevelCompletion', 'url' => '/api/adventure/check-completion', 'verb' => 'GET'],

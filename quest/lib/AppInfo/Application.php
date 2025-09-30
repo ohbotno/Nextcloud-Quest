@@ -9,7 +9,11 @@ namespace OCA\NextcloudQuest\AppInfo;
 
 use OCA\NextcloudQuest\BackgroundJob\DailySummaryJob;
 use OCA\NextcloudQuest\BackgroundJob\StreakMaintenanceJob;
-use OCA\NextcloudQuest\Controller\SimpleQuestController;
+use OCA\NextcloudQuest\BackgroundJob\HealthPenaltyJob;
+use OCA\NextcloudQuest\Controller\QuestController;
+use OCA\NextcloudQuest\Controller\QuestStatsController;
+use OCA\NextcloudQuest\Controller\TaskCompletionController;
+use OCA\NextcloudQuest\Controller\TaskListController;
 use OCA\NextcloudQuest\Controller\AdventureWorldController;
 use OCA\NextcloudQuest\Controller\TestController;
 use OCA\NextcloudQuest\Service\WorldGenerator;
@@ -35,13 +39,110 @@ class Application extends App implements IBootstrap {
         // Register notification provider
         $context->registerNotifierService(Notifier::class);
         
-        // Register SimpleQuestController
-        $context->registerService(SimpleQuestController::class, function($c) {
-            return new SimpleQuestController(
+        // Register database mappers first (no dependencies)
+        $context->registerService(\OCA\NextcloudQuest\Db\QuestMapper::class, function($c) {
+            return new \OCA\NextcloudQuest\Db\QuestMapper($c->get(\OCP\IDBConnection::class));
+        });
+        
+        $context->registerService(\OCA\NextcloudQuest\Db\HistoryMapper::class, function($c) {
+            return new \OCA\NextcloudQuest\Db\HistoryMapper($c->get(\OCP\IDBConnection::class));
+        });
+        
+        $context->registerService(\OCA\NextcloudQuest\Db\AchievementMapper::class, function($c) {
+            return new \OCA\NextcloudQuest\Db\AchievementMapper($c->get(\OCP\IDBConnection::class));
+        });
+        
+        // Register core services (depend only on mappers)
+        $context->registerService(\OCA\NextcloudQuest\Service\XPService::class, function($c) {
+            return new \OCA\NextcloudQuest\Service\XPService(
+                $c->get(\OCA\NextcloudQuest\Db\QuestMapper::class),
+                $c->get(\OCA\NextcloudQuest\Db\HistoryMapper::class),
+                $c->get(\Psr\Log\LoggerInterface::class)
+            );
+        });
+        
+        $context->registerService(\OCA\NextcloudQuest\Service\StreakService::class, function($c) {
+            return new \OCA\NextcloudQuest\Service\StreakService(
+                $c->get(\OCA\NextcloudQuest\Db\QuestMapper::class),
+                $c->get(\OCA\NextcloudQuest\Db\HistoryMapper::class),
+                $c->get(\Psr\Log\LoggerInterface::class)
+            );
+        });
+        
+        $context->registerService(\OCA\NextcloudQuest\Service\AchievementService::class, function($c) {
+            return new \OCA\NextcloudQuest\Service\AchievementService(
+                $c->get(\OCA\NextcloudQuest\Db\AchievementMapper::class),
+                $c->get(\OCA\NextcloudQuest\Db\HistoryMapper::class),
+                $c->get(\OCP\Notification\IManager::class),
+                $c->get(\Psr\Log\LoggerInterface::class)
+            );
+        });
+        
+        $context->registerService(\OCA\NextcloudQuest\Service\LevelService::class, function($c) {
+            return new \OCA\NextcloudQuest\Service\LevelService(
+                $c->get(\OCA\NextcloudQuest\Db\QuestMapper::class),
+                $c->get(\OCA\NextcloudQuest\Service\XPService::class),
+                $c->get(\Psr\Log\LoggerInterface::class)
+            );
+        });
+        
+        // Register integration services (depend on core services)
+        $context->registerService(TasksApiIntegration::class, function($c) {
+            return new TasksApiIntegration(
+                $c->get(\OCP\IDBConnection::class),
+                $c->get(\Psr\Log\LoggerInterface::class),
+                $c->get(\OCP\IUserSession::class),
+                $c->get(\OCA\NextcloudQuest\Service\XPService::class),
+                $c->get(\OCA\NextcloudQuest\Service\AchievementService::class),
+                $c->get(\OCA\NextcloudQuest\Service\StreakService::class),
+                $c->get(\OCA\NextcloudQuest\Db\QuestMapper::class)
+            );
+        });
+        
+        // Register API controllers (depend on services and integrations)
+        $context->registerService(QuestStatsController::class, function($c) {
+            return new QuestStatsController(
                 self::APP_ID,
                 $c->get(\OCP\IRequest::class),
                 $c->get(\OCP\IUserSession::class),
                 $c->get(\OCP\IDBConnection::class)
+            );
+        });
+        
+        $context->registerService(TaskCompletionController::class, function($c) {
+            return new TaskCompletionController(
+                self::APP_ID,
+                $c->get(\OCP\IRequest::class),
+                $c->get(\OCP\IUserSession::class),
+                $c->get(\OCP\IDBConnection::class),
+                $c->get(\OCA\NextcloudQuest\Service\XPService::class),
+                $c->get(\OCA\NextcloudQuest\Service\LevelService::class),
+                $c->get(\OCA\NextcloudQuest\Service\AchievementService::class)
+            );
+        });
+        
+        $context->registerService(TaskListController::class, function($c) {
+            return new TaskListController(
+                self::APP_ID,
+                $c->get(\OCP\IRequest::class),
+                $c->get(\OCP\IUserSession::class),
+                $c->get(\OCP\IDBConnection::class)
+            );
+        });
+        
+        // Register QuestController following the same pattern as other controllers
+        $context->registerService(QuestController::class, function($c) {
+            return new QuestController(
+                self::APP_ID,
+                $c->get(\OCP\IRequest::class),
+                $c->get(\OCP\IUserSession::class),
+                $c->get(\OCA\NextcloudQuest\Service\XPService::class),
+                $c->get(\OCA\NextcloudQuest\Service\AchievementService::class),
+                $c->get(\OCA\NextcloudQuest\Service\StreakService::class),
+                $c->get(\OCA\NextcloudQuest\Service\LevelService::class),
+                $c->get(\OCA\NextcloudQuest\Db\QuestMapper::class),
+                $c->get(\OCA\NextcloudQuest\Db\HistoryMapper::class),
+                $c->get(\OCA\NextcloudQuest\Integration\TasksApiIntegration::class)
             );
         });
         
@@ -52,8 +153,6 @@ class Application extends App implements IBootstrap {
                 $c->get(\OCP\IRequest::class)
             );
         });
-        
-        // TODO: Register Tasks API integration service later
         
         // Register event listeners
         $context->registerEventListener(TaskCompletedEvent::class, TaskCompletionListener::class);
@@ -81,35 +180,10 @@ class Application extends App implements IBootstrap {
             );
         });
         
-        $context->registerService(TasksApiIntegration::class, function($c) {
-            return new TasksApiIntegration(
-                $c->get(\OCP\IDBConnection::class),
-                $c->get(\Psr\Log\LoggerInterface::class),
-                $c->get(\OCP\IUserSession::class)
-            );
-        });
-        
-        $context->registerService(\OCA\NextcloudQuest\Service\XPService::class, function($c) {
-            return new \OCA\NextcloudQuest\Service\XPService(
-                $c->get(\OCA\NextcloudQuest\Db\QuestMapper::class),
-                $c->get(\OCA\NextcloudQuest\Db\HistoryMapper::class),
-                $c->get(\Psr\Log\LoggerInterface::class)
-            );
-        });
-        
-        $context->registerService(\OCA\NextcloudQuest\Db\QuestMapper::class, function($c) {
-            return new \OCA\NextcloudQuest\Db\QuestMapper($c->get(\OCP\IDBConnection::class));
-        });
-        
-        $context->registerService(\OCA\NextcloudQuest\Db\HistoryMapper::class, function($c) {
-            return new \OCA\NextcloudQuest\Db\HistoryMapper($c->get(\OCP\IDBConnection::class));
-        });
-        
-        $context->registerService(\OCA\NextcloudQuest\Service\StreakService::class, function($c) {
-            return new \OCA\NextcloudQuest\Service\StreakService(
-                $c->get(\OCA\NextcloudQuest\Db\QuestMapper::class),
-                $c->get(\OCA\NextcloudQuest\Db\HistoryMapper::class),
-                $c->get(\Psr\Log\LoggerInterface::class)
+        // Register Infinite Level Generator
+        $context->registerService(\OCA\NextcloudQuest\Service\InfiniteLevelGenerator::class, function($c) {
+            return new \OCA\NextcloudQuest\Service\InfiniteLevelGenerator(
+                $c->get(\OCP\IDBConnection::class)
             );
         });
         
@@ -124,7 +198,8 @@ class Application extends App implements IBootstrap {
                 $c->get(PathGenerator::class),
                 $c->get(LevelObjective::class),
                 $c->get(\OCA\NextcloudQuest\Integration\TasksApiIntegration::class),
-                $c->get(\OCA\NextcloudQuest\Service\XPService::class)
+                $c->get(\OCA\NextcloudQuest\Service\XPService::class),
+                $c->get(\OCA\NextcloudQuest\Service\InfiniteLevelGenerator::class)
             );
         });
 
@@ -145,6 +220,33 @@ class Application extends App implements IBootstrap {
                 $c->get(\Psr\Log\LoggerInterface::class)
             );
         });
+
+        // Register HealthService
+        $context->registerService(\OCA\NextcloudQuest\Service\HealthService::class, function($c) {
+            return new \OCA\NextcloudQuest\Service\HealthService(
+                $c->get(\OCP\IDBConnection::class),
+                $c->get(\Psr\Log\LoggerInterface::class)
+            );
+        });
+        
+        // Register UserDataService for unified database access
+        $context->registerService(\OCA\NextcloudQuest\Service\UserDataService::class, function($c) {
+            return new \OCA\NextcloudQuest\Service\UserDataService(
+                $c->get(\OCP\IDBConnection::class),
+                $c->get(\Psr\Log\LoggerInterface::class)
+            );
+        });
+
+        // Register Health Penalty background job
+        $context->registerService(HealthPenaltyJob::class, function($c) {
+            return new HealthPenaltyJob(
+                $c->get(\OCP\AppFramework\Utility\ITimeFactory::class),
+                $c->get(\OCA\NextcloudQuest\Service\HealthService::class),
+                $c->get(\OCP\IDBConnection::class),
+                $c->get(\OCP\Notification\IManager::class),
+                $c->get(\Psr\Log\LoggerInterface::class)
+            );
+        });
     }
 
     public function boot(IBootContext $context): void {
@@ -161,6 +263,11 @@ class Application extends App implements IBootstrap {
         // Register daily summary job (runs daily at midnight)
         if (!$jobList->has(DailySummaryJob::class, null)) {
             $jobList->add(DailySummaryJob::class);
+        }
+        
+        // Register health penalty job (runs daily at midnight)
+        if (!$jobList->has(HealthPenaltyJob::class, null)) {
+            $jobList->add(HealthPenaltyJob::class);
         }
         
         // Additional initialization can go here

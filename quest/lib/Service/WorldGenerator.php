@@ -294,7 +294,7 @@ class WorldGenerator {
         // Check if previous world is completed
         $qb = $this->db->getQueryBuilder();
         $qb->select('status')
-           ->from('*PREFIX*adventure_player_progress')
+           ->from('*PREFIX*quest_adv_progress')
            ->where($qb->expr()->eq('user_id', $qb->createNamedParameter($userId)))
            ->andWhere($qb->expr()->eq('world_number', $qb->createNamedParameter($worldNumber - 1)));
 

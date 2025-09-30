@@ -777,7 +777,6 @@ class SettingsController extends Controller {
             );
         } catch (\Exception $e) {
             // Don't fail the main operation if audit logging fails
-            error_log('Failed to log settings change: ' . $e->getMessage());
         }
     }
     

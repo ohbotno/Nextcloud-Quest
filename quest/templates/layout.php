@@ -70,54 +70,45 @@
                     </div>
                 </div>
                 
-                <!-- Character Gauges - Condensed Layout -->
-                <div class="character-gauges">
-                    <!-- Level Gauge -->
-                    <div class="character-gauge level-gauge">
+                <!-- Character Gauges - Always Visible -->
+                <div class="character-gauges" id="character-gauges">
+                    <!-- Compact Level Display -->
+                    <div class="character-gauge level-gauge compact">
                         <div class="gauge-header">
-                            <div class="gauge-label">
-                                <span class="gauge-icon">⭐</span>
-                                <span class="gauge-text">Level</span>
-                            </div>
-                            <div class="gauge-value" id="character-level">1</div>
+                            <span class="gauge-icon">⭐</span>
+                            <span class="gauge-text">Lv. <span id="character-level">1</span></span>
+                            <span class="gauge-value" id="level-progress-text">0%</span>
                         </div>
                         <div class="level-bar">
                             <div class="level-progress" id="level-progress-bar" style="width: 0%"></div>
-                            <div class="level-text" id="level-progress-text">0%</div>
                         </div>
                     </div>
                     
-                    <!-- XP Gauge -->
-                    <div class="character-gauge xp-gauge">
+                    <!-- Compact XP Display -->
+                    <div class="character-gauge xp-gauge compact">
                         <div class="gauge-header">
-                            <div class="gauge-label">
-                                <span class="gauge-icon">✨</span>
-                                <span class="gauge-text">Experience</span>
-                            </div>
-                            <div class="gauge-value">
-                                <span id="current-xp">0</span> / <span id="next-level-xp">100</span>
-                            </div>
+                            <span class="gauge-icon">✨</span>
+                            <span class="gauge-text">XP</span>
+                            <span class="gauge-value">
+                                <span id="current-xp">0</span>/<span id="next-level-xp">100</span>
+                            </span>
                         </div>
                         <div class="xp-bar">
                             <div class="xp-progress" id="xp-progress-bar" style="width: 0%"></div>
-                            <div class="xp-text">XP</div>
                         </div>
                     </div>
                     
-                    <!-- Health Gauge -->
-                    <div class="character-gauge health-gauge">
+                    <!-- Compact Health Display -->
+                    <div class="character-gauge health-gauge compact">
                         <div class="gauge-header">
-                            <div class="gauge-label">
-                                <span class="gauge-icon">❤️</span>
-                                <span class="gauge-text">Health</span>
-                            </div>
-                            <div class="gauge-value">
-                                <span id="current-health">100</span>%
-                            </div>
+                            <span class="gauge-icon">❤️</span>
+                            <span class="gauge-text">Health</span>
+                            <span class="gauge-value">
+                                <span id="current-health">100</span>/<span id="max-health">100</span>
+                            </span>
                         </div>
                         <div class="health-bar">
                             <div class="health-progress" id="health-progress-bar" style="width: 100%"></div>
-                            <div class="health-text">HP</div>
                         </div>
                     </div>
                 </div>
@@ -168,14 +159,6 @@
                             <span class="nav-badge" id="achievements-badge" style="display: none;">0</span>
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a href="<?php print_unescaped(\OC::$server->getURLGenerator()->linkToRoute('quest.page.progress')); ?>" 
-                           class="nav-link <?php p($_['active_page'] === 'progress' ? 'active' : ''); ?>"
-                           data-page="progress">
-                            <span class="nav-icon">📊</span>
-                            <span class="nav-text">Progress</span>
-                        </a>
-                    </li>
                     <li class="nav-item nav-separator"></li>
                     <li class="nav-item">
                         <a href="<?php print_unescaped(\OC::$server->getURLGenerator()->linkToRoute('quest.page.settings')); ?>" 
@@ -189,18 +172,9 @@
             </nav>
             
             
-            <!-- Footer Info -->
+            <!-- Footer Info - Simplified -->
             <div class="sidebar-footer">
-                <div class="footer-stats">
-                    <div class="stat-item">
-                        <span class="stat-label">Today</span>
-                        <span class="stat-value" id="tasks-today">0</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">This Week</span>
-                        <span class="stat-value" id="tasks-week">0</span>
-                    </div>
-                </div>
+                <div class="app-version">Quest v1.0</div>
             </div>
         </aside>
         

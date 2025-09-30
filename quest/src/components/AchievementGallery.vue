@@ -270,7 +270,7 @@ export default {
         },
         
         getAchievementIcon(icon) {
-            return `/apps/nextcloudquest/img/achievements/${icon}`
+            return `/apps/quest/img/achievements/${icon}`
         },
         
         getAchievementRarity(key) {
@@ -676,7 +676,6 @@ export default {
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    hover: background-color: var(--color-background-hover);
 }
 
 .modal-body {

@@ -70,7 +70,7 @@ export default {
     
     methods: {
         getAchievementIcon(icon) {
-            return `/apps/nextcloudquest/img/achievements/${icon}`
+            return `/apps/quest/img/achievements/${icon}`
         },
         
         getAchievementRarity(key) {
@@ -196,7 +196,7 @@ export default {
             try {
                 const rarity = this.getAchievementRarity(achievement.key)
                 // Play different sounds based on rarity
-                // Example: new Audio(`/apps/nextcloudquest/sounds/achievement_${rarity}.mp3`).play()
+                // Example: new Audio(`/apps/quest/sounds/achievement_${rarity}.mp3`).play()
             } catch (error) {
                 // Sound playing failed, continue silently
             }

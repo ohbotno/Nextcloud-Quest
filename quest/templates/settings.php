@@ -53,8 +53,8 @@ ob_start();
             </select>
         </div>
         
-        <!-- Task Lists Grid -->
-        <div class="task-lists-grid" id="settings-task-lists-grid">
+        <!-- Task Lists Table -->
+        <div class="task-lists-table-container" id="settings-task-lists-grid">
             <!-- Will be populated dynamically -->
             <div class="task-list-placeholder">
                 <div class="empty-state">

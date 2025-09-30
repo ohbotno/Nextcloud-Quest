@@ -1,0 +1,12 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="32" cy="32" r="30" fill="#FF5722" stroke="#D84315" stroke-width="2"/>
+  <polygon points="32,8 30,18 26,16 28,22 22,24 28,26 26,32 30,30 32,40 34,30 38,32 36,26 42,24 36,22 38,16 34,18" fill="#FFEB3B"/>
+  <polygon points="32,12 31,18 28,17 29,21 26,22 29,23 28,27 31,26 32,32 33,26 36,27 35,23 38,22 35,21 36,17 33,18" fill="#FFD700"/>
+  <polygon points="32,16 31.5,20 29,19 30,22 27,23 30,24 29,27 31.5,26 32,28 32.5,26 35,27 34,24 37,23 34,22 35,19 32.5,20" fill="#FF9800"/>
+  <polygon points="16,16 18,20 22,18 20,22 24,24 20,26 22,30 18,28 16,32 14,28 10,30 12,26 8,24 12,22 10,18 14,20" fill="#FFEB3B"/>
+  <polygon points="48,16 50,20 54,18 52,22 56,24 52,26 54,30 50,28 48,32 46,28 42,30 44,26 40,24 44,22 42,18 46,20" fill="#FFEB3B"/>
+  <polygon points="16,48 18,52 22,50 20,54 24,56 20,58 22,62 18,60 16,64 14,60 10,62 12,58 8,56 12,54 10,50 14,52" fill="#FFEB3B"/>
+  <polygon points="48,48 50,52 54,50 52,54 56,56 52,58 54,62 50,60 48,64 46,60 42,62 44,58 40,56 44,54 42,50 46,52" fill="#FFEB3B"/>
+  <text x="32" y="44" text-anchor="middle" fill="#D84315" font-family="Arial" font-size="8" font-weight="bold">XP</text>
+  <text x="32" y="58" text-anchor="middle" fill="#D84315" font-family="Arial" font-size="6">EXPLOSION</text>
+</svg>

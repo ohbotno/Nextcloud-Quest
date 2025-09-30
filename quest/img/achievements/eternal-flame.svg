@@ -1,0 +1,13 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="32" cy="32" r="30" fill="#FF5722" stroke="#D84315" stroke-width="2"/>
+  <polygon points="32,8 30,18 26,16 28,22 22,24 28,26 26,32 30,30 32,40 34,30 38,32 36,26 42,24 36,22 38,16 34,18" fill="#FFEB3B"/>
+  <polygon points="32,12 31,18 28,17 29,21 26,22 29,23 28,27 31,26 32,32 33,26 36,27 35,23 38,22 35,21 36,17 33,18" fill="#FFD700"/>
+  <polygon points="32,16 31.5,20 29,19 30,22 27,23 30,24 29,27 31.5,26 32,28 32.5,26 35,27 34,24 37,23 34,22 35,19 32.5,20" fill="#FF9800"/>
+  <polygon points="32,20 31.7,22 30,21.5 31,23 29,24 31,25 30,26.5 31.7,26 32,26 32.3,26 34,26.5 33,25 35,24 33,23 34,21.5 32.3,22" fill="#FF5722"/>
+  <circle cx="32" cy="23" r="1" fill="#F44336"/>
+  <rect x="28" y="40" width="8" height="12" fill="#8D6E63" stroke="#5D4037" stroke-width="1"/>
+  <rect x="30" y="42" width="4" height="8" fill="#A1887F"/>
+  <ellipse cx="32" cy="53" rx="4" ry="1" fill="#5D4037"/>
+  <text x="32" y="6" text-anchor="middle" fill="#D84315" font-family="Arial" font-size="6">ETERNAL</text>
+  <text x="32" y="62" text-anchor="middle" fill="#D84315" font-family="Arial" font-size="6">FLAME</text>
+</svg>

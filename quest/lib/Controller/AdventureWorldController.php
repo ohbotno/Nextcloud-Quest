@@ -7,6 +7,7 @@ namespace OCA\NextcloudQuest\Controller;
 use OCA\NextcloudQuest\Service\WorldGenerator;
 use OCA\NextcloudQuest\Service\PathGenerator;
 use OCA\NextcloudQuest\Service\LevelObjective;
+use OCA\NextcloudQuest\Service\InfiniteLevelGenerator;
 use OCA\NextcloudQuest\Integration\TasksApiIntegration;
 use OCA\NextcloudQuest\Service\XPService;
 
@@ -43,6 +44,9 @@ class AdventureWorldController extends Controller {
     /** @var XPService */
     private $xpService;
 
+    /** @var InfiniteLevelGenerator */
+    private $infiniteLevelGenerator;
+
     public function __construct(
         $AppName,
         IRequest $request,
@@ -52,7 +56,8 @@ class AdventureWorldController extends Controller {
         PathGenerator $pathGenerator,
         LevelObjective $levelObjective,
         TasksApiIntegration $tasksApi,
-        XPService $xpService
+        XPService $xpService,
+        InfiniteLevelGenerator $infiniteLevelGenerator = null
     ) {
         parent::__construct($AppName, $request);
         $this->db = $db;
@@ -62,11 +67,13 @@ class AdventureWorldController extends Controller {
         $this->levelObjective = $levelObjective;
         $this->tasksApi = $tasksApi;
         $this->xpService = $xpService;
+        $this->infiniteLevelGenerator = $infiniteLevelGenerator;
     }
 
     /**
      * Diagnostic endpoint for current-path API
      * @NoAdminRequired
+     * @NoCSRFRequired
      * @param int $worldNumber
      * @return JSONResponse
      */
@@ -142,6 +149,7 @@ class AdventureWorldController extends Controller {
     /**
      * Test endpoint
      * @NoAdminRequired
+     * @NoCSRFRequired
      * @return JSONResponse
      */
     public function test(): JSONResponse {
@@ -191,45 +199,43 @@ class AdventureWorldController extends Controller {
     }
 
     /**
-     * Get all available worlds for the current user
+     * Get current active world for the user (only shows unlocked/in-progress worlds)
      * @NoAdminRequired
+     * @NoCSRFRequired
      * @return JSONResponse
      */
     public function getWorlds(): JSONResponse {
         try {
-            error_log('Adventure: Starting getWorlds method');
-            
             $user = $this->userSession->getUser();
             if (!$user) {
-                error_log('Adventure: User not authenticated');
                 return new JSONResponse(['error' => 'User not authenticated'], 401);
             }
 
             $userId = $user->getUID();
-            error_log("Adventure: User ID: $userId");
             
             $worlds = [];
             
             try {
-                // Try to get all world definitions from WorldGenerator
-                error_log('Adventure: Calling worldGenerator->getWorldDefinitions()');
+                // Get world definitions
                 $worldDefs = $this->worldGenerator->getWorldDefinitions();
-                error_log('Adventure: Got world definitions: ' . count($worldDefs) . ' worlds');
                 
-                foreach ($worldDefs as $worldNumber => $worldDef) {
+                // Find the current active world (highest unlocked or in-progress)
+                $currentWorldNumber = $this->getCurrentWorldNumber($userId);
+                
+                // Only process the current world and maybe the next locked one for preview
+                for ($worldNumber = $currentWorldNumber; $worldNumber <= min($currentWorldNumber + 1, 8); $worldNumber++) {
+                    if (!isset($worldDefs[$worldNumber])) continue;
+                    
+                    $worldDef = $worldDefs[$worldNumber];
+                    
                     try {
-                        // Get user progress for this world (creates if doesn't exist)
-                        try {
-                            $progress = $this->getUserWorldProgress($userId, $worldNumber);
-                        } catch (\Exception $progressError) {
-                            error_log("Adventure: Progress error for world $worldNumber: " . $progressError->getMessage());
-                            // Use basic progress data as fallback
-                            $progress = [
-                                'world_status' => $worldNumber === 1 ? 'unlocked' : 'locked',
-                                'levels_completed' => 0,
-                                'total_levels' => 4,
-                                'current_position' => 'level_1'
-                            ];
+                        // Get user progress for this world
+                        $progress = $this->getUserWorldProgress($userId, $worldNumber);
+                        
+                        // For infinite mode, don't show total levels
+                        if ($this->infiniteLevelGenerator) {
+                            $progress['total_levels'] = '∞';
+                            $progress['infinite_mode'] = true;
                         }
                         
                         $world = [
@@ -241,20 +247,22 @@ class AdventureWorldController extends Controller {
                             'color_secondary' => $worldDef['color_secondary'],
                             'icon' => $worldDef['icon'],
                             'difficulty_modifier' => $worldDef['difficulty_modifier'],
-                            'status' => $progress['world_status'], // Use real database status
-                            'progress' => $progress
+                            'status' => $progress['world_status'],
+                            'progress' => $progress,
+                            'is_current' => $worldNumber === $currentWorldNumber
                         ];
                         
-                        $worlds[] = $world;
+                        // Only add the current world (unlocked/in-progress)
+                        if ($world['status'] !== 'locked') {
+                            $worlds[] = $world;
+                        }
                     } catch (\Exception $e) {
-                        error_log("Adventure: Error processing world $worldNumber: " . $e->getMessage());
                         // Skip this world and continue with others
                         continue;
                     }
                 }
                 
             } catch (\Exception $e) {
-                error_log('Adventure: WorldGenerator failed, using fallback worlds: ' . $e->getMessage());
                 
                 // Fallback to basic world data
                 $fallbackWorlds = [
@@ -297,7 +305,6 @@ class AdventureWorldController extends Controller {
                 $worlds = $fallbackWorlds;
             }
 
-            error_log('Adventure: Returning ' . count($worlds) . ' worlds');
             
             return new JSONResponse([
                 'status' => 'success',
@@ -305,8 +312,6 @@ class AdventureWorldController extends Controller {
             ]);
 
         } catch (\Exception $e) {
-            error_log('Adventure: Critical error in getWorlds - ' . $e->getMessage());
-            error_log('Adventure: Stack trace - ' . $e->getTraceAsString());
             return new JSONResponse([
                 'status' => 'error',
                 'message' => 'Failed to load worlds: ' . $e->getMessage()
@@ -328,10 +333,8 @@ class AdventureWorldController extends Controller {
             }
 
             $userId = $user->getUID();
-            error_log("Adventure: getCurrentPath for world $worldNumber, user $userId");
 
             // Use the same approach as diagnostic - simplified and known to work
-            error_log("Adventure: Using simplified fallback approach");
             
             // Get progress (we know this works from diagnostic)
             $progress = $this->getUserWorldProgress($userId, $worldNumber);
@@ -339,7 +342,6 @@ class AdventureWorldController extends Controller {
             // Use fallback path data (we know this works from diagnostic)
             $pathData = $this->getFallbackPathData($worldNumber);
             
-            error_log("Adventure: Simple approach - progress OK, fallback path has " . count($pathData['levels'] ?? []) . " levels");
             
             return new JSONResponse([
                 'status' => 'success',
@@ -352,10 +354,6 @@ class AdventureWorldController extends Controller {
             ]);
 
         } catch (\Exception $e) {
-            error_log('Adventure: Error getting current path - ' . $e->getMessage());
-            error_log('Adventure: Exception type: ' . get_class($e));
-            error_log('Adventure: File: ' . $e->getFile() . ' Line: ' . $e->getLine());
-            error_log('Adventure: Stack trace - ' . $e->getTraceAsString());
             return new JSONResponse([
                 'status' => 'error',
                 'message' => 'Failed to load path: ' . $e->getMessage(),
@@ -365,6 +363,102 @@ class AdventureWorldController extends Controller {
                     'line' => $e->getLine()
                 ]
             ], 500);
+        }
+    }
+
+    /**
+     * Get infinite levels for a world
+     * @NoAdminRequired
+     * @param int $worldNumber
+     * @return JSONResponse
+     */
+    public function getInfiniteLevels(int $worldNumber): JSONResponse {
+        try {
+            $user = $this->userSession->getUser();
+            if (!$user) {
+                return new JSONResponse(['error' => 'User not authenticated'], 401);
+            }
+
+            $userId = $user->getUID();
+            
+            // Check if infinite level generator is available
+            if (!$this->infiniteLevelGenerator) {
+                return $this->getCurrentPath($worldNumber);
+            }
+            
+            // Get player progression
+            $progress = $this->getUserWorldProgress($userId, $worldNumber);
+            $currentLevel = (int)($progress['levels_completed'] ?? 0) + 1; // Next level to play
+            
+            // Generate a batch of levels (current + next 9)
+            $levels = $this->infiniteLevelGenerator->generateLevelBatch(
+                $userId,
+                $worldNumber,
+                max(1, $currentLevel - 2), // Show 2 before current
+                15 // Show 15 levels total
+            );
+            
+            // Create path connections based on level connections
+            $paths = [];
+            foreach ($levels as $level) {
+                $fromLevelId = $level['level_id'];
+                $connections = $level['connections'] ?? [];
+                
+                foreach ($connections as $toLevelNumber) {
+                    $toLevelId = "w{$worldNumber}_l{$toLevelNumber}";
+                    
+                    // Only add path if the target level exists in our current batch
+                    $targetExists = false;
+                    foreach ($levels as $targetLevel) {
+                        if ($targetLevel['level_id'] === $toLevelId) {
+                            $targetExists = true;
+                            break;
+                        }
+                    }
+                    
+                    if ($targetExists) {
+                        $pathType = 'normal';
+                        if ($level['layout_type'] === 'side_quest') {
+                            $pathType = 'side_quest';
+                        } elseif ($level['type'] === 'boss' || $level['type'] === 'mini_boss') {
+                            $pathType = 'boss';
+                        }
+                        
+                        $paths[] = [
+                            'from' => $fromLevelId,
+                            'to' => $toLevelId,
+                            'type' => $pathType
+                        ];
+                    }
+                }
+            }
+            
+            // Format response similar to existing path structure
+            $pathData = [
+                'levels' => array_combine(
+                    array_column($levels, 'level_id'),
+                    $levels
+                ),
+                'paths' => $paths,
+                'start_level' => $levels[0]['level_id'] ?? 'w' . $worldNumber . '_l1',
+                'current_level' => 'w' . $worldNumber . '_l' . $currentLevel,
+                'infinite_mode' => true
+            ];
+            
+            return new JSONResponse([
+                'status' => 'success',
+                'data' => [
+                    'world_number' => $worldNumber,
+                    'path' => $pathData,
+                    'progress' => $progress,
+                    'current_position' => $pathData['current_level'],
+                    'infinite_mode' => true
+                ]
+            ]);
+            
+        } catch (\Exception $e) {
+            // Fallback to regular path on error
+            return $this->getCurrentPath($worldNumber);
         }
     }
 
@@ -384,7 +478,6 @@ class AdventureWorldController extends Controller {
             $worldNumber = (int)$this->request->getParam('worldNumber', 1);
             $levelPosition = $this->request->getParam('levelPosition', 'level_1');
             
-            error_log("Adventure: Getting simple objectives for world $worldNumber, level $levelPosition");
 
             // Get level data to customize objectives
             $pathData = $this->getFallbackPathData($worldNumber);
@@ -464,7 +557,6 @@ class AdventureWorldController extends Controller {
             ]);
 
         } catch (\Exception $e) {
-            error_log('Adventure: Error getting level objectives - ' . $e->getMessage());
             return new JSONResponse([
                 'status' => 'error',
                 'message' => 'Failed to load level objectives: ' . $e->getMessage()
@@ -489,7 +581,6 @@ class AdventureWorldController extends Controller {
             $levelPosition = $this->request->getParam('levelPosition', 'level_1');
             
             $userId = $user->getUID();
-            error_log("Adventure: Starting level $levelPosition in world $worldNumber for user $userId");
             
             // Get level data
             $pathData = $this->getFallbackPathData($worldNumber);
@@ -523,7 +614,6 @@ class AdventureWorldController extends Controller {
             ]);
 
         } catch (\Exception $e) {
-            error_log('Adventure: Error starting level - ' . $e->getMessage());
             return new JSONResponse([
                 'status' => 'error',
                 'message' => 'Failed to start level: ' . $e->getMessage()
@@ -534,6 +624,7 @@ class AdventureWorldController extends Controller {
     /**
      * Debug task completion detection
      * @NoAdminRequired
+     * @NoCSRFRequired
      * @return JSONResponse
      */
     public function debugTaskCompletion(): JSONResponse {
@@ -560,7 +651,6 @@ class AdventureWorldController extends Controller {
             ]);
             
         } catch (\Exception $e) {
-            error_log('Adventure: Error in debug task completion - ' . $e->getMessage());
             return new JSONResponse([
                 'status' => 'error',
                 'message' => 'Failed to debug task completion: ' . $e->getMessage()
@@ -575,11 +665,8 @@ class AdventureWorldController extends Controller {
      */
     public function checkLevelCompletion(): JSONResponse {
         try {
-            error_log("Adventure: checkLevelCompletion method called");
-            
             $user = $this->userSession->getUser();
             if (!$user) {
-                error_log("Adventure: User not authenticated");
                 return new JSONResponse(['error' => 'User not authenticated'], 401);
             }
 
@@ -587,12 +674,10 @@ class AdventureWorldController extends Controller {
             $levelPosition = $this->request->getParam('levelPosition', 'level_1');
             $userId = $user->getUID();
 
-            error_log("Adventure: Checking completion for $levelPosition in world $worldNumber, user $userId");
             
             // Simple test responses to verify API is working
             if ($worldNumber === 1) {
                 if ($levelPosition === 'level_1') {
-                    error_log("Adventure: Returning simple test response for level_1");
                     return new JSONResponse([
                         'status' => 'success',
                         'data' => [
@@ -603,7 +688,6 @@ class AdventureWorldController extends Controller {
                         ]
                     ]);
                 } elseif ($levelPosition === 'level_2') {
-                    error_log("Adventure: Returning simple test response for level_2");
                     return new JSONResponse([
                         'status' => 'success',
                         'data' => [
@@ -614,7 +698,6 @@ class AdventureWorldController extends Controller {
                         ]
                     ]);
                 } elseif ($levelPosition === 'level_3') {
-                    error_log("Adventure: Returning simple test response for level_3");
                     return new JSONResponse([
                         'status' => 'success',
                         'data' => [
@@ -625,7 +708,6 @@ class AdventureWorldController extends Controller {
                         ]
                     ]);
                 } elseif ($levelPosition === 'level_4') {
-                    error_log("Adventure: Returning simple test response for level_4");
                     return new JSONResponse([
                         'status' => 'success',
                         'data' => [
@@ -641,41 +723,30 @@ class AdventureWorldController extends Controller {
             // Get level data and current objectives
             try {
                 $pathData = $this->getFallbackPathData($worldNumber);
-                error_log("Adventure: Got path data for world $worldNumber");
             } catch (\Exception $e) {
-                error_log("Adventure: Error getting path data: " . $e->getMessage());
                 throw new \Exception("Failed to get world path data: " . $e->getMessage());
             }
             
             $level = $pathData['levels'][$levelPosition] ?? null;
             
             if (!$level) {
-                error_log("Adventure: Level $levelPosition not found in world $worldNumber");
                 return new JSONResponse([
                     'status' => 'error',
                     'message' => "Level $levelPosition not found in world $worldNumber"
                 ], 404);
             }
-            
-            error_log("Adventure: Found level: " . json_encode($level));
 
             // Get level objectives
             try {
                 $objectives = $this->generateSimpleLevelObjectives($level, $worldNumber);
-                error_log("Adventure: Level objectives: " . json_encode($objectives));
             } catch (\Exception $e) {
-                error_log("Adventure: Error generating objectives: " . $e->getMessage());
                 throw new \Exception("Failed to generate level objectives: " . $e->getMessage());
             }
             
             // Check if objectives are completed
             try {
                 $completionResult = $this->checkObjectivesCompletion($userId, $objectives);
-                error_log("Adventure: Completion result: " . json_encode($completionResult));
             } catch (\Exception $e) {
-                error_log("Adventure: Error checking completion: " . $e->getMessage());
-                error_log("Adventure: Error trace: " . $e->getTraceAsString());
-                
                 // Create a safe fallback response to avoid total failure
                 $completionResult = [
                     'completed' => false,
@@ -688,24 +759,19 @@ class AdventureWorldController extends Controller {
                         ]
                     ]
                 ];
-                error_log("Adventure: Using fallback completion result");
             }
             
             if ($completionResult['completed']) {
                 // Complete the level and award XP
                 try {
                     $this->completeLevelAndAwardXP($userId, $worldNumber, $levelPosition, $level);
-                    error_log("Adventure: Successfully completed level and awarded XP");
                 } catch (\Exception $e) {
-                    error_log("Adventure: Error completing level: " . $e->getMessage());
                     // Continue anyway - level completion is more important than XP
                 }
                 
                 try {
                     $nextLevelUnlocked = $this->unlockNextLevel($userId, $worldNumber, $levelPosition);
-                    error_log("Adventure: Next level unlock result: " . ($nextLevelUnlocked ? 'true' : 'false'));
                 } catch (\Exception $e) {
-                    error_log("Adventure: Error unlocking next level: " . $e->getMessage());
                     $nextLevelUnlocked = false;
                 }
                 
@@ -729,8 +795,6 @@ class AdventureWorldController extends Controller {
             }
 
         } catch (\Exception $e) {
-            error_log('Adventure: Error checking level completion - ' . $e->getMessage());
-            error_log('Adventure: Stack trace: ' . $e->getTraceAsString());
             
             return new JSONResponse([
                 'status' => 'error',
@@ -830,7 +894,6 @@ class AdventureWorldController extends Controller {
             return new JSONResponse($response);
 
         } catch (\Exception $e) {
-            error_log('Adventure: Error completing level - ' . $e->getMessage());
             return new JSONResponse([
                 'status' => 'error',
                 'message' => 'Failed to complete level'
@@ -875,7 +938,6 @@ class AdventureWorldController extends Controller {
             ]);
 
         } catch (\Exception $e) {
-            error_log('Adventure: Error getting boss challenge - ' . $e->getMessage());
             return new JSONResponse([
                 'status' => 'error',
                 'message' => 'Failed to load boss challenge'
@@ -958,7 +1020,6 @@ class AdventureWorldController extends Controller {
             ]);
 
         } catch (\Exception $e) {
-            error_log('Adventure: Error completing boss - ' . $e->getMessage());
             return new JSONResponse([
                 'status' => 'error',
                 'message' => 'Failed to complete boss'
@@ -1029,7 +1090,6 @@ class AdventureWorldController extends Controller {
             ]);
 
         } catch (\Exception $e) {
-            error_log('Adventure: Error getting progress - ' . $e->getMessage());
             return new JSONResponse([
                 'status' => 'error',
                 'message' => 'Failed to load progress'
@@ -1068,45 +1128,36 @@ class AdventureWorldController extends Controller {
 
         // Try to generate new path
         try {
-            error_log("Adventure: Generating new path for world $worldNumber");
             $worldData = $this->worldGenerator->generateWorld($worldNumber, $userId);
             $availableTasks = $this->tasksApi->getTaskLists();
             
             $pathData = $this->pathGenerator->generateWorldPath($worldData, $availableTasks);
             
             if (!$pathData) {
-                error_log("Adventure: PathGenerator returned null, using fallback");
                 throw new \Exception("PathGenerator returned null");
             }
             
             // Save path to database
             $this->saveWorldPath($userId, $worldNumber, $pathData);
             
-            error_log("Adventure: Generated and saved path with " . count($pathData['levels'] ?? []) . " levels");
             return $pathData;
             
         } catch (\Exception $e) {
-            error_log("Adventure: Path generation failed: " . $e->getMessage());
-            error_log("Adventure: Exception type: " . get_class($e));
-            error_log("Adventure: Using fallback hardcoded path for world $worldNumber");
             
             // Fallback to hardcoded path data
             try {
                 $fallbackPath = $this->getFallbackPathData($worldNumber);
                 
                 if (!$fallbackPath) {
-                    error_log("Adventure: Fallback path generation failed!");
                     return null;
                 }
                 
                 // Save fallback path to database
                 $this->saveWorldPath($userId, $worldNumber, $fallbackPath);
                 
-                error_log("Adventure: Fallback path saved successfully with " . count($fallbackPath['levels'] ?? []) . " levels");
                 return $fallbackPath;
                 
             } catch (\Exception $fallbackException) {
-                error_log("Adventure: Fallback path generation also failed: " . $fallbackException->getMessage());
                 return null;
             }
         }
@@ -1116,7 +1167,6 @@ class AdventureWorldController extends Controller {
      * Get fallback hardcoded path data for a world
      */
     private function getFallbackPathData(int $worldNumber): array {
-        error_log("Adventure: Creating fallback path for world $worldNumber");
         
         // Base level data that works for all worlds
         $baseLevels = [
@@ -1210,43 +1260,47 @@ class AdventureWorldController extends Controller {
      * Get user's progress for a specific world
      */
     private function getUserWorldProgress(string $userId, int $worldNumber): ?array {
-        error_log("Adventure: Getting progress for user $userId, world $worldNumber");
         
-        $qb = $this->db->getQueryBuilder();
-        $qb->select('*')
-           ->from('adventure_progress')
-           ->where($qb->expr()->eq('user_id', $qb->createNamedParameter($userId)))
-           ->andWhere($qb->expr()->eq('world_number', $qb->createNamedParameter($worldNumber)));
+        // Try new table name first, then fall back to old table name
+        $tableNames = ['quest_adv_progress', 'adventure_player_progress'];
+        
+        foreach ($tableNames as $tableName) {
+            try {
+                $qb = $this->db->getQueryBuilder();
+                $qb->select('*')
+                   ->from('*PREFIX*' . $tableName)
+                   ->where($qb->expr()->eq('user_id', $qb->createNamedParameter($userId)))
+                   ->andWhere($qb->expr()->eq('world_number', $qb->createNamedParameter($worldNumber)));
 
-        $result = $qb->executeQuery();
-        $row = $result->fetch();
-        $result->closeCursor();
+                $result = $qb->executeQuery();
+                $row = $result->fetch();
+                $result->closeCursor();
 
-        if ($row) {
-            error_log("Adventure: Found progress data: " . json_encode($row));
-            return [
-                'world_status' => $row['world_status'],
-                'current_position' => $row['current_position'],
-                'levels_completed' => (int)$row['levels_completed'],
-                'total_levels' => (int)$row['total_levels'],
-                'boss_defeated' => (bool)$row['boss_defeated'],
-                'mini_boss_defeated' => (bool)$row['mini_boss_defeated'],
-                'total_xp_earned' => (int)$row['total_xp_earned'],
-                'started_at' => $row['started_at'],
-                'completed_at' => $row['completed_at']
-            ];
-        } else {
-            error_log("Adventure: No progress data found, initializing world $worldNumber");
-            // Initialize progress for new world
-            return $this->initializeWorldProgress($userId, $worldNumber);
+                if ($row) {
+                    return [
+                        'world_status' => $row['world_status'],
+                        'current_position' => $row['current_position'],
+                        'levels_completed' => (int)$row['levels_completed'],
+                        'total_levels' => (int)$row['total_levels'],
+                        'boss_defeated' => (bool)$row['boss_defeated'],
+                        'mini_boss_defeated' => (bool)$row['mini_boss_defeated'],
+                        'total_xp_earned' => (int)$row['total_xp_earned'],
+                        'started_at' => $row['started_at'],
+                        'completed_at' => $row['completed_at']
+                    ];
+                }
+            } catch (\Exception $e) {
+                continue; // Try next table
+            }
         }
+        // Initialize progress for new world
+        return $this->initializeWorldProgress($userId, $worldNumber);
     }
 
     /**
      * Initialize progress tracking for a new world
      */
     private function initializeWorldProgress(string $userId, int $worldNumber): array {
-        error_log("Adventure: Initializing progress for user $userId, world $worldNumber");
         
         // Determine if world should be unlocked (World 1 always unlocked)
         $status = 'locked';
@@ -1256,7 +1310,7 @@ class AdventureWorldController extends Controller {
             // Check if previous world is completed (avoid recursion by checking database directly)
             $qb = $this->db->getQueryBuilder();
             $qb->select('world_status')
-               ->from('adventure_progress')
+               ->from('*PREFIX*quest_adv_progress')
                ->where($qb->expr()->eq('user_id', $qb->createNamedParameter($userId)))
                ->andWhere($qb->expr()->eq('world_number', $qb->createNamedParameter($worldNumber - 1)));
             
@@ -1266,9 +1320,6 @@ class AdventureWorldController extends Controller {
             
             if ($previousRow && $previousRow['world_status'] === 'completed') {
                 $status = 'unlocked';
-                error_log("Adventure: World $worldNumber unlocked because previous world is completed");
-            } else {
-                error_log("Adventure: World $worldNumber locked because previous world not completed");
             }
         }
         
@@ -1285,24 +1336,63 @@ class AdventureWorldController extends Controller {
         ];
         
         // Save to database
-        $qb = $this->db->getQueryBuilder();
-        $qb->insert('adventure_progress')
-           ->setValue('user_id', $qb->createNamedParameter($userId))
-           ->setValue('world_number', $qb->createNamedParameter($worldNumber))
-           ->setValue('world_status', $qb->createNamedParameter($status))
-           ->setValue('current_position', $qb->createNamedParameter('level_1'))
-           ->setValue('levels_completed', $qb->createNamedParameter(0))
-           ->setValue('total_levels', $qb->createNamedParameter(10))
-           ->setValue('boss_defeated', $qb->createNamedParameter(0))
-           ->setValue('mini_boss_defeated', $qb->createNamedParameter(0))
-           ->setValue('total_xp_earned', $qb->createNamedParameter(0))
-           ->setValue('created_at', $qb->createNamedParameter(date('Y-m-d H:i:s')))
-           ->setValue('updated_at', $qb->createNamedParameter(date('Y-m-d H:i:s')));
+        try {
+            $qb = $this->db->getQueryBuilder();
+            $qb->insert('*PREFIX*quest_adv_progress')
+               ->setValue('user_id', $qb->createNamedParameter($userId))
+               ->setValue('world_number', $qb->createNamedParameter($worldNumber))
+               ->setValue('world_status', $qb->createNamedParameter($status))
+               ->setValue('current_position', $qb->createNamedParameter('level_1'))
+               ->setValue('levels_completed', $qb->createNamedParameter(0))
+               ->setValue('total_levels', $qb->createNamedParameter(10))
+               ->setValue('boss_defeated', $qb->createNamedParameter(0))
+               ->setValue('mini_boss_defeated', $qb->createNamedParameter(0))
+               ->setValue('total_xp_earned', $qb->createNamedParameter(0))
+               ->setValue('created_at', $qb->createNamedParameter(date('Y-m-d H:i:s')))
+               ->setValue('updated_at', $qb->createNamedParameter(date('Y-m-d H:i:s')));
 
-        $qb->executeStatement();
-        error_log("Adventure: Progress initialized for world $worldNumber with status: $status");
+            $qb->executeStatement();
+        } catch (\Exception $e) {
+            // Continue with in-memory progress data
+        }
         
         return $progressData;
+    }
+
+    /**
+     * Get the current active world number for a user
+     */
+    private function getCurrentWorldNumber(string $userId): int {
+        // Try new table name first, then fall back to old table name
+        $tableNames = ['quest_adv_progress', 'adventure_player_progress'];
+        
+        foreach ($tableNames as $tableName) {
+            try {
+                $qb = $this->db->getQueryBuilder();
+                $qb->select('world_number', 'world_status')
+                   ->from('*PREFIX*' . $tableName)
+                   ->where($qb->expr()->eq('user_id', $qb->createNamedParameter($userId)))
+                   ->andWhere($qb->expr()->in('world_status', $qb->createNamedParameter(
+                       ['unlocked', 'in_progress'],
+                       \OCP\DB\QueryBuilder\IQueryBuilder::PARAM_STR_ARRAY
+                   )))
+                   ->orderBy('world_number', 'DESC')
+                   ->setMaxResults(1);
+                
+                $result = $qb->executeQuery();
+                $row = $result->fetch();
+                $result->closeCursor();
+                
+                if ($row) {
+                    return (int)$row['world_number'];
+                }
+            } catch (\Exception $e) {
+                continue; // Try next table
+            }
+        }
+        
+        // Default to world 1 if no progress found in any table
+        return 1;
     }
 
     /**
@@ -1310,7 +1400,7 @@ class AdventureWorldController extends Controller {
      */
     private function saveWorldPath(string $userId, int $worldNumber, array $pathData): void {
         $qb = $this->db->getQueryBuilder();
-        $qb->insert('adventure_paths')
+        $qb->insert('*PREFIX*quest_adv_paths')
            ->setValue('user_id', $qb->createNamedParameter($userId))
            ->setValue('world_number', $qb->createNamedParameter($worldNumber))
            ->setValue('path_data', $qb->createNamedParameter(json_encode($pathData['levels'])))
@@ -1422,7 +1512,6 @@ class AdventureWorldController extends Controller {
      * Mark a level as started by the user
      */
     private function markLevelStarted(string $userId, int $worldNumber, string $levelPosition): void {
-        error_log("Adventure: Marking level $levelPosition in world $worldNumber as started for user $userId");
         
         // For now, we'll just log it. Later we can store this in a dedicated table
         // or update the user's current position in the adventure_progress table
@@ -1437,14 +1526,9 @@ class AdventureWorldController extends Controller {
             
             $rowsAffected = $qb->executeStatement();
             
-            if ($rowsAffected > 0) {
-                error_log("Adventure: Successfully updated current position to $levelPosition");
-            } else {
-                error_log("Adventure: No progress record found to update, level start recorded in logs only");
-            }
+            // Position updated successfully or no record found
             
         } catch (\Exception $e) {
-            error_log("Adventure: Error updating level start position: " . $e->getMessage());
             // Continue anyway - it's not critical
         }
     }
@@ -1537,21 +1621,17 @@ class AdventureWorldController extends Controller {
      */
     private function getTasksCompletedToday(string $userId): int {
         try {
-            error_log("Adventure: Checking tasks for user $userId using Quest XP history");
-            
             $today = date('Y-m-d');
-            error_log("Adventure: Looking for quest completions on: $today");
             
             // Try Quest XP history table first
             try {
                 $questCount = $this->getQuestCompletionsToday($userId);
-                error_log("Adventure: Quest completions today: $questCount");
                 
                 if ($questCount > 0) {
                     return $questCount;
                 }
             } catch (\Exception $e) {
-                error_log("Adventure: Error accessing quest history: " . $e->getMessage());
+                // Continue to fallback
             }
             
             // Fallback: Check user's existing quest data to estimate completions
@@ -1569,20 +1649,16 @@ class AdventureWorldController extends Controller {
                 if ($userData && $userData['level'] > 1) {
                     // User has progressed, assume they've completed some tasks today
                     $estimatedTasks = max(1, min(10, $userData['level'])); // 1-10 tasks based on level
-                    error_log("Adventure: Estimated $estimatedTasks tasks based on user level {$userData['level']}");
                     return $estimatedTasks;
                 }
             } catch (\Exception $e) {
-                error_log("Adventure: Error checking user quest data: " . $e->getMessage());
+                // Continue to final fallback
             }
             
             // Final fallback: assume at least 1 task completed
-            error_log("Adventure: Using minimal fallback - 1 task");
             return 1;
             
         } catch (\Exception $e) {
-            error_log("Adventure: Error counting completed tasks: " . $e->getMessage());
-            error_log("Adventure: Stack trace: " . $e->getTraceAsString());
             return 0;
         }
     }
@@ -1605,14 +1681,10 @@ class AdventureWorldController extends Controller {
             $result->closeCursor();
             
             $count = (int)($row['count'] ?? 0);
-            error_log("Adventure: Found $count quest completions today in XP history");
             
             return $count;
             
         } catch (\Exception $e) {
-            error_log("Adventure: Error counting quest completions: " . $e->getMessage());
-            error_log("Adventure: Error trace: " . $e->getTraceAsString());
-            
             // Don't try to create tables during a read operation, just return 0
             return 0;
         }
@@ -1633,8 +1705,6 @@ class AdventureWorldController extends Controller {
             $qb->executeQuery()->closeCursor();
             
         } catch (\Exception $e) {
-            error_log("Adventure: XP history table doesn't exist, creating it...");
-            
             // Create the table
             $schema = $this->db->createSchema();
             $table = $schema->createTable('quest_xp_history');
@@ -1651,7 +1721,6 @@ class AdventureWorldController extends Controller {
             $table->addIndex(['completed_at'], 'quest_xp_history_date_idx');
             
             $this->db->migrateToSchema($schema);
-            error_log("Adventure: Created quest_xp_history table");
         }
     }
 
@@ -1660,7 +1729,6 @@ class AdventureWorldController extends Controller {
      * Complete level and award XP
      */
     private function completeLevelAndAwardXP(string $userId, int $worldNumber, string $levelPosition, array $level): void {
-        error_log("Adventure: Completing level $levelPosition in world $worldNumber for user $userId");
         
         // Award XP using existing XP service
         try {
@@ -1670,10 +1738,8 @@ class AdventureWorldController extends Controller {
                 'level_position' => $levelPosition
             ]);
             
-            error_log("Adventure: Awarded {$level['reward_xp']} XP for completing {$level['name']}");
-            
         } catch (\Exception $e) {
-            error_log("Adventure: Error awarding XP: " . $e->getMessage());
+            // Error awarding XP - continue
         }
         
         // Update level status in progress tracking
@@ -1688,7 +1754,7 @@ class AdventureWorldController extends Controller {
             $qb->executeStatement();
             
         } catch (\Exception $e) {
-            error_log("Adventure: Error updating progress: " . $e->getMessage());
+            // Error updating progress - continue
         }
     }
 
@@ -1707,7 +1773,6 @@ class AdventureWorldController extends Controller {
         $nextLevel = $nextLevelMap[$currentLevelPosition] ?? null;
         
         if ($nextLevel) {
-            error_log("Adventure: Unlocking next level: $nextLevel");
             // In a full implementation, we'd update the level status in the database
             // For now, we'll just return true to indicate progression
             return true;
@@ -1839,7 +1904,7 @@ class AdventureWorldController extends Controller {
         $bossDefinition = $this->worldGenerator->getBossDefinition($worldNumber);
         
         $qb = $this->db->getQueryBuilder();
-        $qb->insert('adventure_boss_wins')
+        $qb->insert('*PREFIX*quest_adv_wins')
            ->setValue('user_id', $qb->createNamedParameter($userId))
            ->setValue('world_number', $qb->createNamedParameter($worldNumber))
            ->setValue('boss_level_id', $qb->createNamedParameter(0)) // Will be updated when we have actual boss level IDs
@@ -1874,7 +1939,7 @@ class AdventureWorldController extends Controller {
         
         // Check if progress row exists
         $qb->select('COUNT(*)')
-           ->from('adventure_progress')
+           ->from('*PREFIX*quest_adv_progress')
            ->where($qb->expr()->eq('user_id', $qb->createNamedParameter($userId)))
            ->andWhere($qb->expr()->eq('world_number', $qb->createNamedParameter($worldNumber)));
 
@@ -1885,7 +1950,7 @@ class AdventureWorldController extends Controller {
         if (!$exists) {
             // Insert new progress record
             $qb = $this->db->getQueryBuilder();
-            $qb->insert('adventure_progress')
+            $qb->insert('*PREFIX*quest_adv_progress')
                ->setValue('user_id', $qb->createNamedParameter($userId))
                ->setValue('world_number', $qb->createNamedParameter($worldNumber))
                ->setValue('world_status', $qb->createNamedParameter('unlocked'))

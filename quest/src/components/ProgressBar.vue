@@ -2,7 +2,7 @@
     <div class="progress-bar-container" :class="{ detailed: detailed }">
         <div class="progress-header">
             <div class="progress-info">
-                <h4 v-if="detailed">{{ t('nextcloudquest', 'Experience Points') }}</h4>
+                <h4 v-if="detailed">{{ t('quest', 'Experience Points') }}</h4>
                 <div class="xp-display">
                     <span class="current-xp">{{ formatNumber(stats.level.current_xp) }}</span>
                     <span class="separator">/</span>
@@ -10,7 +10,7 @@
                     <span class="xp-label">XP</span>
                 </div>
                 <div v-if="detailed" class="lifetime-xp">
-                    {{ t('nextcloudquest', 'Total: {xp} XP', { xp: formatNumber(stats.level.lifetime_xp) }) }}
+                    {{ t('quest', 'Total: {xp} XP', { xp: formatNumber(stats.level.lifetime_xp) }) }}
                 </div>
             </div>
             <div class="progress-percentage">
@@ -41,11 +41,11 @@
         
         <div v-if="detailed" class="progress-details">
             <div class="detail-item">
-                <span class="label">{{ t('nextcloudquest', 'XP to next level:') }}</span>
+                <span class="label">{{ t('quest', 'XP to next level:') }}</span>
                 <span class="value">{{ formatNumber(stats.level.xp_to_next_level) }}</span>
             </div>
             <div class="detail-item">
-                <span class="label">{{ t('nextcloudquest', 'Next level:') }}</span>
+                <span class="label">{{ t('quest', 'Next level:') }}</span>
                 <span class="value">{{ stats.level.level + 1 }}</span>
             </div>
         </div>

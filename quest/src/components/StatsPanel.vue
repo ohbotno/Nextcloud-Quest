@@ -1,13 +1,13 @@
 <template>
     <div class="stats-panel">
         <div class="panel-header">
-            <h3>{{ t('nextcloudquest', 'Statistics & History') }}</h3>
+            <h3>{{ t('quest', 'Statistics & History') }}</h3>
             <div class="time-filter">
                 <select v-model="selectedPeriod" @change="loadData">
-                    <option value="7">{{ t('nextcloudquest', 'Last 7 days') }}</option>
-                    <option value="30">{{ t('nextcloudquest', 'Last 30 days') }}</option>
-                    <option value="90">{{ t('nextcloudquest', 'Last 90 days') }}</option>
-                    <option value="0">{{ t('nextcloudquest', 'All time') }}</option>
+                    <option value="7">{{ t('quest', 'Last 7 days') }}</option>
+                    <option value="30">{{ t('quest', 'Last 30 days') }}</option>
+                    <option value="90">{{ t('quest', 'Last 90 days') }}</option>
+                    <option value="0">{{ t('quest', 'All time') }}</option>
                 </select>
             </div>
         </div>
@@ -18,7 +18,7 @@
                 <div class="stat-icon">📋</div>
                 <div class="stat-info">
                     <div class="stat-value">{{ historyStats.total_tasks }}</div>
-                    <div class="stat-label">{{ t('nextcloudquest', 'Tasks Completed') }}</div>
+                    <div class="stat-label">{{ t('quest', 'Tasks Completed') }}</div>
                 </div>
             </div>
             
@@ -26,7 +26,7 @@
                 <div class="stat-icon">⭐</div>
                 <div class="stat-info">
                     <div class="stat-value">{{ formatNumber(historyStats.total_xp) }}</div>
-                    <div class="stat-label">{{ t('nextcloudquest', 'XP Earned') }}</div>
+                    <div class="stat-label">{{ t('quest', 'XP Earned') }}</div>
                 </div>
             </div>
             
@@ -34,7 +34,7 @@
                 <div class="stat-icon">📈</div>
                 <div class="stat-info">
                     <div class="stat-value">{{ historyStats.average_per_day.toFixed(1) }}</div>
-                    <div class="stat-label">{{ t('nextcloudquest', 'Avg per Day') }}</div>
+                    <div class="stat-label">{{ t('quest', 'Avg per Day') }}</div>
                 </div>
             </div>
             
@@ -42,7 +42,7 @@
                 <div class="stat-icon">🏆</div>
                 <div class="stat-info">
                     <div class="stat-value">{{ stats.achievements.unlocked }}</div>
-                    <div class="stat-label">{{ t('nextcloudquest', 'Achievements') }}</div>
+                    <div class="stat-label">{{ t('quest', 'Achievements') }}</div>
                 </div>
             </div>
         </div>
@@ -50,15 +50,15 @@
         <!-- Activity Chart -->
         <div class="chart-section">
             <div class="chart-header">
-                <h4>{{ t('nextcloudquest', 'Daily Activity') }}</h4>
+                <h4>{{ t('quest', 'Daily Activity') }}</h4>
                 <div class="chart-legend">
                     <div class="legend-item">
                         <div class="legend-color tasks"></div>
-                        <span>{{ t('nextcloudquest', 'Tasks') }}</span>
+                        <span>{{ t('quest', 'Tasks') }}</span>
                     </div>
                     <div class="legend-item">
                         <div class="legend-color xp"></div>
-                        <span>{{ t('nextcloudquest', 'XP') }}</span>
+                        <span>{{ t('quest', 'XP') }}</span>
                     </div>
                 </div>
             </div>
@@ -101,9 +101,9 @@
         <!-- Recent History -->
         <div class="history-section">
             <div class="history-header">
-                <h4>{{ t('nextcloudquest', 'Recent Completions') }}</h4>
+                <h4>{{ t('quest', 'Recent Completions') }}</h4>
                 <button @click="loadMoreHistory" :disabled="loading.history" class="load-more-btn">
-                    {{ loading.history ? t('nextcloudquest', 'Loading...') : t('nextcloudquest', 'Load More') }}
+                    {{ loading.history ? t('quest', 'Loading...') : t('quest', 'Load More') }}
                 </button>
             </div>
             
@@ -129,7 +129,7 @@
                 <div v-if="history.length === 0 && !loading.history" class="no-history">
                     <div class="no-history-icon">📝</div>
                     <div class="no-history-text">
-                        {{ t('nextcloudquest', 'No tasks completed yet. Start your quest by completing your first task!') }}
+                        {{ t('quest', 'No tasks completed yet. Start your quest by completing your first task!') }}
                     </div>
                 </div>
             </div>
@@ -141,11 +141,11 @@
                 <div class="tooltip-date">{{ tooltip.data.date }}</div>
                 <div class="tooltip-stats">
                     <div class="tooltip-stat">
-                        <span class="tooltip-label">{{ t('nextcloudquest', 'Tasks:') }}</span>
+                        <span class="tooltip-label">{{ t('quest', 'Tasks:') }}</span>
                         <span class="tooltip-value">{{ tooltip.data.tasks }}</span>
                     </div>
                     <div class="tooltip-stat">
-                        <span class="tooltip-label">{{ t('nextcloudquest', 'XP:') }}</span>
+                        <span class="tooltip-label">{{ t('quest', 'XP:') }}</span>
                         <span class="tooltip-value">{{ tooltip.data.xp }}</span>
                     </div>
                 </div>
@@ -227,16 +227,16 @@ export default {
             const diffInSeconds = Math.floor((now - date) / 1000)
             
             if (diffInSeconds < 60) {
-                return this.t('nextcloudquest', 'Just now')
+                return this.t('quest', 'Just now')
             } else if (diffInSeconds < 3600) {
                 const minutes = Math.floor(diffInSeconds / 60)
-                return this.t('nextcloudquest', '{minutes}m ago', { minutes })
+                return this.t('quest', '{minutes}m ago', { minutes })
             } else if (diffInSeconds < 86400) {
                 const hours = Math.floor(diffInSeconds / 3600)
-                return this.t('nextcloudquest', '{hours}h ago', { hours })
+                return this.t('quest', '{hours}h ago', { hours })
             } else if (diffInSeconds < 604800) {
                 const days = Math.floor(diffInSeconds / 86400)
-                return this.t('nextcloudquest', '{days}d ago', { days })
+                return this.t('quest', '{days}d ago', { days })
             } else {
                 return date.toLocaleDateString()
             }
@@ -249,9 +249,9 @@ export default {
         },
         
         getXPBadgeText(xpEarned) {
-            if (xpEarned >= 25) return this.t('nextcloudquest', 'High XP')
-            if (xpEarned >= 15) return this.t('nextcloudquest', 'Good XP')
-            return this.t('nextcloudquest', 'Base XP')
+            if (xpEarned >= 25) return this.t('quest', 'High XP')
+            if (xpEarned >= 15) return this.t('quest', 'Good XP')
+            return this.t('quest', 'Base XP')
         },
         
         async loadData() {

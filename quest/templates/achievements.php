@@ -1071,14 +1071,7 @@ ob_start();
 }
 </style>
 
-<script>
-// Initialize achievements page when DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
-    if (typeof QuestAchievements !== 'undefined') {
-        QuestAchievements.init();
-    }
-});
-</script>
+<!-- JavaScript initialization moved to achievements.js to avoid CSP violations -->
 
 <?php
 // Capture the content and pass it to the layout

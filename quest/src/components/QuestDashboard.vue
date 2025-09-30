@@ -4,8 +4,8 @@
         <div class="quest-header">
             <div class="quest-title">
                 <h1>
-                    <img src="../assets/quest-icon.svg" alt="Quest" class="quest-icon" />
-                    {{ t('nextcloudquest', 'Quest') }}
+                    <span class="quest-icon">🎯</span>
+                    {{ t('quest', 'Quest') }}
                 </h1>
                 <div class="theme-toggle">
                     <button 
@@ -325,7 +325,7 @@ export default {
         },
         
         getAchievementIcon(icon) {
-            return `/apps/nextcloudquest/img/achievements/${icon}`
+            return `/apps/quest/img/achievements/${icon}`
         },
         
         getPlayerName(userId) {
@@ -348,12 +348,12 @@ export default {
         this.loadHistory()
         this.loadLeaderboard({ orderBy: this.leaderboardType })
         
-        // Set up periodic refresh
-        this.refreshInterval = setInterval(() => {
-            if (!this.loading.stats) {
-                this.loadUserStats()
-            }
-        }, 60000) // Refresh every minute
+        // DISABLED: Set up periodic refresh (was causing stats to be overwritten)
+        // this.refreshInterval = setInterval(() => {
+        //     if (!this.loading.stats) {
+        //         this.loadUserStats()
+        //     }
+        // }, 60000) // Refresh every minute
     },
     
     beforeDestroy() {
@@ -391,8 +391,8 @@ export default {
 }
 
 .quest-icon {
-    width: 32px;
-    height: 32px;
+    font-size: 32px;
+    margin-right: 10px;
 }
 
 .theme-toggle {

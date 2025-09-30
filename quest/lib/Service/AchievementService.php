@@ -401,6 +401,475 @@ class AchievementService {
             'rarity' => 'Epic',
             'progress_type' => 'milestone',
             'milestone' => 100
+        ],
+
+        // ===== ENDURANCE TITAN CATEGORY - Ultra Long-term =====
+        'tasks_10000' => [
+            'name' => 'Task Emperor',
+            'description' => 'Complete 10,000 tasks - A true productivity emperor!',
+            'icon' => 'task-emperor.svg',
+            'category' => 'Endurance Titan',
+            'rarity' => 'Mythic',
+            'progress_type' => 'milestone',
+            'milestone' => 10000
+        ],
+        'tasks_25000' => [
+            'name' => 'Task Immortal',
+            'description' => 'Complete 25,000 tasks - Immortal productivity legend!',
+            'icon' => 'task-immortal.svg',
+            'category' => 'Endurance Titan',
+            'rarity' => 'Mythic',
+            'progress_type' => 'milestone',
+            'milestone' => 25000
+        ],
+        'tasks_50000' => [
+            'name' => 'Task Transcendent',
+            'description' => 'Complete 50,000 tasks - Beyond mortal achievement!',
+            'icon' => 'task-transcendent.svg',
+            'category' => 'Endurance Titan',
+            'rarity' => 'Mythic',
+            'progress_type' => 'milestone',
+            'milestone' => 50000
+        ],
+        'streak_500' => [
+            'name' => 'Eternal Flame',
+            'description' => 'Maintain a 500-day streak - The eternal flame of dedication!',
+            'icon' => 'eternal-flame.svg',
+            'category' => 'Endurance Titan',
+            'rarity' => 'Mythic',
+            'progress_type' => 'streak',
+            'milestone' => 500
+        ],
+        'streak_1000' => [
+            'name' => 'Millennium Master',
+            'description' => 'Maintain a 1000-day streak - Master of the millennium!',
+            'icon' => 'millennium-master.svg',
+            'category' => 'Endurance Titan',
+            'rarity' => 'Mythic',
+            'progress_type' => 'streak',
+            'milestone' => 1000
+        ],
+
+        // ===== WORLD CONQUEROR CATEGORY - Adventure Path =====
+        'world_1_complete' => [
+            'name' => 'Grassland Hero',
+            'description' => 'Complete all levels in World 1: Grassland Village',
+            'icon' => 'grassland-hero.svg',
+            'category' => 'World Conqueror',
+            'rarity' => 'Common',
+            'progress_type' => 'special'
+        ],
+        'world_2_complete' => [
+            'name' => 'Desert Champion',
+            'description' => 'Conquer World 2: Desert Pyramid',
+            'icon' => 'desert-champion.svg',
+            'category' => 'World Conqueror',
+            'rarity' => 'Rare',
+            'progress_type' => 'special'
+        ],
+        'world_8_complete' => [
+            'name' => 'Shadow Realm Master',
+            'description' => 'Complete the ultimate World 8: Shadow Realm',
+            'icon' => 'shadow-master.svg',
+            'category' => 'World Conqueror',
+            'rarity' => 'Legendary',
+            'progress_type' => 'special'
+        ],
+        'all_bosses' => [
+            'name' => 'Boss Slayer Supreme',
+            'description' => 'Defeat all 8 world bosses',
+            'icon' => 'boss-slayer.svg',
+            'category' => 'World Conqueror',
+            'rarity' => 'Epic',
+            'progress_type' => 'special'
+        ],
+        'speedrun_world' => [
+            'name' => 'Speed Runner',
+            'description' => 'Complete any world in under 3 days',
+            'icon' => 'speed-runner.svg',
+            'category' => 'World Conqueror',
+            'rarity' => 'Epic',
+            'progress_type' => 'special'
+        ],
+        'perfect_world' => [
+            'name' => 'Flawless Victory',
+            'description' => 'Complete a world without losing any health',
+            'icon' => 'flawless-victory.svg',
+            'category' => 'World Conqueror',
+            'rarity' => 'Legendary',
+            'progress_type' => 'special'
+        ],
+
+        // ===== CATEGORY SPECIALIST - Master each task type =====
+        'personal_master' => [
+            'name' => 'Personal Growth Guru',
+            'description' => 'Complete 500 personal tasks',
+            'icon' => 'personal-guru.svg',
+            'category' => 'Category Specialist',
+            'rarity' => 'Epic',
+            'progress_type' => 'milestone',
+            'milestone' => 500
+        ],
+        'work_warrior' => [
+            'name' => 'Work Warrior',
+            'description' => 'Complete 500 work tasks',
+            'icon' => 'work-warrior.svg',
+            'category' => 'Category Specialist',
+            'rarity' => 'Epic',
+            'progress_type' => 'milestone',
+            'milestone' => 500
+        ],
+        'fitness_fanatic' => [
+            'name' => 'Fitness Fanatic',
+            'description' => 'Complete 500 fitness tasks',
+            'icon' => 'fitness-fanatic.svg',
+            'category' => 'Category Specialist',
+            'rarity' => 'Epic',
+            'progress_type' => 'milestone',
+            'milestone' => 500
+        ],
+        'creative_genius' => [
+            'name' => 'Creative Genius',
+            'description' => 'Complete 500 creative tasks',
+            'icon' => 'creative-genius.svg',
+            'category' => 'Category Specialist',
+            'rarity' => 'Epic',
+            'progress_type' => 'milestone',
+            'milestone' => 500
+        ],
+        'social_butterfly' => [
+            'name' => 'Social Butterfly',
+            'description' => 'Complete 500 social tasks',
+            'icon' => 'social-butterfly.svg',
+            'category' => 'Category Specialist',
+            'rarity' => 'Epic',
+            'progress_type' => 'milestone',
+            'milestone' => 500
+        ],
+        'all_categories_master' => [
+            'name' => 'Jack of All Trades',
+            'description' => 'Complete 100 tasks in every category',
+            'icon' => 'jack-of-trades.svg',
+            'category' => 'Category Specialist',
+            'rarity' => 'Legendary',
+            'progress_type' => 'special'
+        ],
+
+        // ===== TIME LORD CATEGORY - Time-based achievements =====
+        'tasks_every_hour' => [
+            'name' => '24/7 Achiever',
+            'description' => 'Complete tasks in all 24 hours of a day',
+            'icon' => '24-7-achiever.svg',
+            'category' => 'Time Lord',
+            'rarity' => 'Legendary',
+            'progress_type' => 'special'
+        ],
+        'monthly_perfect' => [
+            'name' => 'Monthly Perfectionist',
+            'description' => 'Complete tasks every day for a full month',
+            'icon' => 'monthly-perfect.svg',
+            'category' => 'Time Lord',
+            'rarity' => 'Epic',
+            'progress_type' => 'special'
+        ],
+        'quarterly_champion' => [
+            'name' => 'Quarterly Champion',
+            'description' => 'Maintain a 90-day streak',
+            'icon' => 'quarterly-champion.svg',
+            'category' => 'Time Lord',
+            'rarity' => 'Epic',
+            'progress_type' => 'streak',
+            'milestone' => 90
+        ],
+        'seasonal_master' => [
+            'name' => 'Four Seasons Master',
+            'description' => 'Complete tasks in all four seasons of a year',
+            'icon' => 'four-seasons.svg',
+            'category' => 'Time Lord',
+            'rarity' => 'Rare',
+            'progress_type' => 'special'
+        ],
+        'year_dominator' => [
+            'name' => 'Year Dominator',
+            'description' => 'Complete 1000+ tasks in a single year',
+            'icon' => 'year-dominator.svg',
+            'category' => 'Time Lord',
+            'rarity' => 'Legendary',
+            'progress_type' => 'special'
+        ],
+
+        // ===== EXTREME CHALLENGES - Pushing limits =====
+        'speed_20_in_hour' => [
+            'name' => 'Task Tornado',
+            'description' => 'Complete 20 tasks in one hour - Tornado speed!',
+            'icon' => 'task-tornado.svg',
+            'category' => 'Extreme Challenges',
+            'rarity' => 'Mythic',
+            'progress_type' => 'special'
+        ],
+        'daily_50' => [
+            'name' => 'Daily Dominator',
+            'description' => 'Complete 50 tasks in one day',
+            'icon' => 'daily-dominator.svg',
+            'category' => 'Extreme Challenges',
+            'rarity' => 'Mythic',
+            'progress_type' => 'special'
+        ],
+        'weekly_200' => [
+            'name' => 'Weekly Wonder',
+            'description' => 'Complete 200 tasks in one week',
+            'icon' => 'weekly-wonder.svg',
+            'category' => 'Extreme Challenges',
+            'rarity' => 'Legendary',
+            'progress_type' => 'special'
+        ],
+        'no_overdue_30' => [
+            'name' => 'Zero Tolerance',
+            'description' => 'Have no overdue tasks for 30 consecutive days',
+            'icon' => 'zero-tolerance.svg',
+            'category' => 'Extreme Challenges',
+            'rarity' => 'Epic',
+            'progress_type' => 'special'
+        ],
+        'comeback_king' => [
+            'name' => 'Comeback King',
+            'description' => 'Restore your streak after a 30+ day break',
+            'icon' => 'comeback-king.svg',
+            'category' => 'Extreme Challenges',
+            'rarity' => 'Rare',
+            'progress_type' => 'special'
+        ],
+
+        // ===== HEALTH MASTER CATEGORY =====
+        'full_health_week' => [
+            'name' => 'Healthy Week',
+            'description' => 'Maintain full health for 7 consecutive days',
+            'icon' => 'healthy-week.svg',
+            'category' => 'Health Master',
+            'rarity' => 'Rare',
+            'progress_type' => 'special'
+        ],
+        'full_health_month' => [
+            'name' => 'Health Champion',
+            'description' => 'Maintain full health for 30 consecutive days',
+            'icon' => 'health-champion.svg',
+            'category' => 'Health Master',
+            'rarity' => 'Epic',
+            'progress_type' => 'special'
+        ],
+        'never_zero' => [
+            'name' => 'Never Give Up',
+            'description' => 'Never reach 0 health in your first 100 days',
+            'icon' => 'never-give-up.svg',
+            'category' => 'Health Master',
+            'rarity' => 'Legendary',
+            'progress_type' => 'special'
+        ],
+        'health_recovery' => [
+            'name' => 'Phoenix Rising',
+            'description' => 'Recover from less than 10 health to full health',
+            'icon' => 'phoenix-rising.svg',
+            'category' => 'Health Master',
+            'rarity' => 'Rare',
+            'progress_type' => 'special'
+        ],
+        'xp_healer' => [
+            'name' => 'XP Medic',
+            'description' => 'Heal 1000 health points using XP',
+            'icon' => 'xp-medic.svg',
+            'category' => 'Health Master',
+            'rarity' => 'Epic',
+            'progress_type' => 'milestone',
+            'milestone' => 1000
+        ],
+
+        // ===== XP & LEVEL LEGENDS =====
+        'level_150' => [
+            'name' => 'Ascended Master',
+            'description' => 'Reach level 150 - Ascend beyond mortal limits!',
+            'icon' => 'ascended-master.svg',
+            'category' => 'XP Legends',
+            'rarity' => 'Mythic',
+            'progress_type' => 'level',
+            'milestone' => 150
+        ],
+        'level_200' => [
+            'name' => 'Divine Champion',
+            'description' => 'Reach level 200 - Achieve divine status!',
+            'icon' => 'divine-champion.svg',
+            'category' => 'XP Legends',
+            'rarity' => 'Mythic',
+            'progress_type' => 'level',
+            'milestone' => 200
+        ],
+        'xp_millionaire' => [
+            'name' => 'XP Millionaire',
+            'description' => 'Earn 1,000,000 lifetime XP',
+            'icon' => 'xp-millionaire.svg',
+            'category' => 'XP Legends',
+            'rarity' => 'Legendary',
+            'progress_type' => 'milestone',
+            'milestone' => 1000000
+        ],
+        'daily_xp_1000' => [
+            'name' => 'XP Explosion',
+            'description' => 'Earn 1000 XP in a single day',
+            'icon' => 'xp-explosion.svg',
+            'category' => 'XP Legends',
+            'rarity' => 'Epic',
+            'progress_type' => 'special'
+        ],
+        'xp_streak' => [
+            'name' => 'XP Machine',
+            'description' => 'Earn 500+ XP for 7 consecutive days',
+            'icon' => 'xp-machine.svg',
+            'category' => 'XP Legends',
+            'rarity' => 'Rare',
+            'progress_type' => 'special'
+        ],
+
+        // ===== STATISTICAL MARVELS =====
+        'task_variety' => [
+            'name' => 'Variety King',
+            'description' => 'Complete 10 different task types in one day',
+            'icon' => 'variety-king.svg',
+            'category' => 'Statistical Marvels',
+            'rarity' => 'Rare',
+            'progress_type' => 'special'
+        ],
+        'priority_master_500' => [
+            'name' => 'Priority Prophet',
+            'description' => 'Complete 500 high-priority tasks',
+            'icon' => 'priority-prophet.svg',
+            'category' => 'Statistical Marvels',
+            'rarity' => 'Epic',
+            'progress_type' => 'milestone',
+            'milestone' => 500
+        ],
+        'deadline_ninja' => [
+            'name' => 'Deadline Ninja',
+            'description' => 'Complete 500 tasks before their deadline',
+            'icon' => 'deadline-ninja.svg',
+            'category' => 'Statistical Marvels',
+            'rarity' => 'Epic',
+            'progress_type' => 'milestone',
+            'milestone' => 500
+        ],
+        'early_completer' => [
+            'name' => 'Ahead of Schedule',
+            'description' => 'Complete 100 tasks 3+ days before deadline',
+            'icon' => 'ahead-schedule.svg',
+            'category' => 'Statistical Marvels',
+            'rarity' => 'Rare',
+            'progress_type' => 'milestone',
+            'milestone' => 100
+        ],
+        'overdue_recovery' => [
+            'name' => 'Redemption Arc',
+            'description' => 'Clear 50+ overdue tasks',
+            'icon' => 'redemption-arc.svg',
+            'category' => 'Statistical Marvels',
+            'rarity' => 'Rare',
+            'progress_type' => 'milestone',
+            'milestone' => 50
+        ],
+
+        // ===== RARE & SECRET ACHIEVEMENTS =====
+        'palindrome_day' => [
+            'name' => 'Palindrome Power',
+            'description' => 'Complete tasks on a palindrome date (like 12/21)',
+            'icon' => 'palindrome-power.svg',
+            'category' => 'Rare & Secret',
+            'rarity' => 'Legendary',
+            'progress_type' => 'special'
+        ],
+        'friday_13th' => [
+            'name' => 'Lucky 13',
+            'description' => 'Complete 13 tasks on Friday the 13th',
+            'icon' => 'lucky-13.svg',
+            'category' => 'Rare & Secret',
+            'rarity' => 'Legendary',
+            'progress_type' => 'special'
+        ],
+        'perfect_score' => [
+            'name' => 'Perfect Score',
+            'description' => 'Reach exactly 10,000 XP (no more, no less)',
+            'icon' => 'perfect-score.svg',
+            'category' => 'Rare & Secret',
+            'rarity' => 'Mythic',
+            'progress_type' => 'special'
+        ],
+        'binary_master' => [
+            'name' => 'Binary Master',
+            'description' => 'Complete exactly 1024 tasks (2^10)',
+            'icon' => 'binary-master.svg',
+            'category' => 'Rare & Secret',
+            'rarity' => 'Epic',
+            'progress_type' => 'milestone',
+            'milestone' => 1024
+        ],
+        'anniversary_dedication' => [
+            'name' => 'Anniversary Hero',
+            'description' => 'Complete tasks on the app anniversary date',
+            'icon' => 'anniversary-hero.svg',
+            'category' => 'Rare & Secret',
+            'rarity' => 'Legendary',
+            'progress_type' => 'special'
+        ],
+        'golden_ratio' => [
+            'name' => 'Golden Ratio',
+            'description' => 'Complete exactly 1618 tasks (golden ratio × 1000)',
+            'icon' => 'golden-ratio.svg',
+            'category' => 'Rare & Secret',
+            'rarity' => 'Mythic',
+            'progress_type' => 'milestone',
+            'milestone' => 1618
+        ],
+
+        // ===== COMMUNITY & SOCIAL (Future multiplayer) =====
+        'helper' => [
+            'name' => 'Helpful Hero',
+            'description' => 'Help 10 other users achieve their goals',
+            'icon' => 'helpful-hero.svg',
+            'category' => 'Community & Social',
+            'rarity' => 'Rare',
+            'progress_type' => 'milestone',
+            'milestone' => 10
+        ],
+        'team_player' => [
+            'name' => 'Team Player',
+            'description' => 'Complete 50 team challenges',
+            'icon' => 'team-player.svg',
+            'category' => 'Community & Social',
+            'rarity' => 'Epic',
+            'progress_type' => 'milestone',
+            'milestone' => 50
+        ],
+        'mentor' => [
+            'name' => 'Wise Mentor',
+            'description' => 'Guide 5 new users to their first achievement',
+            'icon' => 'wise-mentor.svg',
+            'category' => 'Community & Social',
+            'rarity' => 'Legendary',
+            'progress_type' => 'milestone',
+            'milestone' => 5
+        ],
+        'inspiration' => [
+            'name' => 'Inspiration',
+            'description' => 'Share achievements 50 times',
+            'icon' => 'inspiration.svg',
+            'category' => 'Community & Social',
+            'rarity' => 'Rare',
+            'progress_type' => 'milestone',
+            'milestone' => 50
+        ],
+        'trendsetter' => [
+            'name' => 'Trendsetter',
+            'description' => 'Be the first to unlock a new achievement',
+            'icon' => 'trendsetter.svg',
+            'category' => 'Community & Social',
+            'rarity' => 'Mythic',
+            'progress_type' => 'special'
         ]
     ];
     
@@ -533,12 +1002,22 @@ class AchievementService {
             return null;
         }
         
+        // Get achievement data
+        $achievementData = self::ACHIEVEMENTS[$achievementKey] ?? null;
+        if (!$achievementData) {
+            return null;
+        }
+        
         // Create new achievement
         $achievement = new Achievement();
         $achievement->setUserId($userId);
         $achievement->setAchievementKey($achievementKey);
         $achievement->setUnlockedAt((new \DateTime())->format('Y-m-d H:i:s'));
         $achievement->setNotified(0);
+        $achievement->setAchievementPoints($this->calculateAchievementPoints($achievementData['rarity']));
+        $achievement->setAchievementCategory($achievementData['category']);
+        $achievement->setProgressCurrent($achievementData['milestone'] ?? 0);
+        $achievement->setProgressTarget($achievementData['milestone'] ?? 0);
         
         $achievement = $this->achievementMapper->insert($achievement);
         
@@ -606,6 +1085,25 @@ class AchievementService {
                 }
             }
             
+            // Calculate achievement points based on rarity
+            $points = $this->calculateAchievementPoints($data['rarity']);
+            
+            // Get current progress for milestone achievements
+            $progressPercentage = 0;
+            $progressCurrent = 0;
+            $progressTarget = $data['milestone'] ?? 0;
+            
+            if (!$isUnlocked && $data['progress_type'] === 'milestone') {
+                $progress = $this->getAchievementProgress($userId, $key);
+                if ($progress) {
+                    $progressPercentage = $progress['percentage'];
+                    $progressCurrent = $progress['current'];
+                }
+            } elseif ($isUnlocked) {
+                $progressPercentage = 100;
+                $progressCurrent = $progressTarget;
+            }
+            
             $achievements[] = [
                 'key' => $key,
                 'name' => $data['name'],
@@ -615,12 +1113,34 @@ class AchievementService {
                 'rarity' => $data['rarity'],
                 'progress_type' => $data['progress_type'],
                 'milestone' => $data['milestone'] ?? null,
+                'achievement_points' => $points,
+                'progress_percentage' => $progressPercentage,
+                'progress_current' => $progressCurrent,
+                'progress_target' => $progressTarget,
                 'unlocked' => $isUnlocked,
                 'unlocked_at' => $unlockedAt
             ];
         }
         
         return $achievements;
+    }
+
+    /**
+     * Calculate achievement points based on rarity
+     * 
+     * @param string $rarity
+     * @return int
+     */
+    private function calculateAchievementPoints(string $rarity): int {
+        $points = [
+            'Common' => 10,
+            'Rare' => 25,
+            'Epic' => 50,
+            'Legendary' => 100,
+            'Mythic' => 250
+        ];
+        
+        return $points[$rarity] ?? 10;
     }
 
     /**

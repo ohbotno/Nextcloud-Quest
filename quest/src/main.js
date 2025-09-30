@@ -13,10 +13,10 @@ import { loadState } from '@nextcloud/initial-state'
 
 // Nextcloud compatibility
 __webpack_nonce__ = btoa(getRequestToken())
-__webpack_public_path__ = generateFilePath('nextcloudquest', '', 'js/')
+__webpack_public_path__ = generateFilePath('quest', '', 'js/')
 
 // Load initial state
-const initialUser = loadState('nextcloudquest', 'user')
+const initialUser = loadState('quest', 'user')
 
 // Initialize Vue app
 Vue.mixin({

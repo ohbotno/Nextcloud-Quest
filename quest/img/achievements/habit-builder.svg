@@ -1,0 +1,25 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="32" cy="32" r="30" fill="#795548" stroke="#5D4037" stroke-width="2"/>
+  <rect x="16" y="20" width="32" height="24" fill="#8BC34A" stroke="#558B2F" stroke-width="2"/>
+  <rect x="18" y="22" width="28" height="20" fill="#AED581"/>
+  <rect x="20" y="24" width="4" height="4" fill="#4CAF50"/>
+  <rect x="26" y="24" width="4" height="4" fill="#4CAF50"/>
+  <rect x="32" y="24" width="4" height="4" fill="#4CAF50"/>
+  <rect x="38" y="24" width="4" height="4" fill="#4CAF50"/>
+  <rect x="20" y="30" width="4" height="4" fill="#4CAF50"/>
+  <rect x="26" y="30" width="4" height="4" fill="#4CAF50"/>
+  <rect x="32" y="30" width="4" height="4" fill="#66BB6A"/>
+  <rect x="38" y="30" width="4" height="4" fill="#E8F5E8"/>
+  <rect x="20" y="36" width="4" height="4" fill="#66BB6A"/>
+  <rect x="26" y="36" width="4" height="4" fill="#E8F5E8"/>
+  <rect x="32" y="36" width="4" height="4" fill="#E8F5E8"/>
+  <rect x="38" y="36" width="4" height="4" fill="#E8F5E8"/>
+  <polygon points="22,26 24,28 28,24" stroke="#2E7D32" stroke-width="1.5" fill="none"/>
+  <polygon points="28,26 30,28 34,24" stroke="#2E7D32" stroke-width="1.5" fill="none"/>
+  <polygon points="34,26 36,28 40,24" stroke="#2E7D32" stroke-width="1.5" fill="none"/>
+  <polygon points="40,26 42,28 46,24" stroke="#2E7D32" stroke-width="1.5" fill="none"/>
+  <polygon points="22,32 24,34 28,30" stroke="#2E7D32" stroke-width="1.5" fill="none"/>
+  <polygon points="28,32 30,34 34,30" stroke="#2E7D32" stroke-width="1.5" fill="none"/>
+  <text x="32" y="16" text-anchor="middle" fill="#5D4037" font-family="Arial" font-size="6">HABIT</text>
+  <text x="32" y="58" text-anchor="middle" fill="#5D4037" font-family="Arial" font-size="6">BUILDER</text>
+</svg>

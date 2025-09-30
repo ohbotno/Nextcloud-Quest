@@ -27,8 +27,8 @@ class Version1007Date20250110120000 extends SimpleMigrationStep {
         $schema = $schemaClosure();
 
         // Adventure Worlds Table - Defines the 8 themed worlds
-        if (!$schema->hasTable('adventure_worlds')) {
-            $table = $schema->createTable('adventure_worlds');
+        if (!$schema->hasTable('quest_adv_worlds')) {
+            $table = $schema->createTable('quest_adv_worlds');
             $table->addColumn('id', Types::BIGINT, [
                 'autoincrement' => true,
                 'notnull' => true,
@@ -79,8 +79,8 @@ class Version1007Date20250110120000 extends SimpleMigrationStep {
         }
 
         // Adventure Boss Levels Table - Global boss challenges same for all players
-        if (!$schema->hasTable('adventure_boss_levels')) {
-            $table = $schema->createTable('adventure_boss_levels');
+        if (!$schema->hasTable('quest_adv_bosses')) {
+            $table = $schema->createTable('quest_adv_bosses');
             $table->addColumn('id', Types::BIGINT, [
                 'autoincrement' => true,
                 'notnull' => true,
@@ -130,8 +130,8 @@ class Version1007Date20250110120000 extends SimpleMigrationStep {
         }
 
         // Adventure Paths Table - Generated paths with world references
-        if (!$schema->hasTable('adventure_paths')) {
-            $table = $schema->createTable('adventure_paths');
+        if (!$schema->hasTable('quest_adv_paths')) {
+            $table = $schema->createTable('quest_adv_paths');
             $table->addColumn('id', Types::BIGINT, [
                 'autoincrement' => true,
                 'notnull' => true,
@@ -181,8 +181,8 @@ class Version1007Date20250110120000 extends SimpleMigrationStep {
         }
 
         // Adventure Levels Table - Individual level data with boss_type field
-        if (!$schema->hasTable('adventure_levels')) {
-            $table = $schema->createTable('adventure_levels');
+        if (!$schema->hasTable('quest_adv_levels')) {
+            $table = $schema->createTable('quest_adv_levels');
             $table->addColumn('id', Types::BIGINT, [
                 'autoincrement' => true,
                 'notnull' => true,
@@ -270,8 +270,8 @@ class Version1007Date20250110120000 extends SimpleMigrationStep {
         }
 
         // Adventure Objectives Table - Level goals and requirements
-        if (!$schema->hasTable('adventure_objectives')) {
-            $table = $schema->createTable('adventure_objectives');
+        if (!$schema->hasTable('quest_adv_objectives')) {
+            $table = $schema->createTable('quest_adv_objectives');
             $table->addColumn('id', Types::BIGINT, [
                 'autoincrement' => true,
                 'notnull' => true,
@@ -320,8 +320,8 @@ class Version1007Date20250110120000 extends SimpleMigrationStep {
         }
 
         // Adventure Player Progress Table - World progression tracking
-        if (!$schema->hasTable('adventure_progress')) {
-            $table = $schema->createTable('adventure_progress');
+        if (!$schema->hasTable('quest_adv_progress')) {
+            $table = $schema->createTable('quest_adv_progress');
             $table->addColumn('id', Types::BIGINT, [
                 'autoincrement' => true,
                 'notnull' => true,
@@ -389,8 +389,8 @@ class Version1007Date20250110120000 extends SimpleMigrationStep {
         }
 
         // Adventure Boss Completions Table - Global boss completion stats
-        if (!$schema->hasTable('adventure_boss_wins')) {
-            $table = $schema->createTable('adventure_boss_wins');
+        if (!$schema->hasTable('quest_adv_wins')) {
+            $table = $schema->createTable('quest_adv_wins');
             $table->addColumn('id', Types::BIGINT, [
                 'autoincrement' => true,
                 'notnull' => true,

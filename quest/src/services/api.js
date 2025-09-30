@@ -2,6 +2,12 @@
  * @copyright Copyright (c) 2025 Quest Team
  *
  * @license GNU AGPL version 3 or any later version
+ * 
+ * Quest API Utility Functions
+ * 
+ * IMPORTANT: This file provides low-level API utilities only.
+ * For stats data, use StatsManager.registerConsumer() instead of calling getUserStats() directly.
+ * StatsManager provides caching, error handling, and unified event system.
  */
 
 import axios from '@nextcloud/axios'
@@ -9,15 +15,19 @@ import { generateUrl } from '@nextcloud/router'
 
 class QuestAPI {
     constructor() {
-        this.baseURL = generateUrl('/apps/nextcloudquest/api')
+        this.baseURL = generateUrl('/apps/quest/api')
     }
     
     /**
-     * Get user stats
+     * Get user stats (utility function for StatsManager)
+     * NOTE: This should only be used by StatsManager. 
+     * All other components should use StatsManager.registerConsumer() instead.
      * @returns {Promise<Object>}
+     * @deprecated Use StatsManager instead of calling this directly
      */
     async getUserStats() {
-        const response = await axios.get(`${this.baseURL}/user/stats`)
+        // api.getUserStats() should only be used by StatsManager
+        const response = await axios.get(`${this.baseURL}/stats`)
         return response.data
     }
     
@@ -89,6 +99,15 @@ class QuestAPI {
      */
     async updateSettings(settings) {
         const response = await axios.put(`${this.baseURL}/settings`, settings)
+        return response.data
+    }
+    
+    /**
+     * Get quest lists from Tasks app
+     * @returns {Promise<Object>}
+     */
+    async getQuestLists() {
+        const response = await axios.get(`${this.baseURL}/quest-lists`)
         return response.data
     }
 }

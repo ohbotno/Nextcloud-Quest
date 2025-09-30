@@ -60,10 +60,10 @@ class TasksApiIntegration {
      */
     public function isTasksAppAvailable(): bool {
         try {
-            // Check if tasks table exists
+            // Tasks app uses CalDAV, check for CalDAV tables
             $qb = $this->db->getQueryBuilder();
             $qb->select('*')
-                ->from('tasks_tasks')
+                ->from('calendars')
                 ->setMaxResults(1);
             
             $result = $qb->execute();
@@ -89,17 +89,37 @@ class TasksApiIntegration {
         }
         
         try {
+            // Get task from CalDAV calendarobjects table
             $qb = $this->db->getQueryBuilder();
             $qb->select('*')
-                ->from('tasks_tasks')
+                ->from('calendarobjects')
                 ->where($qb->expr()->eq('id', $qb->createNamedParameter($taskId, \PDO::PARAM_INT)))
-                ->andWhere($qb->expr()->eq('uid', $qb->createNamedParameter($userId, \PDO::PARAM_STR)));
+                ->andWhere($qb->expr()->like('calendardata', $qb->createNamedParameter('%VTODO%', \PDO::PARAM_STR)));
             
             $result = $qb->execute();
-            $task = $result->fetch();
+            $object = $result->fetch();
             $result->closeCursor();
             
-            return $task ?: null;
+            if (!$object) {
+                return null;
+            }
+            
+            // Parse CalDAV data and return in expected format
+            $taskData = $this->parseVTodoData($object['calendardata']);
+            if (!$taskData) {
+                return null;
+            }
+            
+            return [
+                'id' => $object['id'],
+                'title' => $taskData['summary'] ?: 'Untitled Task',
+                'description' => $taskData['description'] ?: '',
+                'completed' => $taskData['completed'] ? 1 : 0,
+                'priority' => $taskData['priority'],
+                'due_date' => $taskData['due'],
+                'created_at' => $object['firstoccurence'],
+                'modified_at' => $object['lastmodified']
+            ];
         } catch (\Exception $e) {
             $this->logger->error('Failed to fetch task', [
                 'taskId' => $taskId,
@@ -319,10 +339,12 @@ class TasksApiIntegration {
         }
         
         try {
+            // Get task calendars (task lists) from CalDAV
             $qb = $this->db->getQueryBuilder();
             $qb->select('*')
-                ->from('tasks_lists')
-                ->where($qb->expr()->eq('uid', $qb->createNamedParameter($userId, \PDO::PARAM_STR)))
+                ->from('calendars')
+                ->where($qb->expr()->eq('principaluri', $qb->createNamedParameter('principals/users/' . $userId, \PDO::PARAM_STR)))
+                ->andWhere($qb->expr()->like('components', $qb->createNamedParameter('%VTODO%', \PDO::PARAM_STR)))
                 ->orderBy('displayname', 'ASC');
             
             $result = $qb->execute();
@@ -332,11 +354,12 @@ class TasksApiIntegration {
             // Add task counts for each list
             $enhancedLists = [];
             foreach ($lists as $list) {
+                $tasks = $this->getTasksInList($userId, $list['id']);
                 $listData = [
                     'id' => $list['id'],
                     'name' => $list['displayname'],
-                    'color' => $list['color'] ?? '#0082c9',
-                    'tasks' => $this->getTasksInList($userId, $list['id'])
+                    'color' => $list['calendarcolor'] ?? '#0082c9',
+                    'tasks' => $tasks
                 ];
                 $listData['total_tasks'] = count($listData['tasks']);
                 $listData['completed_tasks'] = count(array_filter($listData['tasks'], function($task) {
@@ -369,45 +392,74 @@ class TasksApiIntegration {
         if (!$this->isTasksAppAvailable()) {
             return [];
         }
-        
+
         try {
+            // Query calendarobjects table using componenttype column (not LIKE on calendardata!)
             $qb = $this->db->getQueryBuilder();
             $qb->select('*')
-                ->from('tasks_tasks')
-                ->where($qb->expr()->eq('uid', $qb->createNamedParameter($userId, \PDO::PARAM_STR)))
-                ->andWhere($qb->expr()->eq('list_id', $qb->createNamedParameter($listId, \PDO::PARAM_STR)))
-                ->orderBy('completed', 'ASC')
-                ->addOrderBy('priority', 'DESC')
-                ->addOrderBy('due', 'ASC');
-            
+                ->from('calendarobjects')
+                ->where($qb->expr()->eq('calendarid', $qb->createNamedParameter($listId, \PDO::PARAM_INT)))
+                ->andWhere($qb->expr()->eq('componenttype', $qb->createNamedParameter('VTODO', \PDO::PARAM_STR)))
+                ->orderBy('lastmodified', 'DESC')
+                ->setMaxResults(100);
+
             $result = $qb->execute();
             $tasks = $result->fetchAll();
             $result->closeCursor();
-            
-            // Enhanced task data with quest information
-            $enhancedTasks = [];
+
+            $this->logger->info('Tasks query from calendarobjects', [
+                'listId' => $listId,
+                'userId' => $userId,
+                'tasksFound' => count($tasks)
+            ]);
+
+            // Parse VTODO data using Sabre\VObject
+            $questTasks = [];
+            $parseFailures = 0;
+
             foreach ($tasks as $task) {
-                $enhancedTasks[] = [
-                    'id' => $task['id'],
-                    'title' => $task['summary'],
-                    'description' => $task['description'] ?? '',
-                    'completed' => (bool)$task['completed'],
-                    'priority' => $this->mapTaskPriority($task['priority'] ?? 0),
-                    'due_date' => $task['due'],
-                    'created_at' => $task['created_at'],
-                    'completed_at' => $task['completed_at'],
-                    'quest_priority' => $this->mapTaskPriority($task['priority'] ?? 0),
-                    'estimated_xp' => $this->calculateEstimatedXP($task['priority'] ?? 0)
-                ];
+                try {
+                    $vobject = \Sabre\VObject\Reader::read($task['calendardata']);
+                    if (!isset($vobject->VTODO)) {
+                        $parseFailures++;
+                        continue;
+                    }
+
+                    $vtodo = $vobject->VTODO;
+
+                    $questTasks[] = [
+                        'id' => $task['id'],
+                        'title' => isset($vtodo->SUMMARY) ? (string)$vtodo->SUMMARY : 'Untitled Task',
+                        'description' => isset($vtodo->DESCRIPTION) ? (string)$vtodo->DESCRIPTION : '',
+                        'completed' => isset($vtodo->STATUS) && (string)$vtodo->STATUS === 'COMPLETED' ? 1 : 0,
+                        'priority' => isset($vtodo->PRIORITY) ? $this->mapTaskPriority((int)$vtodo->PRIORITY) : 'low',
+                        'due_date' => isset($vtodo->DUE) ? (string)$vtodo->DUE : null,
+                        'created_at' => $task['firstoccurence'],
+                        'modified_at' => $task['lastmodified']
+                    ];
+                } catch (\Exception $e) {
+                    $parseFailures++;
+                    $this->logger->warning('Failed to parse VTODO', [
+                        'taskId' => $task['id'],
+                        'error' => $e->getMessage()
+                    ]);
+                }
             }
-            
-            return $enhancedTasks;
-            
+
+            $this->logger->info('Tasks parsed successfully', [
+                'listId' => $listId,
+                'totalTasks' => count($questTasks),
+                'parseFailures' => $parseFailures
+            ]);
+
+            return $questTasks;
+
         } catch (\Exception $e) {
-            $this->logger->error('Failed to fetch tasks in list', [
+            $this->logger->error('Failed to fetch tasks from calendarobjects', [
                 'userId' => $userId,
                 'listId' => $listId,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
+                'errorClass' => get_class($e)
             ]);
             return [];
         }
@@ -436,37 +488,81 @@ class TasksApiIntegration {
     
     /**
      * Mark a task as completed in the Tasks app
-     * 
-     * @param int $taskId
-     * @param string $userId
-     * @return bool
+     * Updates the calendarobjects table and modifies VTODO data
+     *
+     * @param int $taskId The calendarobject ID
+     * @param string $userId User ID
+     * @return bool Success status
      */
     public function markTaskCompleted(int $taskId, string $userId): bool {
         if (!$this->isTasksAppAvailable()) {
             return false;
         }
-        
+
         try {
-            $now = new \DateTime();
-            
+            // Get the task from calendarobjects
             $qb = $this->db->getQueryBuilder();
-            $qb->update('tasks_tasks')
-                ->set('completed', $qb->createNamedParameter(1, \PDO::PARAM_INT))
-                ->set('completed_at', $qb->createNamedParameter($now->format('Y-m-d H:i:s'), \PDO::PARAM_STR))
-                ->set('modified', $qb->createNamedParameter($now->format('Y-m-d H:i:s'), \PDO::PARAM_STR))
+            $qb->select('*')
+                ->from('calendarobjects')
                 ->where($qb->expr()->eq('id', $qb->createNamedParameter($taskId, \PDO::PARAM_INT)))
-                ->andWhere($qb->expr()->eq('uid', $qb->createNamedParameter($userId, \PDO::PARAM_STR)))
-                ->andWhere($qb->expr()->eq('completed', $qb->createNamedParameter(0, \PDO::PARAM_INT))); // Only update if not already completed
-            
+                ->andWhere($qb->expr()->eq('componenttype', $qb->createNamedParameter('VTODO', \PDO::PARAM_STR)));
+
+            $result = $qb->execute();
+            $task = $result->fetch();
+            $result->closeCursor();
+
+            if (!$task) {
+                $this->logger->warning('Task not found for completion', ['taskId' => $taskId]);
+                return false;
+            }
+
+            // Parse VTODO and update STATUS to COMPLETED
+            $vobject = \Sabre\VObject\Reader::read($task['calendardata']);
+            if (!isset($vobject->VTODO)) {
+                $this->logger->warning('No VTODO component found', ['taskId' => $taskId]);
+                return false;
+            }
+
+            $vtodo = $vobject->VTODO;
+
+            // Set task as completed
+            $vtodo->STATUS = 'COMPLETED';
+            $vtodo->{'PERCENT-COMPLETE'} = 100;
+
+            // Set completion timestamp
+            $now = new \DateTime();
+            $vtodo->COMPLETED = $now;
+
+            // Update LAST-MODIFIED
+            $vtodo->{'LAST-MODIFIED'} = $now;
+
+            // Serialize the updated VTODO
+            $updatedData = $vobject->serialize();
+
+            // Update calendarobjects table
+            $qb = $this->db->getQueryBuilder();
+            $qb->update('calendarobjects')
+                ->set('calendardata', $qb->createNamedParameter($updatedData, \PDO::PARAM_STR))
+                ->set('lastmodified', $qb->createNamedParameter(time(), \PDO::PARAM_INT))
+                ->set('etag', $qb->createNamedParameter(md5($updatedData), \PDO::PARAM_STR))
+                ->where($qb->expr()->eq('id', $qb->createNamedParameter($taskId, \PDO::PARAM_INT)));
+
             $affected = $qb->execute();
-            
+
+            $this->logger->info('Task marked as completed', [
+                'taskId' => $taskId,
+                'userId' => $userId,
+                'rowsAffected' => $affected
+            ]);
+
             return $affected > 0;
-            
+
         } catch (\Exception $e) {
             $this->logger->error('Failed to mark task as completed', [
                 'taskId' => $taskId,
                 'userId' => $userId,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
             ]);
             return false;
         }

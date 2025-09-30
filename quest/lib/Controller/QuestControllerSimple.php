@@ -13,7 +13,7 @@ use OCP\IRequest;
 use OCP\IUserSession;
 use OCP\IDBConnection;
 
-class QuestControllerSimpleController extends Controller {
+class QuestControllerSimple extends Controller {
     /** @var IUserSession */
     private $userSession;
     /** @var IDBConnection */

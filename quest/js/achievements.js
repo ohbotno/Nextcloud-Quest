@@ -8,6 +8,7 @@
  * Achievement System JavaScript
  * Handles achievement display, filtering, animations, and interactions
  * Updated: Fixed API endpoints to use correct app ID
+ * Cache bust: Force new version hash generation
  */
 
 (function() {
@@ -213,6 +214,8 @@
                 this.showLoading(true);
                 
                 // Load all achievements and statistics in parallel
+                console.log('🔍 Loading from endpoints:', this.endpoints);
+                
                 const [achievementsResponse, categoriesResponse, statsResponse] = await Promise.all([
                     fetch(this.endpoints.achievements, {
                         method: 'GET',
@@ -234,13 +237,36 @@
                     })
                 ]);
 
-                if (!achievementsResponse.ok || !categoriesResponse.ok || !statsResponse.ok) {
-                    throw new Error('Failed to load achievement data');
+                console.log('🔍 Response status:', {
+                    achievements: achievementsResponse.status,
+                    categories: categoriesResponse.status,
+                    stats: statsResponse.status
+                });
+
+                if (!achievementsResponse.ok) {
+                    const errorText = await achievementsResponse.text();
+                    console.error('❌ Achievements endpoint failed:', achievementsResponse.status, achievementsResponse.statusText);
+                    console.error('❌ Response body:', errorText);
+                    throw new Error(`Failed to load achievements: ${achievementsResponse.status} ${achievementsResponse.statusText}`);
+                }
+                if (!categoriesResponse.ok) {
+                    console.error('❌ Categories endpoint failed:', categoriesResponse.status, categoriesResponse.statusText);
+                    throw new Error(`Failed to load categories: ${categoriesResponse.status} ${categoriesResponse.statusText}`);
+                }
+                if (!statsResponse.ok) {
+                    console.error('❌ Stats endpoint failed:', statsResponse.status, statsResponse.statusText);
+                    throw new Error(`Failed to load stats: ${statsResponse.status} ${statsResponse.statusText}`);
                 }
 
                 const achievementsData = await achievementsResponse.json();
                 const categoriesData = await categoriesResponse.json();
                 const statsData = await statsResponse.json();
+
+                console.log('🔍 Response data:', {
+                    achievements: achievementsData,
+                    categories: categoriesData,
+                    stats: statsData
+                });
 
                 // Store data in state
                 this.state.achievements = achievementsData.achievements || [];
@@ -571,9 +597,11 @@
 
         // Get achievement icon (handle SVG or emoji)
         getAchievementIcon(icon) {
-            // If it's an SVG file, return as image, otherwise return as emoji
+            // If it's an SVG file, return as image with fallback, otherwise return as emoji
             if (icon && icon.includes('.svg')) {
-                return `<img src="${OC.imagePath('quest', 'achievements/' + icon)}" alt="Achievement icon" class="achievement-icon-img">`;
+                const iconUrl = OC.imagePath('quest', 'achievements/' + icon);
+                const fallbackUrl = OC.imagePath('quest', 'achievements/default.svg');
+                return `<img src="${iconUrl}" alt="Achievement icon" class="achievement-icon-img" onerror="this.src='${fallbackUrl}'">`;
             }
             return icon || '🏆';
         },
@@ -793,17 +821,17 @@
         }
     };
 
-    // Auto-initialize if DOM is ready
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => {
-            if (window.location.pathname.includes('/achievements')) {
-                window.QuestAchievements.init();
-            }
-        });
-    } else {
-        if (window.location.pathname.includes('/achievements')) {
+    // Auto-initialize if DOM is ready and on achievements page
+    function initIfAchievementsPage() {
+        if (window.location.pathname.includes('/achievements') || document.getElementById('achievements-grid')) {
             window.QuestAchievements.init();
         }
+    }
+    
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initIfAchievementsPage);
+    } else {
+        initIfAchievementsPage();
     }
 
 })();

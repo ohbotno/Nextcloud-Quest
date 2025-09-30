@@ -25,6 +25,7 @@
 @import url('./components/buttons.css');
 @import url('./components/forms.css');
 @import url('./components/modals.css');
+@import url('./components/toggles.css');
 
 /* Enhanced Base Styles */
 /* Comprehensive scrolling fixes for all pages */
@@ -1694,6 +1695,17 @@ page .character-avatar,
     margin-bottom: 20px;
 }
 
+.error-state-help {
+    color: var(--color-text-light);
+    font-style: italic;
+    line-height: 1.4;
+    margin-bottom: 20px;
+    background-color: var(--color-background-hover);
+    padding: 12px;
+    border-radius: 6px;
+    border-left: 3px solid var(--color-warning);
+}
+
 /* Quest Navigation */
 .quest-nav ul {
     list-style: none;
@@ -2977,6 +2989,26 @@ page .character-avatar,
     animation: fadeOut 0.3s ease forwards;
 }
 
+/* Auto-save indicator */
+.auto-save-indicator {
+    position: fixed;
+    top: 120px;
+    right: 20px;
+    background: var(--color-success);
+    color: white;
+    padding: 8px 16px;
+    border-radius: var(--radius-small);
+    box-shadow: var(--shadow-md);
+    z-index: 9999;
+    font-size: var(--font-size-small);
+    font-weight: 500;
+    display: none;
+    animation: slideInRight 0.3s ease;
+}
+.auto-save-indicator.fade-out {
+    animation: fadeOut 0.3s ease forwards;
+}
+
 @keyframes slideInRight {
     from {
         transform: translateX(100%);
@@ -2998,6 +3030,335 @@ page .character-avatar,
     }
 }
 
+/* Task Lists Table Layout for Settings */
+.task-lists-table-container,
+#settings-task-lists-grid {
+    width: 100%;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-medium);
+    overflow: hidden;
+    background: var(--color-main-background);
+}
+
+.task-lists-table {
+    width: 100% !important;
+    border-collapse: collapse;
+    background: var(--color-main-background);
+    display: table !important;
+    margin: 0;
+    padding: 0;
+}
+
+.task-lists-table thead {
+    background: var(--color-background-hover);
+    border-bottom: 2px solid var(--color-border);
+}
+
+.task-lists-table th {
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 600;
+    font-size: var(--font-size-small);
+    color: var(--color-text-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-right: 1px solid var(--color-border);
+}
+
+.task-lists-table th:last-child {
+    border-right: none;
+    text-align: center;
+}
+
+.task-lists-table tbody tr {
+    border-bottom: 1px solid var(--color-border);
+    transition: background-color var(--transition-normal);
+    display: table-row !important;
+}
+
+.task-lists-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.task-lists-table tbody tr:hover {
+    background: var(--color-background-hover);
+}
+
+.task-lists-table tbody tr.included {
+    border-left: 4px solid var(--color-success);
+}
+
+.task-lists-table tbody tr.excluded {
+    border-left: 4px solid var(--color-border);
+    opacity: 0.7;
+}
+
+.task-lists-table td {
+    padding: 10px 16px;
+    vertical-align: middle;
+    border-right: 1px solid var(--color-border);
+    font-size: var(--font-size-normal);
+    display: table-cell !important;
+}
+
+.task-lists-table td:last-child {
+    border-right: none;
+    text-align: center;
+}
+
+/* Column specific styles */
+.col-task-list {
+    font-weight: 500;
+    color: var(--color-text-primary);
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.col-priority {
+    width: 100px;
+    text-align: center;
+}
+
+.priority-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: var(--radius-small);
+    font-size: var(--font-size-small);
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.priority-badge.high {
+    background: var(--color-error-light);
+    color: var(--color-error);
+}
+
+.priority-badge.normal {
+    background: var(--color-primary-light);
+    color: var(--color-primary);
+}
+
+.priority-badge.low {
+    background: var(--color-text-lighter);
+    color: var(--color-text-primary);
+}
+
+.col-color {
+    width: 60px;
+    text-align: center;
+}
+
+.table-color-preview {
+    width: 24px;
+    height: 24px;
+    border-radius: var(--radius-small);
+    border: 2px solid var(--color-border);
+    display: inline-block;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    position: relative;
+}
+
+.table-color-preview:hover {
+    border-color: var(--color-primary);
+    transform: scale(1.1);
+}
+
+.col-visibility {
+    width: 80px;
+    text-align: center;
+}
+
+.visibility-badge {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: var(--radius-small);
+    font-size: var(--font-size-small);
+    font-weight: 500;
+}
+
+.visibility-badge.included {
+    background: var(--color-success-light);
+    color: var(--color-success);
+}
+
+.visibility-badge.excluded {
+    background: var(--color-border);
+    color: var(--color-text-lighter);
+}
+
+.col-task-count {
+    width: 80px;
+    text-align: center;
+    font-weight: 500;
+    color: var(--color-text-primary);
+}
+
+.col-include {
+    width: 80px;
+    text-align: center;
+}
+
+.table-checkbox {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.table-color-picker {
+    width: 24px;
+    height: 24px;
+    border: none;
+    border-radius: var(--radius-small);
+    cursor: pointer;
+    opacity: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+/* Mobile responsive table */
+@media (max-width: 768px) {
+    .task-lists-table-container {
+        overflow-x: auto;
+    }
+    
+    .task-lists-table {
+        min-width: 600px;
+    }
+    
+    .task-lists-table th,
+    .task-lists-table td {
+        padding: 8px 12px;
+        font-size: var(--font-size-small);
+    }
+}
+
+.settings-list-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 16px;
+    border-bottom: 1px solid var(--color-border);
+    transition: all var(--transition-normal);
+    background: var(--color-main-background);
+    min-height: 52px;
+}
+
+.settings-list-item:last-child {
+    border-bottom: none;
+}
+
+.settings-list-item:hover {
+    background: var(--color-background-hover);
+}
+
+.settings-list-item.included {
+    border-left: 4px solid var(--color-success);
+    padding-left: 16px;
+}
+
+.settings-list-item.excluded {
+    border-left: 4px solid var(--color-border);
+    padding-left: 16px;
+    opacity: 0.7;
+}
+
+.list-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+}
+
+.list-details {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.task-list-name {
+    font-weight: 500;
+    font-size: var(--font-size-normal);
+    color: var(--color-text-primary);
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex-shrink: 0;
+    max-width: 200px;
+}
+
+.task-count {
+    font-size: var(--font-size-small);
+    color: var(--color-text-lighter);
+    margin: 0;
+    flex-shrink: 0;
+    background: var(--color-background-dark);
+    padding: 2px 6px;
+    border-radius: 10px;
+    white-space: nowrap;
+}
+
+.list-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+/* Update existing color picker for column layout */
+.task-lists-column .color-picker {
+    width: 28px;
+    height: 28px;
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-small);
+    cursor: pointer;
+    padding: 0;
+    background: none;
+    transition: all var(--transition-normal);
+}
+
+.task-lists-column .color-picker:hover {
+    border-color: var(--color-primary);
+}
+
+/* Update list color preview for column layout */
+.task-lists-column .list-color-preview {
+    width: 14px;
+    height: 14px;
+    border-radius: var(--radius-small);
+    border: 2px solid var(--color-border);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+}
+
+/* Compact include toggle styling */
+.include-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: var(--font-size-small);
+}
+
+.include-toggle .toggle-label {
+    margin: 0;
+    font-weight: 400;
+    color: var(--color-text-lighter);
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.include-checkbox {
+    margin: 0;
+    cursor: pointer;
+}
+
 /* Settings mobile responsiveness */
 @media (max-width: 768px) {
     .settings-controls {
@@ -3011,5 +3372,40 @@ page .character-avatar,
     
     .color-picker-grid {
         grid-template-columns: 1fr;
+    }
+    
+    /* Mobile responsive for settings lists */
+    .settings-list-item {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+        padding: 12px;
+        min-height: auto;
+    }
+    
+    .list-info {
+        flex-direction: row;
+        align-items: center;
+    }
+    
+    .list-details {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+    
+    .list-controls {
+        justify-content: space-between;
+        gap: 8px;
+        padding-top: 8px;
+        border-top: 1px solid var(--color-border);
+    }
+    
+    .include-toggle .toggle-label {
+        font-size: var(--font-size-normal);
+    }
+    
+    .task-list-name {
+        max-width: none;
     }
 }

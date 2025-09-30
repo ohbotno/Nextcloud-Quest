@@ -16,11 +16,10 @@ const state = {
         level: {
             level: 1,
             rank_title: 'Task Novice',
-            current_xp: 0,
+            xp: 0,
             lifetime_xp: 0,
-            xp_for_next_level: 100,
-            xp_progress: 0,
-            xp_to_next_level: 100
+            xp_to_next: 100,
+            progress_percentage: 0
         },
         streak: {
             current_streak: 0,
@@ -113,6 +112,16 @@ const mutations = {
     
     updateStats(state, newStats) {
         state.stats = { ...state.stats, ...newStats }
+        
+        // Sync back to QuestApp if available
+        if (typeof window !== 'undefined' && window.QuestApp && window.QuestApp.initialized) {
+            try {
+                // QuestApp manages stats centrally, so we don't need to sync back
+                // Stats updated, QuestApp handles consistency
+            } catch (e) {
+                // Could not communicate with QuestApp
+            }
+        }
     },
     
     unlockAchievement(state, achievement) {
@@ -126,23 +135,90 @@ const mutations = {
             state.stats.achievements.unlocked++
             state.stats.achievements.percentage = Math.round((state.stats.achievements.unlocked / state.stats.achievements.total) * 100)
         }
+    },
+    
+    clearCache(state) {
+        // Clearing cache
+        // Reset to default stats
+        state.stats = {
+            level: {
+                level: 1,
+                rank_title: 'Task Novice',
+                xp: 0,
+                lifetime_xp: 0,
+                xp_to_next: 100,
+                progress_percentage: 0
+            },
+            streak: {
+                current_streak: 0,
+                longest_streak: 0,
+                last_completion: null,
+                is_active_today: false,
+                grace_period_ends: null
+            },
+            achievements: {
+                total: 17,
+                unlocked: 0,
+                percentage: 0
+            },
+            leaderboard_rank: null
+        };
     }
 }
 
 const actions = {
-    async loadUserStats({ commit }) {
-        commit('setLoading', { type: 'stats', loading: true })
-        try {
-            const response = await api.getUserStats()
-            if (response.status === 'success') {
-                commit('setStats', response.data)
-                commit('setUser', response.data.user)
+    // Initialize QuestApp integration
+    initQuestApp({ commit, dispatch }) {
+        // Initializing QuestApp integration
+        
+        // Wait for QuestApp to be available
+        function connectToQuestApp() {
+            if (typeof window !== 'undefined' && window.QuestApp && window.QuestApp.initialized) {
+                // Registering as QuestApp consumer
+                
+                // Register as consumer
+                window.QuestApp.registerStatsConsumer('vue-store', {
+                    onUpdate: function(stats) {
+                        // Received stats update from QuestApp
+                        commit('setStats', stats);
+                        if (stats.user) {
+                            commit('setUser', stats.user);
+                        }
+                    },
+                    onError: function(error) {
+                        // QuestApp error occurred
+                    },
+                    onLoading: function(isLoading) {
+                        commit('setLoading', { type: 'stats', loading: isLoading });
+                    }
+                });
+                
+                // Get current stats immediately
+                const currentStats = window.QuestApp.getCurrentStats();
+                if (currentStats) {
+                    // Loading current stats immediately
+                    commit('setStats', currentStats);
+                }
+                
+            } else {
+                // QuestApp not available, retrying...
+                setTimeout(connectToQuestApp, 500);
             }
-        } catch (error) {
-            console.error('Failed to load user stats:', error)
-        } finally {
-            commit('setLoading', { type: 'stats', loading: false })
         }
+        
+        // Try to connect immediately or wait for QuestApp ready event
+        if (typeof window !== 'undefined' && window.QuestApp && window.QuestApp.initialized) {
+            connectToQuestApp();
+        } else {
+            document.addEventListener('questAppReady', connectToQuestApp);
+            setTimeout(connectToQuestApp, 1000); // Fallback
+        }
+    },
+    
+    // Legacy method for backward compatibility (now uses QuestApp)
+    async loadUserStats({ dispatch }) {
+        // loadUserStats is deprecated, using QuestApp instead
+        dispatch('initQuestApp');
     },
     
     async loadAchievements({ commit }) {
@@ -153,7 +229,7 @@ const actions = {
                 commit('setAchievements', response.data)
             }
         } catch (error) {
-            console.error('Failed to load achievements:', error)
+            // Failed to load achievements
         } finally {
             commit('setLoading', { type: 'achievements', loading: false })
         }
@@ -167,7 +243,7 @@ const actions = {
                 commit('setHistory', response.data)
             }
         } catch (error) {
-            console.error('Failed to load history:', error)
+            // Failed to load history
         } finally {
             commit('setLoading', { type: 'history', loading: false })
         }
@@ -181,7 +257,7 @@ const actions = {
                 commit('setLeaderboard', response.data)
             }
         } catch (error) {
-            console.error('Failed to load leaderboard:', error)
+            // Failed to load leaderboard
         } finally {
             commit('setLoading', { type: 'leaderboard', loading: false })
         }
@@ -199,10 +275,10 @@ const actions = {
                     level: {
                         ...state.stats.level,
                         level: xp.level,
-                        current_xp: xp.current_xp,
+                        xp: xp.current_xp,
                         lifetime_xp: xp.lifetime_xp,
-                        xp_progress: xp.progress_to_next_level,
-                        xp_to_next_level: xp.next_level_xp - xp.current_xp
+                        progress_percentage: xp.progress_to_next_level,
+                        xp_to_next: xp.next_level_xp - xp.current_xp
                     },
                     streak: {
                         ...state.stats.streak,
@@ -232,7 +308,7 @@ const actions = {
                 return response.data
             }
         } catch (error) {
-            console.error('Failed to complete task:', error)
+            // Failed to complete task
             throw error
         } finally {
             commit('setLoading', { type: 'completingTask', loading: false })
@@ -246,7 +322,7 @@ const actions = {
                 commit('setSettings', response.data)
             }
         } catch (error) {
-            console.error('Failed to load settings:', error)
+            // Failed to load settings
         }
     },
     
@@ -258,7 +334,7 @@ const actions = {
             }
             return response
         } catch (error) {
-            console.error('Failed to update settings:', error)
+            // Failed to update settings
             throw error
         }
     }

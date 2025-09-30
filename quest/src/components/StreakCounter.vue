@@ -8,10 +8,10 @@
                 <span v-else>🔥🔥🔥</span>
             </div>
             <div class="streak-info">
-                <h4 v-if="detailed">{{ t('nextcloudquest', 'Current Streak') }}</h4>
+                <h4 v-if="detailed">{{ t('quest', 'Current Streak') }}</h4>
                 <div class="streak-number">
                     <span class="number">{{ stats.streak.current_streak }}</span>
-                    <span class="label">{{ t('nextcloudquest', 'days') }}</span>
+                    <span class="label">{{ t('quest', 'days') }}</span>
                 </div>
                 <div v-if="!detailed && stats.streak.current_streak > 0" class="streak-status">
                     {{ getStreakMessage() }}
@@ -22,24 +22,24 @@
         <div v-if="detailed" class="streak-details">
             <div class="detail-grid">
                 <div class="detail-item">
-                    <div class="detail-label">{{ t('nextcloudquest', 'Longest Streak') }}</div>
+                    <div class="detail-label">{{ t('quest', 'Longest Streak') }}</div>
                     <div class="detail-value">
-                        {{ stats.streak.longest_streak }} {{ t('nextcloudquest', 'days') }}
+                        {{ stats.streak.longest_streak }} {{ t('quest', 'days') }}
                         <span v-if="stats.streak.current_streak === stats.streak.longest_streak" class="record-badge">
-                            🏆 {{ t('nextcloudquest', 'Record!') }}
+                            🏆 {{ t('quest', 'Record!') }}
                         </span>
                     </div>
                 </div>
                 
                 <div class="detail-item">
-                    <div class="detail-label">{{ t('nextcloudquest', 'Last Completion') }}</div>
+                    <div class="detail-label">{{ t('quest', 'Last Completion') }}</div>
                     <div class="detail-value">
                         {{ formatLastCompletion() }}
                     </div>
                 </div>
                 
                 <div v-if="stats.streak.current_streak > 0" class="detail-item">
-                    <div class="detail-label">{{ t('nextcloudquest', 'Status') }}</div>
+                    <div class="detail-label">{{ t('quest', 'Status') }}</div>
                     <div class="detail-value" :class="{ 'status-active': stats.streak.is_active_today, 'status-risk': isStreakAtRisk }">
                         {{ getDetailedStatus() }}
                     </div>
@@ -49,7 +49,7 @@
             <!-- Streak Progress Visualization -->
             <div class="streak-visualization">
                 <div class="streak-calendar">
-                    <div class="calendar-header">{{ t('nextcloudquest', 'Last 7 Days') }}</div>
+                    <div class="calendar-header">{{ t('quest', 'Last 7 Days') }}</div>
                     <div class="calendar-days">
                         <div 
                             v-for="(day, index) in last7Days"
@@ -75,7 +75,7 @@
             
             <!-- Streak Milestones -->
             <div class="streak-milestones">
-                <div class="milestones-header">{{ t('nextcloudquest', 'Streak Milestones') }}</div>
+                <div class="milestones-header">{{ t('quest', 'Streak Milestones') }}</div>
                 <div class="milestones-list">
                     <div 
                         v-for="milestone in streakMilestones"
@@ -89,7 +89,7 @@
                         <div class="milestone-icon">{{ milestone.icon }}</div>
                         <div class="milestone-info">
                             <div class="milestone-name">{{ milestone.name }}</div>
-                            <div class="milestone-requirement">{{ milestone.days }} {{ t('nextcloudquest', 'days') }}</div>
+                            <div class="milestone-requirement">{{ milestone.days }} {{ t('quest', 'days') }}</div>
                         </div>
                         <div class="milestone-status">
                             <span v-if="stats.streak.longest_streak >= milestone.days" class="achieved">✓</span>
@@ -104,7 +104,7 @@
         <div v-if="isStreakAtRisk && detailed" class="streak-warning">
             <div class="warning-icon">⚠️</div>
             <div class="warning-content">
-                <div class="warning-title">{{ t('nextcloudquest', 'Streak at Risk!') }}</div>
+                <div class="warning-title">{{ t('quest', 'Streak at Risk!') }}</div>
                 <div class="warning-message">
                     {{ getWarningMessage() }}
                 </div>
@@ -115,9 +115,9 @@
         <div v-if="stats.streak.current_streak === 0 && detailed" class="streak-encouragement">
             <div class="encouragement-icon">💪</div>
             <div class="encouragement-content">
-                <div class="encouragement-title">{{ t('nextcloudquest', 'Start Your Streak!') }}</div>
+                <div class="encouragement-title">{{ t('quest', 'Start Your Streak!') }}</div>
                 <div class="encouragement-message">
-                    {{ t('nextcloudquest', 'Complete a task today to begin your productivity streak.') }}
+                    {{ t('quest', 'Complete a task today to begin your productivity streak.') }}
                 </div>
             </div>
         </div>
@@ -187,31 +187,31 @@ export default {
     methods: {
         getStreakMessage() {
             if (this.stats.streak.current_streak === 0) {
-                return this.t('nextcloudquest', 'No streak yet')
+                return this.t('quest', 'No streak yet')
             } else if (this.stats.streak.current_streak === 1) {
-                return this.t('nextcloudquest', 'Great start!')
+                return this.t('quest', 'Great start!')
             } else if (this.stats.streak.current_streak < 7) {
-                return this.t('nextcloudquest', 'Building momentum')
+                return this.t('quest', 'Building momentum')
             } else if (this.stats.streak.current_streak < 30) {
-                return this.t('nextcloudquest', 'On fire!')
+                return this.t('quest', 'On fire!')
             } else {
-                return this.t('nextcloudquest', 'Legendary!')
+                return this.t('quest', 'Legendary!')
             }
         },
         
         getDetailedStatus() {
             if (this.stats.streak.is_active_today) {
-                return this.t('nextcloudquest', 'Active today ✓')
+                return this.t('quest', 'Active today ✓')
             } else if (this.isStreakAtRisk) {
-                return this.t('nextcloudquest', 'At risk ⚠️')
+                return this.t('quest', 'At risk ⚠️')
             } else {
-                return this.t('nextcloudquest', 'Waiting for completion')
+                return this.t('quest', 'Waiting for completion')
             }
         },
         
         formatLastCompletion() {
             if (!this.stats.streak.last_completion) {
-                return this.t('nextcloudquest', 'Never')
+                return this.t('quest', 'Never')
             }
             
             const date = new Date(this.stats.streak.last_completion)
@@ -219,17 +219,17 @@ export default {
             const diffDays = Math.floor((now - date) / (1000 * 60 * 60 * 24))
             
             if (diffDays === 0) {
-                return this.t('nextcloudquest', 'Today')
+                return this.t('quest', 'Today')
             } else if (diffDays === 1) {
-                return this.t('nextcloudquest', 'Yesterday')
+                return this.t('quest', 'Yesterday')
             } else {
-                return this.t('nextcloudquest', '{days} days ago', { days: diffDays })
+                return this.t('quest', '{days} days ago', { days: diffDays })
             }
         },
         
         getWarningMessage() {
             if (!this.stats.streak.grace_period_ends) {
-                return this.t('nextcloudquest', 'Complete a task today to maintain your streak.')
+                return this.t('quest', 'Complete a task today to maintain your streak.')
             }
             
             const graceEnd = new Date(this.stats.streak.grace_period_ends)
@@ -237,9 +237,9 @@ export default {
             const hoursLeft = Math.max(0, Math.floor((graceEnd - now) / (1000 * 60 * 60)))
             
             if (hoursLeft <= 1) {
-                return this.t('nextcloudquest', 'Less than 1 hour left to maintain your streak!')
+                return this.t('quest', 'Less than 1 hour left to maintain your streak!')
             } else {
-                return this.t('nextcloudquest', '{hours} hours left to maintain your streak.', { hours: hoursLeft })
+                return this.t('quest', '{hours} hours left to maintain your streak.', { hours: hoursLeft })
             }
         },
         

@@ -34,3 +34,20 @@ package-lock.json
 # Environment
 .env
 .env.local
+
+# Claude Code files
+PROMPT.md
+ARCHITECTURE.md
+CODEBASE_ARCHITECTURE.md
+PERFORMANCE_ANALYSIS_REPORT.md
+STATS_PERSISTENCE_DEBUG_REPORT.md
+TASK_LOADING_DEBUG_SUMMARY.md
+*_DEBUG_REPORT.md
+*_ANALYSIS*.md
+
+# Debug and documentation folders
+debug/
+documentation/
+quest-last version/
+quest-most-current/
+quest-oldest/

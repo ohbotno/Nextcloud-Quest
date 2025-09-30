@@ -88,8 +88,6 @@ class LevelObjective {
         // Generate new objective based on type and available tasks
         $newObjective = $this->generateSimilarObjective($objective, $availableTasks, $worldTheme, $difficultyModifier);
         
-        // Log the regeneration for debugging
-        error_log("Adventure: Regenerated objective from '{$objective['description']}' to '{$newObjective['description']}'");
         
         return $newObjective;
     }

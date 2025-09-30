@@ -3,13 +3,13 @@
         <div class="level-header">
             <div class="level-badge" :class="levelBadgeClass">
                 <div class="level-number">{{ stats.level.level }}</div>
-                <div class="level-label">{{ t('nextcloudquest', 'Level') }}</div>
+                <div class="level-label">{{ t('quest', 'Level') }}</div>
             </div>
             <div class="level-info">
-                <h4 v-if="detailed">{{ t('nextcloudquest', 'Your Rank') }}</h4>
+                <h4 v-if="detailed">{{ t('quest', 'Your Rank') }}</h4>
                 <div class="rank-title">{{ stats.level.rank_title }}</div>
                 <div v-if="!detailed" class="level-subtitle">
-                    {{ t('nextcloudquest', 'Level {level}', { level: stats.level.level }) }}
+                    {{ t('quest', 'Level {level}', { level: stats.level.level }) }}
                 </div>
             </div>
         </div>
@@ -18,12 +18,12 @@
             <!-- Next Level Preview -->
             <div class="next-level-preview">
                 <div class="preview-header">
-                    <span class="preview-label">{{ t('nextcloudquest', 'Next Level') }}</span>
+                    <span class="preview-label">{{ t('quest', 'Next Level') }}</span>
                     <span class="preview-level">{{ stats.level.level + 1 }}</span>
                 </div>
                 <div class="preview-rank">{{ getNextRankTitle() }}</div>
                 <div class="preview-progress">
-                    <span class="xp-needed">{{ formatNumber(stats.level.xp_to_next_level) }} XP {{ t('nextcloudquest', 'needed') }}</span>
+                    <span class="xp-needed">{{ formatNumber(stats.level.xp_to_next_level) }} XP {{ t('quest', 'needed') }}</span>
                 </div>
                 
                 <!-- Progress to Next Level -->
@@ -35,14 +35,14 @@
                         ></div>
                     </div>
                     <div class="progress-text">
-                        {{ Math.round(stats.level.xp_progress) }}% {{ t('nextcloudquest', 'to next level') }}
+                        {{ Math.round(stats.level.xp_progress) }}% {{ t('quest', 'to next level') }}
                     </div>
                 </div>
             </div>
             
             <!-- Level History/Achievements -->
             <div class="level-milestones">
-                <div class="milestones-header">{{ t('nextcloudquest', 'Level Milestones') }}</div>
+                <div class="milestones-header">{{ t('quest', 'Level Milestones') }}</div>
                 <div class="milestones-list">
                     <div 
                         v-for="milestone in levelMilestones"
@@ -71,15 +71,15 @@
             <!-- Stats Summary -->
             <div class="level-stats">
                 <div class="stat-item">
-                    <div class="stat-label">{{ t('nextcloudquest', 'Total XP') }}</div>
+                    <div class="stat-label">{{ t('quest', 'Total XP') }}</div>
                     <div class="stat-value">{{ formatNumber(stats.level.lifetime_xp) }}</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-label">{{ t('nextcloudquest', 'Current Level XP') }}</div>
+                    <div class="stat-label">{{ t('quest', 'Current Level XP') }}</div>
                     <div class="stat-value">{{ formatNumber(stats.level.current_xp) }}</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-label">{{ t('nextcloudquest', 'Levels Gained') }}</div>
+                    <div class="stat-label">{{ t('quest', 'Levels Gained') }}</div>
                     <div class="stat-value">{{ stats.level.level - 1 }}</div>
                 </div>
             </div>
@@ -88,7 +88,7 @@
         <!-- Level Up Animation Trigger -->
         <transition name="level-up">
             <div v-if="showLevelUpEffect" class="level-up-effect">
-                <div class="level-up-text">{{ t('nextcloudquest', 'LEVEL UP!') }}</div>
+                <div class="level-up-text">{{ t('quest', 'LEVEL UP!') }}</div>
                 <div class="level-up-particles">
                     <div v-for="i in 8" :key="i" class="particle" :style="getParticleStyle(i)"></div>
                 </div>

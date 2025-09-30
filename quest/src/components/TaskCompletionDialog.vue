@@ -2,18 +2,18 @@
     <div class="task-dialog-overlay" @click="$emit('close')">
         <div class="task-dialog" @click.stop>
             <div class="dialog-header">
-                <h3>{{ t('nextcloudquest', 'Complete Task') }}</h3>
+                <h3>{{ t('quest', 'Complete Task') }}</h3>
                 <button @click="$emit('close')" class="close-btn">×</button>
             </div>
             
             <form @submit.prevent="submitTask" class="dialog-content">
                 <div class="form-group">
-                    <label for="task-title">{{ t('nextcloudquest', 'Task Title') }}</label>
+                    <label for="task-title">{{ t('quest', 'Task Title') }}</label>
                     <input 
                         id="task-title"
                         v-model="taskData.title"
                         type="text"
-                        :placeholder="t('nextcloudquest', 'Enter task description...')"
+                        :placeholder="t('quest', 'Enter task description...')"
                         required
                         class="form-input"
                         maxlength="255"
@@ -21,32 +21,32 @@
                 </div>
                 
                 <div class="form-group">
-                    <label for="task-priority">{{ t('nextcloudquest', 'Priority') }}</label>
+                    <label for="task-priority">{{ t('quest', 'Priority') }}</label>
                     <select id="task-priority" v-model="taskData.priority" class="form-select">
-                        <option value="low">{{ t('nextcloudquest', 'Low') }} (+0 bonus XP)</option>
-                        <option value="medium">{{ t('nextcloudquest', 'Medium') }} (+5 bonus XP)</option>
-                        <option value="high">{{ t('nextcloudquest', 'High') }} (+10 bonus XP)</option>
+                        <option value="low">{{ t('quest', 'Low') }} (+0 bonus XP)</option>
+                        <option value="medium">{{ t('quest', 'Medium') }} (+5 bonus XP)</option>
+                        <option value="high">{{ t('quest', 'High') }} (+10 bonus XP)</option>
                     </select>
                 </div>
                 
                 <!-- XP Preview -->
                 <div class="xp-preview">
-                    <div class="preview-header">{{ t('nextcloudquest', 'XP Preview') }}</div>
+                    <div class="preview-header">{{ t('quest', 'XP Preview') }}</div>
                     <div class="xp-breakdown">
                         <div class="xp-item">
-                            <span class="xp-label">{{ t('nextcloudquest', 'Base XP:') }}</span>
+                            <span class="xp-label">{{ t('quest', 'Base XP:') }}</span>
                             <span class="xp-value">10</span>
                         </div>
                         <div class="xp-item">
-                            <span class="xp-label">{{ t('nextcloudquest', 'Priority Bonus:') }}</span>
+                            <span class="xp-label">{{ t('quest', 'Priority Bonus:') }}</span>
                             <span class="xp-value">+{{ getPriorityBonus() }}</span>
                         </div>
                         <div class="xp-item" v-if="stats.streak.current_streak > 0">
-                            <span class="xp-label">{{ t('nextcloudquest', 'Streak Multiplier:') }}</span>
+                            <span class="xp-label">{{ t('quest', 'Streak Multiplier:') }}</span>
                             <span class="xp-value">×{{ getStreakMultiplier() }}</span>
                         </div>
                         <div class="xp-total">
-                            <span class="xp-label">{{ t('nextcloudquest', 'Total XP:') }}</span>
+                            <span class="xp-label">{{ t('quest', 'Total XP:') }}</span>
                             <span class="xp-value total">{{ calculateTotalXP() }}</span>
                         </div>
                     </div>
@@ -56,13 +56,13 @@
                 <div v-if="stats.streak.current_streak > 0" class="streak-info">
                     <div class="streak-icon">🔥</div>
                     <div class="streak-text">
-                        {{ t('nextcloudquest', 'Current streak: {streak} days', { streak: stats.streak.current_streak }) }}
+                        {{ t('quest', 'Current streak: {streak} days', { streak: stats.streak.current_streak }) }}
                     </div>
                 </div>
                 
                 <div class="dialog-actions">
                     <button type="button" @click="$emit('close')" class="btn-secondary">
-                        {{ t('nextcloudquest', 'Cancel') }}
+                        {{ t('quest', 'Cancel') }}
                     </button>
                     <button 
                         type="submit" 
@@ -70,7 +70,7 @@
                         :disabled="!taskData.title.trim() || submitting"
                     >
                         <span v-if="submitting" class="loading">⏳</span>
-                        {{ submitting ? t('nextcloudquest', 'Completing...') : t('nextcloudquest', 'Complete Task') }}
+                        {{ submitting ? t('quest', 'Completing...') : t('quest', 'Complete Task') }}
                     </button>
                 </div>
             </form>
@@ -138,7 +138,7 @@ export default {
             } catch (error) {
                 console.error('Failed to complete task:', error)
                 // Show error message (in a real app, you'd use a proper notification system)
-                alert(this.t('nextcloudquest', 'Failed to complete task. Please try again.'))
+                alert(this.t('quest', 'Failed to complete task. Please try again.'))
             } finally {
                 this.submitting = false
             }

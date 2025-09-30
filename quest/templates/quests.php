@@ -25,25 +25,9 @@ ob_start();
     <!-- Main Quest Interface using Dashboard styling -->
     <div id="quests-main-interface" style="display: none;">
         
-        <!-- Quest Stats Cards - Using Dashboard Stats Layout -->
+        <!-- Quest Management Section -->
         <section class="content-section">
             <div class="dashboard-stats" id="quest-stats">
-                <!-- Player Level Card -->
-                <div class="stat-card" id="player-level-card">
-                    <div class="stat-card-icon">🗡️</div>
-                    <div class="stat-card-label">Level</div>
-                    <div class="stat-card-value" id="player-level-display">1</div>
-                    <div class="stat-card-change" id="player-rank-display">Novice</div>
-                </div>
-                
-                <!-- Current XP Card -->
-                <div class="stat-card" id="player-xp-card">
-                    <div class="stat-card-icon">✨</div>
-                    <div class="stat-card-label">Current XP</div>
-                    <div class="stat-card-value" id="player-xp-display">0</div>
-                    <div class="stat-card-change" id="player-xp-progress">0% to next level</div>
-                </div>
-                
                 <!-- Active Quests Card -->
                 <div class="stat-card" id="active-quests-card">
                     <div class="stat-card-icon">⚔️</div>

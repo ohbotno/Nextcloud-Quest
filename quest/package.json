@@ -1,5 +1,5 @@
 {
-  "name": "nextcloud-quest",
+  "name": "quest",
   "version": "1.0.0",
   "description": "Gamification for Nextcloud Tasks",
   "main": "src/main.js",

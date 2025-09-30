@@ -1,0 +1,18 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="32" cy="32" r="30" fill="#E65100" stroke="#BF360C" stroke-width="2"/>
+  <polygon points="6,32 18,25 18,39" fill="#FFEB3B"/>
+  <polygon points="10,32 22,27 22,37" fill="#FFD700"/>
+  <polygon points="14,32 26,29 26,35" fill="#FFC107"/>
+  <polygon points="18,32 30,30 30,34" fill="#FF9800"/>
+  <polygon points="22,32 34,31 34,33" fill="#FF5722"/>
+  <circle cx="46" cy="24" r="6" fill="#795548"/>
+  <circle cx="43" cy="22" r="1.5" fill="#F44336"/>
+  <circle cx="49" cy="22" r="1.5" fill="#F44336"/>
+  <polygon points="46,26 44,29 48,29" fill="#D84315"/>
+  <ellipse cx="46" cy="34" rx="8" ry="6" fill="#8D6E63"/>
+  <ellipse cx="46" cy="40" rx="5" ry="4" fill="#A1887F"/>
+  <polygon points="38,44 34,49 42,47" fill="#6D4C41"/>
+  <polygon points="54,44 58,49 50,47" fill="#6D4C41"/>
+  <text x="32" y="44" text-anchor="middle" fill="#BF360C" font-family="Arial" font-size="10" font-weight="bold">15</text>
+  <text x="32" y="56" text-anchor="middle" fill="#BF360C" font-family="Arial" font-size="6">SPEED</text>
+</svg>
