@@ -1251,14 +1251,34 @@
                 return;
             }
 
+            // Apply saved settings to filter and style task lists (same as dashboard)
+            const savedSettings = this.loadSavedSettings();
+            const filteredQuestLists = this.applyTaskListSettings(questLists, savedSettings);
+
+            if (filteredQuestLists.length === 0) {
+                container.innerHTML = `
+                    <div class="task-list-placeholder">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">⚙️</div>
+                            <div class="empty-state-title">No task lists selected</div>
+                            <div class="empty-state-text">Go to Settings to select which task lists to include in your quest.</div>
+                            <a href="${OC.generateUrl('/apps/quest/settings')}" class="btn btn-primary">Open Settings</a>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
             // Clear the container
             container.innerHTML = '';
 
             // Create quest list cards using dashboard task-list-card format
-            questLists.forEach((questList, index) => {
+            filteredQuestLists.forEach((questList, index) => {
                 const listCard = this.createQuestListCard(questList, index);
                 container.appendChild(listCard);
             });
+
+            console.log(`📊 Displayed ${filteredQuestLists.length} of ${questLists.length} quest lists (filtered by settings)`);
 
             // Update quest stats
             this.updateQuestStats(questLists);
