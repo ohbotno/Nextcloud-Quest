@@ -1,0 +1,901 @@
+/**
+ * @copyright Copyright (c) 2025 Quest Team
+ *
+ * @license GNU AGPL version 3 or any later version
+ */
+
+/* Character Customization Page Styles - Desktop-First Design */
+
+/* Rarity Colors */
+:root {
+    --rarity-common: #9e9e9e;
+    --rarity-rare: #2196f3;
+    --rarity-epic: #9c27b0;
+    --rarity-legendary: #ff9800;
+}
+
+/* Page Container */
+.character-page {
+    padding: var(--quest-spacing-xl, 2rem);
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+/* Page Header */
+.page-header {
+    margin-bottom: var(--quest-spacing-xl, 2rem);
+    text-align: center;
+}
+
+.page-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--color-main-text);
+    margin: 0 0 var(--quest-spacing-sm, 0.5rem) 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--quest-spacing-md, 1rem);
+}
+
+.page-icon {
+    font-size: 3rem;
+}
+
+.page-description {
+    font-size: 1.1rem;
+    color: var(--color-text-lighter);
+    margin: 0;
+}
+
+/* Character Content Layout */
+.character-content {
+    display: grid;
+    grid-template-columns: 400px 1fr;
+    gap: var(--quest-spacing-xl, 2rem);
+    margin-bottom: var(--quest-spacing-xl, 2rem);
+}
+
+/* Character Preview Section */
+.character-preview-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--quest-spacing-lg, 1.5rem);
+}
+
+.preview-card,
+.equipment-card {
+    background: var(--color-main-background);
+    border-radius: 12px;
+    padding: var(--quest-spacing-xl, 2rem);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--color-border);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--quest-spacing-lg, 1.5rem);
+    padding-bottom: var(--quest-spacing-md, 1rem);
+    border-bottom: 2px solid var(--color-border);
+}
+
+.card-header h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--color-main-text);
+}
+
+.character-level-badge {
+    background: linear-gradient(135deg, var(--quest-primary, #0082c9), #0066a1);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+/* Character Display */
+.character-display {
+    text-align: center;
+}
+
+.character-avatar-large {
+    width: 200px;
+    height: 200px;
+    margin: 0 auto var(--quest-spacing-lg, 1.5rem);
+    position: relative;
+}
+
+.avatar-display {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 4px solid var(--color-border);
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    position: relative;
+}
+
+/* Avatar Layers */
+.avatar-layer {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.avatar-layer.avatar-base {
+    z-index: 0;
+}
+
+.avatar-layer.avatar-clothing {
+    z-index: 10;
+}
+
+.avatar-layer.avatar-accessory {
+    z-index: 15;
+}
+
+.avatar-layer.avatar-weapon {
+    z-index: 20;
+}
+
+.avatar-layer.avatar-headgear {
+    z-index: 30;
+}
+
+.sprite-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.sprite-fallback {
+    font-size: 4em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+    animation: equip-glow 0.5s ease-out;
+}
+
+@keyframes equip-glow {
+    0% {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.avatar-icon {
+    font-size: 120px;
+    line-height: 1;
+}
+
+.avatar-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Character Info */
+.character-info {
+    background: var(--color-background-hover);
+    border-radius: 8px;
+    padding: var(--quest-spacing-lg, 1.5rem);
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--quest-spacing-sm, 0.5rem) 0;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.info-row:last-child {
+    border-bottom: none;
+}
+
+.info-label {
+    font-weight: 500;
+    color: var(--color-text-lighter);
+}
+
+.info-value {
+    font-weight: 600;
+    color: var(--color-main-text);
+}
+
+/* Equipment Section */
+.equipment-slots {
+    display: flex;
+    flex-direction: column;
+    gap: var(--quest-spacing-md, 1rem);
+}
+
+.equipment-slot {
+    display: flex;
+    align-items: center;
+    gap: var(--quest-spacing-md, 1rem);
+    padding: var(--quest-spacing-lg, 1.5rem);
+    background: var(--color-background-hover);
+    border-radius: 8px;
+    border: 2px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.equipment-slot:hover {
+    border-color: var(--quest-primary, #0082c9);
+    box-shadow: 0 2px 8px rgba(0, 130, 201, 0.2);
+}
+
+.slot-icon {
+    font-size: 2rem;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-main-background);
+    border-radius: 8px;
+    border: 2px solid var(--color-border);
+}
+
+.slot-details {
+    flex: 1;
+}
+
+.slot-name {
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--color-main-text);
+    margin-bottom: 0.25rem;
+}
+
+.slot-equipped {
+    font-size: 0.9rem;
+}
+
+.equipped-label {
+    color: var(--color-text-lighter);
+    font-style: italic;
+}
+
+.equipped-item-name {
+    color: var(--color-main-text);
+    font-weight: 500;
+    margin-right: 0.5rem;
+}
+
+.equipped-item-rarity {
+    display: inline-block;
+    padding: 0.125rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.equipped-item-rarity.common {
+    background: var(--rarity-common);
+    color: white;
+}
+
+.equipped-item-rarity.rare {
+    background: var(--rarity-rare);
+    color: white;
+}
+
+.equipped-item-rarity.epic {
+    background: var(--rarity-epic);
+    color: white;
+}
+
+.equipped-item-rarity.legendary {
+    background: var(--rarity-legendary);
+    color: white;
+}
+
+.slot-button {
+    padding: 0.5rem 1.25rem;
+    background: var(--quest-primary, #0082c9);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.slot-button:hover {
+    background: #0066a1;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0, 130, 201, 0.3);
+}
+
+/* Items Section */
+.items-section {
+    background: var(--color-main-background);
+    border-radius: 12px;
+    padding: var(--quest-spacing-xl, 2rem);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--color-border);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--quest-spacing-xl, 2rem);
+    padding-bottom: var(--quest-spacing-md, 1rem);
+    border-bottom: 2px solid var(--color-border);
+}
+
+.section-header h2 {
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--color-main-text);
+}
+
+/* Filter Tabs */
+.filter-tabs {
+    display: flex;
+    gap: var(--quest-spacing-sm, 0.5rem);
+}
+
+.filter-tab {
+    padding: 0.5rem 1.25rem;
+    background: var(--color-background-hover);
+    border: 2px solid transparent;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--color-main-text);
+}
+
+.filter-tab:hover {
+    background: var(--color-background-dark);
+}
+
+.filter-tab.active {
+    background: var(--quest-primary, #0082c9);
+    color: white;
+    border-color: var(--quest-primary, #0082c9);
+}
+
+/* Items Grid */
+.items-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--quest-spacing-lg, 1.5rem);
+}
+
+/* Item Card */
+.item-card {
+    background: var(--color-main-background);
+    border: 3px solid;
+    border-radius: 10px;
+    padding: var(--quest-spacing-lg, 1.5rem);
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.item-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.item-card.unlocked:hover::before {
+    content: "Click to Equip";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 130, 201, 0.9);
+    color: white;
+    padding: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    z-index: 10;
+}
+
+.item-card.locked {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.item-card.locked:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+.item-card.equipped {
+    background: linear-gradient(135deg, rgba(0, 130, 201, 0.1), rgba(0, 102, 161, 0.05));
+    box-shadow: 0 0 0 2px var(--quest-primary, #0082c9) inset;
+}
+
+.item-icon {
+    font-size: 3rem;
+    margin-bottom: var(--quest-spacing-sm, 0.5rem);
+}
+
+.item-name {
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--color-main-text);
+    margin-bottom: var(--quest-spacing-xs, 0.25rem);
+}
+
+.item-rarity {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: var(--quest-spacing-sm, 0.5rem);
+}
+
+.item-rarity.common {
+    background: var(--rarity-common);
+    color: white;
+}
+
+.item-rarity.rare {
+    background: var(--rarity-rare);
+    color: white;
+}
+
+.item-rarity.epic {
+    background: var(--rarity-epic);
+    color: white;
+}
+
+.item-rarity.legendary {
+    background: var(--rarity-legendary);
+    color: white;
+}
+
+.item-unlock {
+    font-size: 0.85rem;
+    color: var(--color-text-lighter);
+}
+
+/* Badges */
+.equipped-badge {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: var(--quest-success, #46ba61);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.locked-badge {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 3rem;
+    opacity: 0.3;
+}
+
+/* Loading State */
+.loading-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--quest-spacing-3xl, 4rem);
+    color: var(--color-text-lighter);
+}
+
+.spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid var(--color-border);
+    border-top-color: var(--quest-primary, #0082c9);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.loading-placeholder p {
+    margin-top: var(--quest-spacing-md, 1rem);
+    font-size: 1.1rem;
+}
+
+.no-items {
+    text-align: center;
+    padding: var(--quest-spacing-3xl, 4rem);
+    color: var(--color-text-lighter);
+    font-size: 1.1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .character-content {
+        grid-template-columns: 1fr;
+    }
+
+    .equipment-section {
+        order: 2;
+    }
+}
+
+@media (max-width: 768px) {
+    .character-page {
+        padding: var(--quest-spacing-md, 1rem);
+    }
+
+    .page-title {
+        font-size: 2rem;
+    }
+
+    .items-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: var(--quest-spacing-md, 1rem);
+    }
+
+    .equipment-slot {
+        padding: var(--quest-spacing-md, 1rem);
+    }
+
+    .character-avatar-large {
+        width: 150px;
+        height: 150px;
+    }
+
+    .avatar-icon {
+        font-size: 90px;
+    }
+
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--quest-spacing-md, 1rem);
+    }
+
+    .filter-tabs {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+    .filter-tab {
+        flex: 1;
+        min-width: 80px;
+    }
+}
+
+@media (max-width: 480px) {
+    .items-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    }
+
+    .equipment-slot {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .slot-button {
+        width: 100%;
+    }
+}
+
+/* Equipment Selection Overlay */
+.equipment-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    padding: var(--quest-spacing-lg, 1.5rem);
+    animation: fadeIn 0.2s ease-out;
+    pointer-events: auto;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.equipment-overlay-content {
+    background: var(--color-main-background);
+    border-radius: 12px;
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.3);
+    width: 100%;
+    max-width: 900px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    animation: slideUp 0.3s ease-out;
+    position: relative;
+    z-index: 10001;
+    pointer-events: auto;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.equipment-overlay-header {
+    padding: var(--quest-spacing-xl, 2rem);
+    border-bottom: 2px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.equipment-overlay-title {
+    display: flex;
+    align-items: center;
+    gap: var(--quest-spacing-md, 1rem);
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--color-main-text);
+    margin: 0;
+}
+
+.equipment-overlay-title .slot-emoji {
+    font-size: 2rem;
+}
+
+.equipment-overlay-close {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: var(--color-background-hover);
+    color: var(--color-main-text);
+    font-size: 1.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.equipment-overlay-close:hover {
+    background: var(--quest-error, #ff3742);
+    color: white;
+    transform: rotate(90deg);
+}
+
+.equipment-overlay-body {
+    padding: var(--quest-spacing-xl, 2rem);
+    overflow-y: auto;
+    flex: 1;
+}
+
+.equipment-overlay-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: var(--quest-spacing-lg, 1.5rem);
+    pointer-events: none;
+}
+
+.equipment-overlay-items > * {
+    pointer-events: auto;
+}
+
+.equipment-item-card {
+    background: var(--color-main-background);
+    border: 3px solid;
+    border-radius: 10px;
+    padding: var(--quest-spacing-lg, 1.5rem);
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.equipment-item-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.equipment-item-card.unlocked {
+    border-color: var(--color-border);
+}
+
+.equipment-item-card.unlocked:hover {
+    border-color: var(--quest-primary, #0082c9);
+}
+
+.equipment-item-card.locked {
+    border-color: var(--color-border-dark);
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.equipment-item-card.locked:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+.equipment-item-card.equipped {
+    border-color: var(--quest-success, #46ba61);
+    background: linear-gradient(135deg, rgba(70, 186, 97, 0.1), transparent);
+}
+
+.equipment-item-card.equipped::after {
+    content: "✓ Equipped";
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: var(--quest-success, #46ba61);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.equipment-item-card.none-option {
+    border-style: dashed;
+    border-color: var(--color-border);
+    background: var(--color-background-hover);
+}
+
+.equipment-item-card.none-option:hover {
+    border-color: var(--quest-error, #ff3742);
+}
+
+.equipment-item-icon {
+    font-size: 3rem;
+    margin-bottom: var(--quest-spacing-sm, 0.5rem);
+    display: block;
+    pointer-events: none;
+}
+
+.equipment-item-name {
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--color-main-text);
+    margin-bottom: var(--quest-spacing-xs, 0.25rem);
+    pointer-events: none;
+}
+
+.equipment-item-rarity {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: var(--quest-spacing-sm, 0.5rem);
+    pointer-events: none;
+}
+
+.equipment-item-rarity.common {
+    background: #9e9e9e;
+    color: white;
+}
+
+.equipment-item-rarity.rare {
+    background: #2196f3;
+    color: white;
+}
+
+.equipment-item-rarity.epic {
+    background: #9c27b0;
+    color: white;
+}
+
+.equipment-item-rarity.legendary {
+    background: #ff9800;
+    color: white;
+}
+
+.equipment-item-unlock {
+    font-size: 0.85rem;
+    color: var(--color-text-lighter);
+    pointer-events: none;
+}
+
+.equipment-item-locked-badge {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 3rem;
+    opacity: 0.3;
+    pointer-events: none;
+}
+
+.equipment-overlay-empty {
+    text-align: center;
+    padding: var(--quest-spacing-3xl, 4rem);
+    color: var(--color-text-lighter);
+}
+
+.equipment-overlay-empty-icon {
+    font-size: 4rem;
+    margin-bottom: var(--quest-spacing-lg, 1.5rem);
+    opacity: 0.3;
+}
+
+.equipment-overlay-empty-text {
+    font-size: 1.1rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .equipment-overlay-items {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: var(--quest-spacing-md, 1rem);
+    }
+
+    .equipment-overlay-header {
+        padding: var(--quest-spacing-lg, 1.5rem);
+    }
+
+    .equipment-overlay-body {
+        padding: var(--quest-spacing-lg, 1.5rem);
+    }
+
+    .equipment-overlay-title {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .equipment-overlay-items {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    }
+}
