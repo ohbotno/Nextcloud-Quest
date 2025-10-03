@@ -21,25 +21,25 @@ use OCP\AppFramework\Db\Entity;
  * @method void setUnlockedAt(\DateTime $unlockedAt)
  * @method string getUnlockMethod()
  * @method void setUnlockMethod(string $unlockMethod)
- * @method string|null getUnlockContext()
- * @method void setUnlockContext(?string $unlockContext)
+ * @method string|null getUnlockReason()
+ * @method void setUnlockReason(?string $unlockReason)
  */
 class CharacterUnlock extends Entity implements JsonSerializable {
-    
+
     /** @var string */
     protected $userId;
-    
+
     /** @var string */
     protected $itemKey;
-    
+
     /** @var \DateTime */
     protected $unlockedAt;
-    
+
     /** @var string */
     protected $unlockMethod;
-    
+
     /** @var string|null */
-    protected $unlockContext;
+    protected $unlockReason;
 
     // Unlock methods
     public const METHOD_LEVEL = 'level';
@@ -134,7 +134,7 @@ class CharacterUnlock extends Entity implements JsonSerializable {
             'item_key' => $this->itemKey,
             'unlocked_at' => $this->unlockedAt?->format('Y-m-d H:i:s'),
             'unlock_method' => $this->unlockMethod,
-            'unlock_context' => $this->unlockContext,
+            'unlock_reason' => $this->unlockReason,
             'unlock_method_name' => $this->getUnlockMethodName(),
             'unlock_method_icon' => $this->getUnlockMethodIcon(),
             'is_recent' => $this->isRecent(),

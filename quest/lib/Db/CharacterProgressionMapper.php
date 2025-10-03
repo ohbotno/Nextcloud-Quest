@@ -17,7 +17,7 @@ use OCP\IDBConnection;
 class CharacterProgressionMapper extends QBMapper {
 
     public function __construct(IDBConnection $db) {
-        parent::__construct($db, 'ncquest_character_progression', CharacterProgression::class);
+        parent::__construct($db, 'quest_char_progress', CharacterProgression::class);
     }
 
     /**

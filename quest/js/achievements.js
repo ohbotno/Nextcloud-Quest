@@ -26,7 +26,6 @@
             selectedCategories: [],
             selectedRarities: [],
             selectedStatuses: [],
-            minProgress: 0,
             isLoading: true,
             statistics: {}
         },
@@ -75,19 +74,9 @@
                 statusFilter: document.getElementById('status-filter'),
                 rarityFilter: document.getElementById('rarity-filter'),
                 sortBy: document.getElementById('sort-by'),
-                progressRange: document.getElementById('progress-range'),
-                progressValue: document.getElementById('progress-value'),
-                clearFiltersBtn: document.getElementById('clear-filters-btn'),
-                
+
                 // View toggles
                 viewToggleBtns: document.querySelectorAll('.view-toggle-btn'),
-                
-                // Filter panel checkboxes
-                categoryCheckboxes: document.querySelectorAll('.filter-options input[type="checkbox"]'),
-                
-                // Filter stats
-                showingCount: document.getElementById('showing-count'),
-                totalCount: document.getElementById('total-count'),
                 
                 // Modal
                 modal: document.getElementById('achievement-modal'),
@@ -146,17 +135,6 @@
                 });
             }
 
-            // Progress range slider
-            if (this.elements.progressRange) {
-                this.elements.progressRange.addEventListener('input', (e) => {
-                    this.state.minProgress = parseInt(e.target.value);
-                    if (this.elements.progressValue) {
-                        this.elements.progressValue.textContent = this.state.minProgress + '%';
-                    }
-                    this.filterAndRenderAchievements();
-                });
-            }
-
             // View toggle buttons
             this.elements.viewToggleBtns.forEach(btn => {
                 btn.addEventListener('click', (e) => {
@@ -164,20 +142,6 @@
                     this.switchView(view);
                 });
             });
-
-            // Category checkboxes in filter panel
-            this.elements.categoryCheckboxes.forEach(checkbox => {
-                checkbox.addEventListener('change', () => {
-                    this.updateFiltersFromCheckboxes();
-                });
-            });
-
-            // Clear filters button
-            if (this.elements.clearFiltersBtn) {
-                this.elements.clearFiltersBtn.addEventListener('click', () => {
-                    this.clearAllFilters();
-                });
-            }
 
             // Modal events
             this.elements.closeModalBtns.forEach(btn => {
@@ -408,7 +372,6 @@
             this.filterAchievements();
             this.sortAchievements();
             this.renderAchievements();
-            this.updateFilterStats();
         },
 
         // Filter achievements based on current filters
@@ -434,16 +397,11 @@
                 
                 // Status filter
                 if (this.state.selectedStatuses.length > 0) {
-                    const status = achievement.unlocked ? 'unlocked' : (achievement.progress_percentage > 0 ? 'in-progress' : 'locked');
+                    // Use backend status field if available, otherwise calculate
+                    const status = achievement.status || (achievement.unlocked ? 'unlocked' : (achievement.progress_percentage > 0 ? 'in-progress' : 'locked'));
                     if (!this.state.selectedStatuses.includes(status)) return false;
                 }
-                
-                // Progress filter
-                if (this.state.minProgress > 0) {
-                    const progress = achievement.progress_percentage || 0;
-                    if (progress < this.state.minProgress) return false;
-                }
-                
+
                 return true;
             });
         },
@@ -502,7 +460,8 @@
             let html = '';
             
             this.state.filteredAchievements.forEach(achievement => {
-                const status = achievement.unlocked ? 'unlocked' : (achievement.progress_percentage > 0 ? 'in-progress' : 'locked');
+                // Use backend status field if available, otherwise calculate
+                const status = achievement.status || (achievement.unlocked ? 'unlocked' : (achievement.progress_percentage > 0 ? 'in-progress' : 'locked'));
                 const rarityClass = achievement.rarity.toLowerCase();
                 const progressPercentage = achievement.progress_percentage || 0;
                 
@@ -553,7 +512,8 @@
             let html = '';
             
             this.state.filteredAchievements.forEach(achievement => {
-                const status = achievement.unlocked ? 'unlocked' : (achievement.progress_percentage > 0 ? 'in-progress' : 'locked');
+                // Use backend status field if available, otherwise calculate
+                const status = achievement.status || (achievement.unlocked ? 'unlocked' : (achievement.progress_percentage > 0 ? 'in-progress' : 'locked'));
                 const progressPercentage = achievement.progress_percentage || 0;
                 
                 html += `
@@ -610,12 +570,14 @@
         getStatusText(status, achievement) {
             switch (status) {
                 case 'unlocked':
-                    return `Unlocked ${this.formatDate(achievement.unlocked_at)}`;
+                    return `✓ Unlocked ${this.formatDate(achievement.unlocked_at)}`;
+                case 'completed':
+                    return '⭐ Completed';
                 case 'in-progress':
                     return 'In Progress';
                 case 'locked':
                 default:
-                    return 'Locked';
+                    return '🔒 Locked';
             }
         },
 
@@ -667,12 +629,6 @@
             this.filterAndRenderAchievements();
         },
 
-        // Update filters from checkboxes
-        updateFiltersFromCheckboxes() {
-            // This would be implemented if using the checkbox-based filtering
-            // For now, using dropdown filters
-        },
-
         // Filter by category (from category cards)
         filterByCategory(category) {
             this.state.selectedCategories = [category];
@@ -682,34 +638,6 @@
             this.filterAndRenderAchievements();
         },
 
-        // Clear all filters
-        clearAllFilters() {
-            this.state.selectedCategories = [];
-            this.state.selectedRarities = [];
-            this.state.selectedStatuses = [];
-            this.state.searchQuery = '';
-            this.state.minProgress = 0;
-            
-            // Reset UI elements
-            if (this.elements.searchInput) this.elements.searchInput.value = '';
-            if (this.elements.categoryFilter) this.elements.categoryFilter.value = 'all';
-            if (this.elements.statusFilter) this.elements.statusFilter.value = 'all';
-            if (this.elements.rarityFilter) this.elements.rarityFilter.value = 'all';
-            if (this.elements.progressRange) this.elements.progressRange.value = 0;
-            if (this.elements.progressValue) this.elements.progressValue.textContent = '0%';
-            
-            this.filterAndRenderAchievements();
-        },
-
-        // Update filter statistics
-        updateFilterStats() {
-            if (this.elements.showingCount) {
-                this.elements.showingCount.textContent = this.state.filteredAchievements.length;
-            }
-            if (this.elements.totalCount) {
-                this.elements.totalCount.textContent = this.state.achievements.length;
-            }
-        },
 
         // Show achievement modal
         showAchievementModal(achievement) {

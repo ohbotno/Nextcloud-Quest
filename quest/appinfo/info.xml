@@ -12,7 +12,7 @@
 * **Progress Tracking** - Visualize your productivity journey
 
 Perfect for individuals and teams who want to make task completion more engaging and rewarding.]]></description>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <licence>agpl</licence>
     <author mail="support@nextcloudquest.com" homepage="https://github.com/nextcloud/nextcloud-quest">Quest Team</author>
     <namespace>NextcloudQuest</namespace>
@@ -34,4 +34,8 @@ Perfect for individuals and teams who want to make task completion more engaging
     <settings>
         <personal>OCA\NextcloudQuest\Settings\Personal</personal>
     </settings>
+    <commands>
+        <command>OCA\NextcloudQuest\Command\SeedItemsCommand</command>
+        <command>OCA\NextcloudQuest\Command\UnlockItemsForUsersCommand</command>
+    </commands>
 </info>

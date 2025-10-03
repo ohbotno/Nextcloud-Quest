@@ -57,8 +57,19 @@ class PageController extends BasePageController {
     }
 
     /**
+     * Character customization page
+     *
+     * @NoAdminRequired
+     * @NoCSRFRequired
+     * @return TemplateResponse
+     */
+    public function character() {
+        return $this->renderPage('character', 'character', ['character-page'], ['character-page']);
+    }
+
+    /**
      * Dedicated settings page
-     * 
+     *
      * @NoAdminRequired
      * @NoCSRFRequired
      * @return TemplateResponse

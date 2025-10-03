@@ -72,32 +72,20 @@
                 
                 <!-- Character Gauges - Always Visible -->
                 <div class="character-gauges" id="character-gauges">
-                    <!-- Compact Level Display -->
-                    <div class="character-gauge level-gauge compact">
+                    <!-- Unified Level & XP Display -->
+                    <div class="character-gauge level-xp-gauge compact">
                         <div class="gauge-header">
                             <span class="gauge-icon">⭐</span>
                             <span class="gauge-text">Lv. <span id="character-level">1</span></span>
-                            <span class="gauge-value" id="level-progress-text">0%</span>
+                            <span class="gauge-value">
+                                <span id="current-xp">0</span>/<span id="next-level-xp">100</span>
+                            </span>
                         </div>
                         <div class="level-bar">
                             <div class="level-progress" id="level-progress-bar" style="width: 0%"></div>
                         </div>
                     </div>
-                    
-                    <!-- Compact XP Display -->
-                    <div class="character-gauge xp-gauge compact">
-                        <div class="gauge-header">
-                            <span class="gauge-icon">✨</span>
-                            <span class="gauge-text">XP</span>
-                            <span class="gauge-value">
-                                <span id="current-xp">0</span>/<span id="next-level-xp">100</span>
-                            </span>
-                        </div>
-                        <div class="xp-bar">
-                            <div class="xp-progress" id="xp-progress-bar" style="width: 0%"></div>
-                        </div>
-                    </div>
-                    
+
                     <!-- Compact Health Display -->
                     <div class="character-gauge health-gauge compact">
                         <div class="gauge-header">
@@ -111,14 +99,16 @@
                             <div class="health-progress" id="health-progress-bar" style="width: 100%"></div>
                         </div>
                     </div>
-                </div>
-                
-                <!-- Streak Display -->
-                <div class="character-streak">
-                    <div class="streak-icon">🔥</div>
-                    <div class="streak-info">
-                        <div class="streak-number" id="streak-days">0</div>
-                        <div class="streak-label">Day Streak</div>
+
+                    <!-- Streak Display -->
+                    <div class="character-gauge streak-gauge compact">
+                        <div class="gauge-header">
+                            <span class="gauge-icon">🔥</span>
+                            <span class="gauge-text">Day Streak</span>
+                            <span class="gauge-value">
+                                <span id="streak-days">0</span>
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -151,12 +141,20 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="<?php print_unescaped(\OC::$server->getURLGenerator()->linkToRoute('quest.page.achievements')); ?>" 
+                        <a href="<?php print_unescaped(\OC::$server->getURLGenerator()->linkToRoute('quest.page.achievements')); ?>"
                            class="nav-link <?php p($_['active_page'] === 'achievements' ? 'active' : ''); ?>"
                            data-page="achievements">
                             <span class="nav-icon">🏆</span>
                             <span class="nav-text">Achievements</span>
                             <span class="nav-badge" id="achievements-badge" style="display: none;">0</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="<?php print_unescaped(\OC::$server->getURLGenerator()->linkToRoute('quest.page.character')); ?>"
+                           class="nav-link <?php p($_['active_page'] === 'character' ? 'active' : ''); ?>"
+                           data-page="character">
+                            <span class="nav-icon">🎨</span>
+                            <span class="nav-text">Character</span>
                         </a>
                     </li>
                     <li class="nav-item nav-separator"></li>

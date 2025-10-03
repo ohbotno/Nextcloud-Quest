@@ -77,12 +77,21 @@ class CharacterService {
             // Get user quest data
             $quest = $this->questMapper->findByUserId($userId);
             $userLevel = $quest->getLevel();
-            
+
             // Get current age
             $currentAge = $this->ageMapper->getAgeForLevel($userLevel);
             if (!$currentAge) {
-                // Default to Stone Age if no age found
-                $currentAge = $this->ageMapper->findByKey('stone');
+                // Try default to Stone Age if no age found
+                try {
+                    $currentAge = $this->ageMapper->findByKey('stone');
+                } catch (\Exception $e) {
+                    // If stone age doesn't exist, return default data
+                    $this->logger->warning('Character ages table is empty, returning default data', [
+                        'userId' => $userId,
+                        'error' => $e->getMessage()
+                    ]);
+                    return $this->getDefaultCharacterData();
+                }
             }
             
             // Get next age for progression tracking
@@ -116,7 +125,9 @@ class CharacterService {
                 'customization_stats' => [
                     'unlocked_items' => count($unlockedItems),
                     'total_items' => $totalItems,
-                    'unlock_percentage' => round((count($unlockedItems) / $totalItems) * 100, 1),
+                    'unlock_percentage' => $totalItems > 0
+                        ? round((count($unlockedItems) / $totalItems) * 100, 1)
+                        : 0,
                     'ages_reached' => count($progressionHistory),
                     'total_ages' => count($this->ageMapper->findAllActive())
                 ],
@@ -197,14 +208,20 @@ class CharacterService {
                 }
             }
             
+            // Merge available and locked items for frontend
+            $allItemsData = array_merge($availableItems, $lockedItems);
+
             return [
+                'items' => $allItemsData,
                 'available_items' => $availableItems,
                 'locked_items' => $lockedItems,
                 'statistics' => [
                     'total_items' => count($allItems),
                     'unlocked_count' => count($availableItems),
                     'locked_count' => count($lockedItems),
-                    'unlock_percentage' => round((count($availableItems) / count($allItems)) * 100, 1)
+                    'unlock_percentage' => count($allItems) > 0
+                        ? round((count($availableItems) / count($allItems)) * 100, 1)
+                        : 0
                 ]
             ];
             
@@ -237,43 +254,49 @@ class CharacterService {
     public function updateCharacterAppearance(string $userId, array $appearance): array {
         try {
             $quest = $this->questMapper->findByUserId($userId);
-            
+
+            $this->logger->info('Quest entity loaded', [
+                'userId' => $userId,
+                'questId' => $quest->getId(),
+                'hasId' => $quest->getId() !== null
+            ]);
+
             // Validate that user has unlocked the items
             $unlockedItems = $this->unlockMapper->getUnlockedItemKeys($userId);
-            
+
             // Update each equipment slot if provided and unlocked
             $updated = [];
-            
+
             if (isset($appearance['clothing'])) {
                 if (empty($appearance['clothing']) || in_array($appearance['clothing'], $unlockedItems)) {
                     $quest->setCharacterEquippedClothing($appearance['clothing']);
                     $updated[] = 'clothing';
                 }
             }
-            
+
             if (isset($appearance['weapon'])) {
                 if (empty($appearance['weapon']) || in_array($appearance['weapon'], $unlockedItems)) {
                     $quest->setCharacterEquippedWeapon($appearance['weapon']);
                     $updated[] = 'weapon';
                 }
             }
-            
+
             if (isset($appearance['accessory'])) {
                 if (empty($appearance['accessory']) || in_array($appearance['accessory'], $unlockedItems)) {
                     $quest->setCharacterEquippedAccessory($appearance['accessory']);
                     $updated[] = 'accessory';
                 }
             }
-            
+
             if (isset($appearance['headgear'])) {
                 if (empty($appearance['headgear']) || in_array($appearance['headgear'], $unlockedItems)) {
                     $quest->setCharacterEquippedHeadgear($appearance['headgear']);
                     $updated[] = 'headgear';
                 }
             }
-            
-            // Save changes
-            $this->questMapper->update($quest);
+
+            // Save changes using custom method (table uses user_id as primary key, not id)
+            $this->questMapper->updateEquipment($quest);
             
             $this->logger->info('Character appearance updated', [
                 'userId' => $userId,
@@ -294,12 +317,13 @@ class CharacterService {
         } catch (\Exception $e) {
             $this->logger->error('Failed to update character appearance', [
                 'userId' => $userId,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
             ]);
-            
+
             return [
                 'success' => false,
-                'error' => 'Failed to update character appearance'
+                'error' => $e->getMessage()
             ];
         }
     }
@@ -447,6 +471,34 @@ class CharacterService {
         try {
             $quest = $this->questMapper->findByUserId($userId);
             $currentAge = $this->ageMapper->getAgeForLevel($quest->getLevel());
+
+            // If no age found, return empty customization data
+            if (!$currentAge) {
+                $this->logger->warning('No age found for user level, returning empty customization data', [
+                    'userId' => $userId,
+                    'level' => $quest->getLevel()
+                ]);
+
+                return [
+                    'level' => $quest->getLevel(),
+                    'current_age' => [
+                        'key' => 'stone',
+                        'name' => 'Stone Age',
+                        'color' => '#8b7355',
+                        'icon' => '🪨'
+                    ],
+                    'ages' => [],
+                    'items_by_type' => [],
+                    'equipped_items' => [],
+                    'current_appearance' => [],
+                    'customization_stats' => [
+                        'unlocked_items' => 0,
+                        'total_items' => 0
+                    ],
+                    'rarities' => [],
+                    'recent_unlocks' => []
+                ];
+            }
             
             // Get all ages with progression status
             $allAges = $this->ageMapper->findAllActive();
@@ -476,6 +528,13 @@ class CharacterService {
             $equippedData = $this->getEquippedItems($quest);
             
             return [
+                'level' => $quest->getLevel(),
+                'current_age' => [
+                    'key' => $currentAge->getAgeKey(),
+                    'name' => $currentAge->getAgeName(),
+                    'color' => $currentAge->getAgeColor(),
+                    'icon' => $currentAge->getAgeIcon()
+                ],
                 'ages' => $agesData,
                 'items_by_type' => $itemsByType,
                 'equipped_items' => $equippedData,
@@ -484,6 +543,10 @@ class CharacterService {
                     'weapon' => $quest->getCharacterEquippedWeapon(),
                     'accessory' => $quest->getCharacterEquippedAccessory(),
                     'headgear' => $quest->getCharacterEquippedHeadgear()
+                ],
+                'customization_stats' => [
+                    'unlocked_items' => count($this->unlockMapper->getUnlockedItemKeys($userId)),
+                    'total_items' => count($this->itemMapper->findAllActive())
                 ],
                 'rarities' => $this->getRarityStats($userId),
                 'recent_unlocks' => $this->getRecentUnlocks($userId, 5)

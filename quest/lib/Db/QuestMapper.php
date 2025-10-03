@@ -12,13 +12,18 @@ use OCP\AppFramework\Db\Entity;
 use OCP\AppFramework\Db\QBMapper;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
+use Psr\Log\LoggerInterface;
 
 /**
  * @extends QBMapper<Quest>
  */
 class QuestMapper extends QBMapper {
-    public function __construct(IDBConnection $db) {
+
+    private $logger;
+
+    public function __construct(IDBConnection $db, LoggerInterface $logger) {
         parent::__construct($db, 'ncquest_users', Quest::class);
+        $this->logger = $logger;
     }
     
     /**
@@ -40,20 +45,62 @@ class QuestMapper extends QBMapper {
     
     /**
      * Create or update quest data for a user
-     * 
+     *
      * @param Quest $quest
      * @return Quest
      */
     public function insertOrUpdate(\OCP\AppFramework\Db\Entity $quest): \OCP\AppFramework\Db\Entity {
         try {
+            // Try to find existing record
             $existing = $this->findByUserId($quest->getUserId());
+
+            $this->logger->info('Found existing quest', [
+                'userId' => $quest->getUserId(),
+                'existingId' => $existing->getId(),
+                'questIdBefore' => $quest->getId()
+            ]);
+
+            // If found, update the existing entity with new values and save
+            // Copy all modified fields from $quest to $existing
             $quest->setId($existing->getId());
+
+            $this->logger->info('Set ID on quest', [
+                'userId' => $quest->getUserId(),
+                'questIdAfter' => $quest->getId()
+            ]);
+
             return $this->update($quest);
         } catch (DoesNotExistException $e) {
+            // No existing record, insert new one
+            $this->logger->info('No existing quest, inserting', [
+                'userId' => $quest->getUserId()
+            ]);
             return $this->insert($quest);
         }
     }
-    
+
+    /**
+     * Update equipment fields for a quest
+     * Custom method because ncquest_users table uses user_id as primary key, not id
+     *
+     * @param Quest $quest
+     * @return Quest
+     */
+    public function updateEquipment(Quest $quest): Quest {
+        $qb = $this->db->getQueryBuilder();
+
+        $qb->update($this->getTableName())
+            ->set('character_equipped_clothing', $qb->createNamedParameter($quest->getCharacterEquippedClothing()))
+            ->set('character_equipped_weapon', $qb->createNamedParameter($quest->getCharacterEquippedWeapon()))
+            ->set('character_equipped_accessory', $qb->createNamedParameter($quest->getCharacterEquippedAccessory()))
+            ->set('character_equipped_headgear', $qb->createNamedParameter($quest->getCharacterEquippedHeadgear()))
+            ->set('updated_at', $qb->createNamedParameter(date('Y-m-d H:i:s')))
+            ->where($qb->expr()->eq('user_id', $qb->createNamedParameter($quest->getUserId())))
+            ->executeStatement();
+
+        return $quest;
+    }
+
     /**
      * Get leaderboard data
      * 

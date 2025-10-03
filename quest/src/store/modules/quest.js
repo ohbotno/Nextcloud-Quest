@@ -226,7 +226,7 @@ const actions = {
         try {
             const response = await api.getAchievements()
             if (response.status === 'success') {
-                commit('setAchievements', response.data)
+                commit('setAchievements', response.achievements)
             }
         } catch (error) {
             // Failed to load achievements

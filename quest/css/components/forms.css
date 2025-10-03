@@ -265,7 +265,13 @@
 }
 
 .search-input {
-    padding-left: 40px;
+    padding-left: 52px;
+}
+
+/* High specificity override for Nextcloud's generated class names */
+input.search-input,
+.search-box input.search-input {
+    padding-left: 40px !important;
 }
 
 .search-icon {

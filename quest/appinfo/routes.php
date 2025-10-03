@@ -12,6 +12,7 @@ return [
         ['name' => 'page#adventure', 'url' => '/adventure', 'verb' => 'GET'],
         ['name' => 'page#quests', 'url' => '/quests', 'verb' => 'GET'],
         ['name' => 'page#achievements', 'url' => '/achievements', 'verb' => 'GET'],
+        ['name' => 'page#character', 'url' => '/character', 'verb' => 'GET'],
         ['name' => 'page#settings', 'url' => '/settings', 'verb' => 'GET'],
         
         // API routes for quest functionality
@@ -37,7 +38,11 @@ return [
         ['name' => 'quest#getLeaderboard', 'url' => '/api/leaderboard', 'verb' => 'GET'],
         
         // Character system API routes
+        ['name' => 'character#debugAgeSystem', 'url' => '/api/character/debug-age', 'verb' => 'GET'],
+        ['name' => 'character#recalculateAge', 'url' => '/api/character/recalculate-age', 'verb' => 'POST'],
+        ['name' => 'character#debugStatus', 'url' => '/api/character/debug', 'verb' => 'GET'],
         ['name' => 'character#getCharacterData', 'url' => '/api/character', 'verb' => 'GET'],
+        ['name' => 'character#getCharacterData', 'url' => '/api/character/data', 'verb' => 'GET'],
         ['name' => 'character#getAvailableItems', 'url' => '/api/character/items', 'verb' => 'GET'],
         ['name' => 'character#getCustomizationData', 'url' => '/api/character/customization', 'verb' => 'GET'],
         ['name' => 'character#updateAppearance', 'url' => '/api/character/appearance', 'verb' => 'PUT'],

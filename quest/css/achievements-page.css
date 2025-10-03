@@ -418,7 +418,7 @@
 
 .search-input {
     width: 100%;
-    padding: var(--quest-spacing-sm) var(--quest-spacing-lg) var(--quest-spacing-sm) var(--quest-spacing-xl);
+    padding: var(--quest-spacing-sm) var(--quest-spacing-lg) var(--quest-spacing-sm) 52px;
     border: 1px solid var(--color-border);
     border-radius: var(--quest-radius-md);
     font-size: var(--quest-font-base);
@@ -561,17 +561,22 @@
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: var(--quest-spacing-xl);
     margin-top: var(--quest-spacing-md);
+    padding-bottom: var(--quest-spacing-md);
 }
 
 .achievement-card {
     background: var(--achievement-bg-locked);
     border: 2px solid var(--achievement-border-locked);
     border-radius: var(--quest-radius-lg);
-    padding: var(--quest-spacing-lg);
+    padding: var(--quest-spacing-lg) var(--quest-spacing-lg) calc(var(--quest-spacing-lg) + 12px);
     cursor: pointer;
     transition: var(--quest-transition-normal);
     position: relative;
-    overflow: hidden;
+    overflow: visible;
+    min-height: auto;
+    height: auto;
+    display: flex;
+    flex-direction: column;
 }
 
 .achievement-card:hover {
@@ -657,6 +662,9 @@
 
 .achievement-content {
     text-align: center;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .achievement-name {
@@ -671,10 +679,11 @@
 }
 
 .achievement-description {
-    margin: 0 0 var(--quest-spacing-sm) 0;
+    margin: 0 0 var(--quest-spacing-md) 0;
     font-size: var(--quest-font-sm);
     color: var(--color-text-lighter);
-    line-height: 1.4;
+    line-height: 1.5;
+    min-height: 2.1em;
 }
 
 .achievement-meta {
@@ -721,7 +730,9 @@
 
 /* Achievement Progress Bar */
 .achievement-progress {
-    margin-top: var(--quest-spacing-sm);
+    margin-top: auto;
+    padding-top: var(--quest-spacing-md);
+    padding-bottom: 4px;
 }
 
 .progress-bar {
@@ -743,6 +754,8 @@
     font-size: var(--quest-font-xs);
     color: var(--color-text-lighter);
     text-align: center;
+    margin-top: 4px;
+    padding-bottom: 2px;
 }
 
 .achievement-unlock-date {

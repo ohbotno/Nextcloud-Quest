@@ -17,7 +17,7 @@ use OCP\IDBConnection;
 class CharacterItemMapper extends QBMapper {
 
     public function __construct(IDBConnection $db) {
-        parent::__construct($db, 'ncquest_character_items', CharacterItem::class);
+        parent::__construct($db, 'quest_char_items', CharacterItem::class);
     }
 
     /**

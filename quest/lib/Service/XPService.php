@@ -19,16 +19,20 @@ class XPService {
     private $questMapper;
     /** @var HistoryMapper */
     private $historyMapper;
+    /** @var CharacterService */
+    private $characterService;
     /** @var LoggerInterface */
     private $logger;
-    
+
     public function __construct(
         QuestMapper $questMapper,
         HistoryMapper $historyMapper,
+        CharacterService $characterService,
         LoggerInterface $logger
     ) {
         $this->questMapper = $questMapper;
         $this->historyMapper = $historyMapper;
+        $this->characterService = $characterService;
         $this->logger = $logger;
     }
     
@@ -99,12 +103,16 @@ class XPService {
         // Check for level up
         $newLevel = $this->calculateLevel($quest->getLifetimeXp());
         $leveledUp = $newLevel > $oldLevel;
-        
+
         if ($leveledUp) {
             $quest->setLevel($newLevel);
             // Reset current XP for new level (optional: keep overflow)
             $xpForCurrentLevel = $this->getXPForLevel($newLevel);
             $quest->setCurrentXp($quest->getLifetimeXp() - $xpForCurrentLevel);
+
+            // Check for age progression and unlock items
+            $this->characterService->checkAgeProgression($userId, $newLevel, $quest->getLifetimeXp());
+            $this->characterService->checkLevelUnlocks($userId, $newLevel);
         }
         
         // Save updated quest data

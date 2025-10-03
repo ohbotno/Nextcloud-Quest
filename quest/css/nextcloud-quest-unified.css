@@ -384,7 +384,7 @@ textarea:focus {
 
 .search-input {
     width: 100%;
-    padding: 10px 16px 10px 40px;
+    padding: 10px 16px 10px 52px;
     border: 1px solid var(--color-border);
     border-radius: var(--radius-medium);
     font-size: var(--font-size-normal);
@@ -404,6 +404,14 @@ textarea:focus {
     top: 50%;
     transform: translateY(-50%);
     color: var(--color-text-light);
+}
+
+/* High specificity rule to override Nextcloud's generated selectors */
+.quest-wrapper .search-box input.search-input,
+.quest-wrapper input#task-search.search-input,
+#quest-main input.search-input,
+input.search-input {
+    padding-left: 40px !important;
 }
 
 .filter-select {

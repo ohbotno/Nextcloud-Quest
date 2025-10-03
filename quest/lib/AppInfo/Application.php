@@ -41,7 +41,10 @@ class Application extends App implements IBootstrap {
         
         // Register database mappers first (no dependencies)
         $context->registerService(\OCA\NextcloudQuest\Db\QuestMapper::class, function($c) {
-            return new \OCA\NextcloudQuest\Db\QuestMapper($c->get(\OCP\IDBConnection::class));
+            return new \OCA\NextcloudQuest\Db\QuestMapper(
+                $c->get(\OCP\IDBConnection::class),
+                $c->get(\Psr\Log\LoggerInterface::class)
+            );
         });
         
         $context->registerService(\OCA\NextcloudQuest\Db\HistoryMapper::class, function($c) {
@@ -51,16 +54,25 @@ class Application extends App implements IBootstrap {
         $context->registerService(\OCA\NextcloudQuest\Db\AchievementMapper::class, function($c) {
             return new \OCA\NextcloudQuest\Db\AchievementMapper($c->get(\OCP\IDBConnection::class));
         });
-        
-        // Register core services (depend only on mappers)
-        $context->registerService(\OCA\NextcloudQuest\Service\XPService::class, function($c) {
-            return new \OCA\NextcloudQuest\Service\XPService(
-                $c->get(\OCA\NextcloudQuest\Db\QuestMapper::class),
-                $c->get(\OCA\NextcloudQuest\Db\HistoryMapper::class),
-                $c->get(\Psr\Log\LoggerInterface::class)
-            );
+
+        // Register character system mappers
+        $context->registerService(\OCA\NextcloudQuest\Db\CharacterAgeMapper::class, function($c) {
+            return new \OCA\NextcloudQuest\Db\CharacterAgeMapper($c->get(\OCP\IDBConnection::class));
         });
-        
+
+        $context->registerService(\OCA\NextcloudQuest\Db\CharacterItemMapper::class, function($c) {
+            return new \OCA\NextcloudQuest\Db\CharacterItemMapper($c->get(\OCP\IDBConnection::class));
+        });
+
+        $context->registerService(\OCA\NextcloudQuest\Db\CharacterUnlockMapper::class, function($c) {
+            return new \OCA\NextcloudQuest\Db\CharacterUnlockMapper($c->get(\OCP\IDBConnection::class));
+        });
+
+        $context->registerService(\OCA\NextcloudQuest\Db\CharacterProgressionMapper::class, function($c) {
+            return new \OCA\NextcloudQuest\Db\CharacterProgressionMapper($c->get(\OCP\IDBConnection::class));
+        });
+
+        // Register core services (depend only on mappers)
         $context->registerService(\OCA\NextcloudQuest\Service\StreakService::class, function($c) {
             return new \OCA\NextcloudQuest\Service\StreakService(
                 $c->get(\OCA\NextcloudQuest\Db\QuestMapper::class),
@@ -68,16 +80,39 @@ class Application extends App implements IBootstrap {
                 $c->get(\Psr\Log\LoggerInterface::class)
             );
         });
-        
+
         $context->registerService(\OCA\NextcloudQuest\Service\AchievementService::class, function($c) {
             return new \OCA\NextcloudQuest\Service\AchievementService(
                 $c->get(\OCA\NextcloudQuest\Db\AchievementMapper::class),
                 $c->get(\OCA\NextcloudQuest\Db\HistoryMapper::class),
                 $c->get(\OCP\Notification\IManager::class),
+                $c->get(\Psr\Log\LoggerInterface::class),
+                $c->get(\OCA\NextcloudQuest\Db\QuestMapper::class)
+            );
+        });
+
+        // Register character service (before XPService since XPService depends on it)
+        $context->registerService(\OCA\NextcloudQuest\Service\CharacterService::class, function($c) {
+            return new \OCA\NextcloudQuest\Service\CharacterService(
+                $c->get(\OCA\NextcloudQuest\Db\CharacterAgeMapper::class),
+                $c->get(\OCA\NextcloudQuest\Db\CharacterItemMapper::class),
+                $c->get(\OCA\NextcloudQuest\Db\CharacterUnlockMapper::class),
+                $c->get(\OCA\NextcloudQuest\Db\CharacterProgressionMapper::class),
+                $c->get(\OCA\NextcloudQuest\Db\QuestMapper::class),
+                $c->get(\OCP\EventDispatcher\IEventDispatcher::class),
                 $c->get(\Psr\Log\LoggerInterface::class)
             );
         });
-        
+
+        $context->registerService(\OCA\NextcloudQuest\Service\XPService::class, function($c) {
+            return new \OCA\NextcloudQuest\Service\XPService(
+                $c->get(\OCA\NextcloudQuest\Db\QuestMapper::class),
+                $c->get(\OCA\NextcloudQuest\Db\HistoryMapper::class),
+                $c->get(\OCA\NextcloudQuest\Service\CharacterService::class),
+                $c->get(\Psr\Log\LoggerInterface::class)
+            );
+        });
+
         $context->registerService(\OCA\NextcloudQuest\Service\LevelService::class, function($c) {
             return new \OCA\NextcloudQuest\Service\LevelService(
                 $c->get(\OCA\NextcloudQuest\Db\QuestMapper::class),
@@ -85,7 +120,7 @@ class Application extends App implements IBootstrap {
                 $c->get(\Psr\Log\LoggerInterface::class)
             );
         });
-        
+
         // Register integration services (depend on core services)
         $context->registerService(TasksApiIntegration::class, function($c) {
             return new TasksApiIntegration(
@@ -153,7 +188,17 @@ class Application extends App implements IBootstrap {
                 $c->get(\OCP\IRequest::class)
             );
         });
-        
+
+        // Register CharacterController
+        $context->registerService(\OCA\NextcloudQuest\Controller\CharacterController::class, function($c) {
+            return new \OCA\NextcloudQuest\Controller\CharacterController(
+                self::APP_ID,
+                $c->get(\OCP\IRequest::class),
+                $c->get(\OCP\IUserSession::class),
+                $c->get(\OCA\NextcloudQuest\Service\CharacterService::class)
+            );
+        });
+
         // Register event listeners
         $context->registerEventListener(TaskCompletedEvent::class, TaskCompletionListener::class);
         

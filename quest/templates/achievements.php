@@ -93,8 +93,9 @@ ob_start();
         <select class="filter-select" id="status-filter">
             <option value="all">All Status</option>
             <option value="unlocked">Unlocked</option>
-            <option value="locked">Locked</option>
+            <option value="completed">Completed</option>
             <option value="in-progress">In Progress</option>
+            <option value="locked">Locked</option>
         </select>
         
         <select class="filter-select" id="rarity-filter">
@@ -117,132 +118,8 @@ ob_start();
 <!-- Achievements Layout -->
 <section class="content-section achievements-main-section">
     <div class="achievements-layout">
-        <!-- Filter Panel -->
-        <aside class="achievements-filter-panel">
-            <div class="filter-panel-header">
-                <h3 class="filter-panel-title">Filters</h3>
-                <button class="btn btn-small btn-secondary" id="clear-filters-btn">Clear All</button>
-            </div>
-            
-            <div class="filter-group">
-                <label class="filter-label">Category</label>
-                <div class="filter-options">
-                    <label class="checkbox-option">
-                        <input type="checkbox" value="all" checked> All Categories
-                    </label>
-                    <label class="checkbox-option">
-                        <input type="checkbox" value="Task Master"> Task Master
-                    </label>
-                    <label class="checkbox-option">
-                        <input type="checkbox" value="Streak Keeper"> Streak Keeper
-                    </label>
-                    <label class="checkbox-option">
-                        <input type="checkbox" value="Level Champion"> Level Champion
-                    </label>
-                    <label class="checkbox-option">
-                        <input type="checkbox" value="Speed Demon"> Speed Demon
-                    </label>
-                    <label class="checkbox-option">
-                        <input type="checkbox" value="Consistency Master"> Consistency Master
-                    </label>
-                    <label class="checkbox-option">
-                        <input type="checkbox" value="Time Master"> Time Master
-                    </label>
-                    <label class="checkbox-option">
-                        <input type="checkbox" value="Priority Master"> Priority Master
-                    </label>
-                    <label class="checkbox-option">
-                        <input type="checkbox" value="Special Achievements"> Special
-                    </label>
-                </div>
-            </div>
-            
-            <div class="filter-group">
-                <label class="filter-label">Status</label>
-                <div class="filter-options">
-                    <label class="checkbox-option">
-                        <input type="checkbox" value="unlocked"> Unlocked
-                    </label>
-                    <label class="checkbox-option">
-                        <input type="checkbox" value="locked"> Locked
-                    </label>
-                    <label class="checkbox-option">
-                        <input type="checkbox" value="in-progress"> In Progress
-                    </label>
-                </div>
-            </div>
-            
-            <div class="filter-group">
-                <label class="filter-label">Rarity</label>
-                <div class="filter-options">
-                    <label class="checkbox-option">
-                        <input type="checkbox" value="common"> <span class="rarity-badge common">Common</span>
-                    </label>
-                    <label class="checkbox-option">
-                        <input type="checkbox" value="rare"> <span class="rarity-badge rare">Rare</span>
-                    </label>
-                    <label class="checkbox-option">
-                        <input type="checkbox" value="epic"> <span class="rarity-badge epic">Epic</span>
-                    </label>
-                    <label class="checkbox-option">
-                        <input type="checkbox" value="legendary"> <span class="rarity-badge legendary">Legendary</span>
-                    </label>
-                </div>
-            </div>
-            
-            <div class="filter-group">
-                <label class="filter-label">Progress</label>
-                <div class="progress-range">
-                    <input type="range" id="progress-range" min="0" max="100" value="0" class="progress-slider">
-                    <div class="range-labels">
-                        <span>0%</span>
-                        <span id="progress-value">0%</span>
-                        <span>100%</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="filter-stats">
-                <div class="filter-stat-item">
-                    <span class="filter-stat-label">Showing:</span>
-                    <span class="filter-stat-value" id="showing-count">0</span>
-                </div>
-                <div class="filter-stat-item">
-                    <span class="filter-stat-label">Total:</span>
-                    <span class="filter-stat-value" id="total-count">0</span>
-                </div>
-            </div>
-        </aside>
-        
         <!-- Main Content -->
         <main class="achievements-content">
-            <!-- Search and View Controls -->
-            <div class="achievements-controls">
-                <div class="search-box">
-                    <input type="text" class="search-input" id="achievement-search" placeholder="Search achievements...">
-                    <span class="search-icon">🔍</span>
-                </div>
-                
-                <div class="sort-controls">
-                    <select class="filter-select" id="sort-by">
-                        <option value="name">Sort by Name</option>
-                        <option value="rarity">Sort by Rarity</option>
-                        <option value="progress">Sort by Progress</option>
-                        <option value="unlocked">Sort by Date Unlocked</option>
-                        <option value="category">Sort by Category</option>
-                    </select>
-                    
-                    <div class="view-toggle">
-                        <button class="btn btn-secondary view-toggle-btn active" data-view="grid">
-                            <span class="btn-icon">▦</span>
-                        </button>
-                        <button class="btn btn-secondary view-toggle-btn" data-view="list">
-                            <span class="btn-icon">☰</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            
             <!-- Loading State -->
             <div class="content-loading" id="achievements-loading">
                 <div class="content-spinner">
@@ -352,166 +229,16 @@ ob_start();
 </div>
 
 <style>
-/* Achievement Layout - Desktop-First with 240px Filter Panel */
+/* Achievement Styles - Updated 2025-01-03 - Fixed card heights */
+/* Achievement Layout - Full Width */
 .achievements-layout {
-    display: flex;
-    gap: 24px;
-    min-height: 600px;
-}
-
-/* Filter Panel - Fixed 240px Width */
-.achievements-filter-panel {
-    width: 240px;
-    flex-shrink: 0;
-    background: var(--color-main-background);
-    border-radius: var(--radius-large);
-    padding: 20px;
-    box-shadow: var(--shadow-sm);
-    height: fit-content;
-    position: sticky;
-    top: 20px;
-}
-
-.filter-panel-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid var(--color-border);
-}
-
-.filter-panel-title {
-    font-size: var(--font-size-large);
-    font-weight: 600;
-    color: var(--color-main-text);
-}
-
-.filter-group {
-    margin-bottom: 24px;
-}
-
-.filter-label {
     display: block;
-    font-size: var(--font-size-small);
-    font-weight: 600;
-    color: var(--color-main-text);
-    margin-bottom: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.filter-options {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.checkbox-option {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: var(--font-size-small);
-    color: var(--color-text-light);
-    cursor: pointer;
-    padding: 6px 0;
-    transition: color var(--transition-fast);
-}
-
-.checkbox-option:hover {
-    color: var(--color-main-text);
-}
-
-.checkbox-option input[type="checkbox"] {
-    width: 16px;
-    height: 16px;
-    accent-color: var(--color-primary);
-}
-
-.progress-range {
-    padding: 8px 0;
-}
-
-.progress-slider {
-    width: 100%;
-    height: 6px;
-    border-radius: 3px;
-    background: var(--color-background-dark);
-    outline: none;
-    appearance: none;
-    margin-bottom: 8px;
-}
-
-.progress-slider::-webkit-slider-thumb {
-    appearance: none;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background: var(--color-primary);
-    cursor: pointer;
-}
-
-.progress-slider::-moz-range-thumb {
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background: var(--color-primary);
-    cursor: pointer;
-    border: none;
-}
-
-.range-labels {
-    display: flex;
-    justify-content: space-between;
-    font-size: var(--font-size-small);
-    color: var(--color-text-lighter);
-}
-
-.filter-stats {
-    margin-top: 20px;
-    padding-top: 16px;
-    border-top: 1px solid var(--color-border);
-}
-
-.filter-stat-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 4px 0;
-}
-
-.filter-stat-label {
-    font-size: var(--font-size-small);
-    color: var(--color-text-light);
-}
-
-.filter-stat-value {
-    font-weight: 600;
-    color: var(--color-primary);
+    min-height: 600px;
 }
 
 /* Main Content Area */
 .achievements-content {
-    flex: 1;
-    min-width: 0;
-}
-
-.achievements-controls {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 24px;
-    padding: 16px 20px;
-    background: var(--color-main-background);
-    border-radius: var(--radius-large);
-    box-shadow: var(--shadow-sm);
-}
-
-.sort-controls {
-    display: flex;
-    gap: 12px;
-    align-items: center;
+    width: 100%;
 }
 
 /* Achievements Grid - Desktop-First 4-5 Columns with 240x320px Cards */
@@ -522,14 +249,15 @@ ob_start();
     justify-content: space-between;
 }
 
-/* Achievement Cards - Fixed 240x320px */
+/* Achievement Cards - Flexible height to prevent text cutoff */
 .achievement-card {
-    width: 240px;
-    height: 320px;
+    width: 240px !important;
+    min-height: 320px !important;
+    height: auto !important;
     background: var(--color-main-background);
     border-radius: var(--radius-large);
     box-shadow: var(--shadow-md);
-    overflow: hidden;
+    overflow: visible !important;
     cursor: pointer;
     transition: all var(--transition-normal);
     position: relative;
@@ -549,6 +277,18 @@ ob_start();
 
 .achievement-card.unlocked {
     border: 2px solid var(--color-success);
+}
+
+.achievement-card.completed {
+    border: 2px solid #f59e0b;
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(251, 191, 36, 0.05));
+    box-shadow: 0 0 15px rgba(245, 158, 11, 0.2);
+    animation: completedPulse 2s ease-in-out infinite;
+}
+
+@keyframes completedPulse {
+    0%, 100% { box-shadow: 0 0 15px rgba(245, 158, 11, 0.2); }
+    50% { box-shadow: 0 0 25px rgba(245, 158, 11, 0.4); }
 }
 
 /* Rarity Borders */
@@ -720,6 +460,18 @@ ob_start();
     color: var(--color-primary);
 }
 
+.achievement-status.completed {
+    background: #f59e0b;
+    color: white;
+    font-weight: 700;
+    animation: completedTextPulse 2s ease-in-out infinite;
+}
+
+@keyframes completedTextPulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.9; transform: scale(1.02); }
+}
+
 /* Responsive Grid Breakdowns */
 @media (max-width: 1600px) {
     .achievements-grid {
@@ -728,15 +480,6 @@ ob_start();
 }
 
 @media (max-width: 1200px) {
-    .achievements-layout {
-        flex-direction: column;
-    }
-    
-    .achievements-filter-panel {
-        width: 100%;
-        position: static;
-    }
-    
     .achievements-grid {
         grid-template-columns: repeat(3, 240px);
         justify-content: center;
@@ -1015,6 +758,12 @@ ob_start();
 .achievement-status.in-progress {
     background: var(--color-primary-light);
     color: var(--color-primary);
+}
+
+.achievement-status.completed {
+    background: #f59e0b;
+    color: white;
+    font-weight: 700;
 }
 
 /* Category overview cards */

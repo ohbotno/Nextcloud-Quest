@@ -56,57 +56,62 @@
                 </div>
                 
                 <div class="achievements-grid">
-                    <div 
+                    <div
                         v-for="achievement in getFilteredAchievements(category.achievements)"
                         :key="achievement.key"
                         class="achievement-card"
-                        :class="{ 
-                            unlocked: achievement.unlocked,
-                            locked: !achievement.unlocked,
+                        :class="{
+                            unlocked: achievement.status === 'unlocked',
+                            completed: achievement.status === 'completed',
+                            locked: achievement.status === 'locked',
                             recent: isRecentlyUnlocked(achievement)
                         }"
                         @click="showAchievementDetails(achievement)"
                     >
                         <div class="achievement-icon">
-                            <img 
-                                v-if="achievement.unlocked || showLockedIcons"
+                            <img
+                                v-if="achievement.status !== 'locked' || showLockedIcons"
                                 :src="getAchievementIcon(achievement.icon)"
                                 :alt="achievement.name"
                                 loading="lazy"
                             />
                             <div v-else class="locked-icon">🔒</div>
                         </div>
-                        
+
                         <div class="achievement-info">
                             <div class="achievement-name">
-                                {{ achievement.unlocked || showLockedNames ? achievement.name : '???' }}
+                                {{ achievement.status !== 'locked' || showLockedNames ? achievement.name : '???' }}
                             </div>
                             <div class="achievement-description">
-                                {{ achievement.unlocked || showLockedDescriptions ? achievement.description : 'Complete more tasks to unlock' }}
+                                {{ achievement.status !== 'locked' || showLockedDescriptions ? achievement.description : 'Complete more tasks to unlock' }}
                             </div>
-                            <div v-if="achievement.unlocked" class="achievement-date">
+                            <div v-if="achievement.status === 'unlocked'" class="achievement-date">
                                 {{ t('nextcloudquest', 'Unlocked {date}', { date: formatDate(achievement.unlocked_at) }) }}
                             </div>
+                            <div v-else-if="achievement.status === 'completed'" class="achievement-completed-text">
+                                {{ t('nextcloudquest', 'Completed - Complete a task to unlock!') }}
+                            </div>
                         </div>
-                        
+
                         <div class="achievement-status">
-                            <div v-if="achievement.unlocked" class="status-unlocked">✓</div>
+                            <div v-if="achievement.status === 'unlocked'" class="status-unlocked">✓</div>
+                            <div v-else-if="achievement.status === 'completed'" class="status-completed">⭐</div>
                             <div v-else class="status-locked">🔒</div>
                         </div>
                         
-                        <!-- Progress indicator for achievements with progress -->
-                        <div 
-                            v-if="achievement.progress !== undefined"
+                        <!-- Progress indicator for locked achievements with progress -->
+                        <div
+                            v-if="achievement.status === 'locked' && achievement.progress_percentage !== undefined && achievement.progress_percentage > 0"
                             class="achievement-progress"
                         >
                             <div class="progress-bar">
-                                <div 
+                                <div
                                     class="progress-fill"
-                                    :style="{ width: `${achievement.progress}%` }"
+                                    :style="{ width: `${achievement.progress_percentage}%` }"
                                 ></div>
                             </div>
                             <div class="progress-text">
-                                {{ Math.round(achievement.progress) }}%
+                                {{ Math.round(achievement.progress_percentage) }}%
                             </div>
                         </div>
                         
@@ -481,15 +486,16 @@ export default {
 .achievement-card {
     position: relative;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 12px;
-    padding: 15px;
+    padding: 15px 15px 28px;
+    min-height: 90px;
     border: 2px solid var(--color-border);
     border-radius: 8px;
     background: var(--color-background-hover);
     cursor: pointer;
     transition: all 0.2s ease;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .achievement-card:hover {
@@ -500,6 +506,12 @@ export default {
 .achievement-card.unlocked {
     border-color: var(--color-success);
     background: var(--color-success-background);
+}
+
+.achievement-card.completed {
+    border-color: #f59e0b;
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(251, 191, 36, 0.05));
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.2);
 }
 
 .achievement-card.locked {
@@ -559,6 +571,13 @@ export default {
     font-style: italic;
 }
 
+.achievement-completed-text {
+    font-size: 11px;
+    color: #f59e0b;
+    font-weight: 600;
+    font-style: italic;
+}
+
 .achievement-status {
     flex-shrink: 0;
     font-size: 20px;
@@ -566,6 +585,12 @@ export default {
 
 .status-unlocked {
     color: var(--color-success);
+}
+
+.status-completed {
+    color: #f59e0b;
+    font-size: 22px;
+    animation: pulse 2s infinite;
 }
 
 .status-locked {
@@ -589,7 +614,7 @@ export default {
 
 .progress-text {
     position: absolute;
-    top: -20px;
+    bottom: 8px;
     right: 10px;
     font-size: 10px;
     color: var(--color-text-lighter);
@@ -799,6 +824,11 @@ export default {
 @keyframes glow {
     0% { box-shadow: 0 0 5px rgba(var(--color-primary-rgb), 0.3); }
     100% { box-shadow: 0 0 20px rgba(var(--color-primary-rgb), 0.6); }
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.8; }
 }
 
 /* Theme Variations */

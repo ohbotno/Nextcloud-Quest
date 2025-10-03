@@ -45,6 +45,19 @@
                     <div class="stat-label">{{ t('quest', 'Achievements') }}</div>
                 </div>
             </div>
+
+            <div class="stat-card streak-stat">
+                <div class="stat-icon">
+                    <span v-if="stats.streak.current_streak === 0">⭕</span>
+                    <span v-else-if="stats.streak.current_streak < 7">🔥</span>
+                    <span v-else-if="stats.streak.current_streak < 30">🔥🔥</span>
+                    <span v-else>🔥🔥🔥</span>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-value">{{ stats.streak.current_streak }}</div>
+                    <div class="stat-label">{{ t('quest', 'Day Streak') }}</div>
+                </div>
+            </div>
         </div>
         
         <!-- Activity Chart -->
@@ -352,6 +365,11 @@ export default {
     font-size: 12px;
     color: var(--color-text-lighter);
     margin-top: 2px;
+}
+
+/* Streak stat card styling */
+.stat-card.streak-stat .stat-icon {
+    font-size: 22px;
 }
 
 .chart-section {

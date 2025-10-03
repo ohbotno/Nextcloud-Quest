@@ -1209,7 +1209,15 @@ class AchievementService {
                 $progressPercentage = 100;
                 $progressCurrent = $progressTarget;
             }
-            
+
+            // Determine status: locked (in progress), completed (criteria met), or unlocked
+            $status = 'locked';
+            if ($isUnlocked) {
+                $status = 'unlocked';
+            } elseif ($progressPercentage >= 100) {
+                $status = 'completed';
+            }
+
             $achievements[] = [
                 'key' => $key,
                 'name' => $data['name'],
@@ -1223,6 +1231,7 @@ class AchievementService {
                 'progress_percentage' => $progressPercentage,
                 'progress_current' => $progressCurrent,
                 'progress_target' => $progressTarget,
+                'status' => $status,
                 'unlocked' => $isUnlocked,
                 'unlocked_at' => $unlockedAt
             ];

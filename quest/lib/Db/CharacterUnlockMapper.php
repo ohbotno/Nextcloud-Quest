@@ -17,7 +17,7 @@ use OCP\IDBConnection;
 class CharacterUnlockMapper extends QBMapper {
 
     public function __construct(IDBConnection $db) {
-        parent::__construct($db, 'ncquest_character_unlocks', CharacterUnlock::class);
+        parent::__construct($db, 'quest_char_unlocks', CharacterUnlock::class);
     }
 
     /**
@@ -180,10 +180,10 @@ class CharacterUnlockMapper extends QBMapper {
      * @param string $userId
      * @param string $itemKey
      * @param string $unlockMethod
-     * @param string|null $unlockContext
+     * @param string|null $unlockReason
      * @return CharacterUnlock
      */
-    public function createUnlock(string $userId, string $itemKey, string $unlockMethod = 'level', ?string $unlockContext = null): CharacterUnlock {
+    public function createUnlock(string $userId, string $itemKey, string $unlockMethod = 'level', ?string $unlockReason = null): CharacterUnlock {
         // Check if already unlocked
         if ($this->hasUnlocked($userId, $itemKey)) {
             return $this->findByUserAndItem($userId, $itemKey);
@@ -194,8 +194,8 @@ class CharacterUnlockMapper extends QBMapper {
         $unlock->setItemKey($itemKey);
         $unlock->setUnlockedAt(new \DateTime());
         $unlock->setUnlockMethod($unlockMethod);
-        if ($unlockContext !== null) {
-            $unlock->setUnlockContext($unlockContext);
+        if ($unlockReason !== null) {
+            $unlock->setUnlockReason($unlockReason);
         }
 
         return $this->insert($unlock);
@@ -207,16 +207,16 @@ class CharacterUnlockMapper extends QBMapper {
      * @param string $userId
      * @param array $itemKeys
      * @param string $unlockMethod
-     * @param string|null $unlockContext
+     * @param string|null $unlockReason
      * @return int Number of new unlocks created
      */
-    public function bulkUnlock(string $userId, array $itemKeys, string $unlockMethod = 'level', ?string $unlockContext = null): int {
+    public function bulkUnlock(string $userId, array $itemKeys, string $unlockMethod = 'level', ?string $unlockReason = null): int {
         $newUnlocks = 0;
         $alreadyUnlocked = $this->getUnlockedItemKeys($userId);
 
         foreach ($itemKeys as $itemKey) {
             if (!in_array($itemKey, $alreadyUnlocked)) {
-                $this->createUnlock($userId, $itemKey, $unlockMethod, $unlockContext);
+                $this->createUnlock($userId, $itemKey, $unlockMethod, $unlockReason);
                 $newUnlocks++;
             }
         }

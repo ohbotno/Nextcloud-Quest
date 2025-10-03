@@ -53,6 +53,8 @@ abstract class BasePageController extends Controller {
         // Add common application layer scripts
         Util::addScript('quest', 'navigation');
         Util::addScript('quest', 'task-list-manager');
+        Util::addScript('quest', 'sidebar-character');
+        Util::addScript('quest', 'character-customizer');
         
         // Add page-specific scripts
         foreach ($additionalScripts as $script) {

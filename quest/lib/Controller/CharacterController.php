@@ -36,9 +36,128 @@ class CharacterController extends Controller {
     }
 
     /**
+     * Debug endpoint to check age system specifically
+     *
+     * @NoAdminRequired
+     * @NoCSRFRequired
+     * @return JSONResponse
+     */
+    public function debugAgeSystem() {
+        try {
+            $user = $this->userSession->getUser();
+            if (!$user) {
+                return new JSONResponse(['error' => 'User not found'], 401);
+            }
+
+            $userId = $user->getUID();
+            $db = \OC::$server->get(\OCP\IDBConnection::class);
+            $questMapper = \OC::$server->get(\OCA\NextcloudQuest\Db\QuestMapper::class);
+            $ageMapper = \OC::$server->get(\OCA\NextcloudQuest\Db\CharacterAgeMapper::class);
+
+            // Get user level
+            $quest = $questMapper->findByUserId($userId);
+            $userLevel = $quest->getLevel();
+
+            // Get all ages from database
+            $qb = $db->getQueryBuilder();
+            $qb->select('*')
+                ->from('ncquest_character_ages')
+                ->orderBy('min_level', 'ASC');
+            $result = $qb->executeQuery();
+            $agesInDb = $result->fetchAll();
+            $result->closeCursor();
+
+            // Get age for user's level
+            $currentAge = $ageMapper->getAgeForLevel($userLevel);
+
+            return new JSONResponse([
+                'user_level' => $userLevel,
+                'ages_in_database' => $agesInDb,
+                'age_for_current_level' => $currentAge ? $currentAge->jsonSerialize() : null,
+                'character_current_age_field' => $quest->getCharacterCurrentAge()
+            ]);
+
+        } catch (\Throwable $e) {
+            return new JSONResponse([
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ], 500);
+        }
+    }
+
+    /**
+     * Debug endpoint to check character system status
+     *
+     * @NoAdminRequired
+     * @NoCSRFRequired
+     * @return JSONResponse
+     */
+    public function debugStatus() {
+        $status = [
+            'service_available' => $this->characterService !== null,
+            'user_logged_in' => $this->userSession->getUser() !== null,
+            'tables_check' => [],
+            'errors' => []
+        ];
+
+        if (!$this->characterService) {
+            $status['errors'][] = 'CharacterService not injected';
+            return new JSONResponse($status);
+        }
+
+        try {
+            $db = \OC::$server->get(\OCP\IDBConnection::class);
+            $tables = [
+                'quest_char_ages',
+                'quest_char_items',
+                'quest_char_unlocks',
+                'quest_char_progress',
+                'ncquest_character_ages',
+                'ncquest_character_items',
+                'ncquest_character_unlocks',
+                'ncquest_character_progression',
+                'ncquest_users'
+            ];
+
+            foreach ($tables as $table) {
+                try {
+                    $qb = $db->getQueryBuilder();
+                    $qb->select($qb->createFunction('COUNT(*)'))
+                        ->from($table);
+                    $result = $qb->executeQuery();
+                    $count = $result->fetchOne();
+                    $status['tables_check'][$table] = ['exists' => true, 'rows' => $count];
+                } catch (\Exception $e) {
+                    $status['tables_check'][$table] = ['exists' => false, 'error' => $e->getMessage()];
+                }
+            }
+
+            if ($this->userSession->getUser()) {
+                $userId = $this->userSession->getUser()->getUID();
+                try {
+                    $data = $this->characterService->getCharacterData($userId);
+                    $status['character_data_test'] = 'SUCCESS';
+                } catch (\Throwable $e) {
+                    $status['character_data_test'] = 'FAILED';
+                    $status['errors'][] = [
+                        'message' => $e->getMessage(),
+                        'file' => $e->getFile(),
+                        'line' => $e->getLine()
+                    ];
+                }
+            }
+        } catch (\Throwable $e) {
+            $status['errors'][] = 'Fatal: ' . $e->getMessage();
+        }
+
+        return new JSONResponse($status);
+    }
+
+    /**
      * Get character data for the current user
      *
      * @NoAdminRequired
+     * @NoCSRFRequired
      * @return JSONResponse
      */
     public function getCharacterData() {
@@ -50,7 +169,7 @@ class CharacterController extends Controller {
                     'message' => 'User not found'
                 ], 401);
             }
-            
+
             if (!$this->characterService) {
                 return new JSONResponse([
                     'status' => 'error',
@@ -66,10 +185,13 @@ class CharacterController extends Controller {
                 'data' => $characterData
             ]);
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return new JSONResponse([
                 'status' => 'error',
-                'message' => 'Failed to get character data: ' . $e->getMessage()
+                'message' => 'Failed to get character data: ' . $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
             ], 500);
         }
     }
@@ -78,6 +200,7 @@ class CharacterController extends Controller {
      * Get available character items for customization
      *
      * @NoAdminRequired
+     * @NoCSRFRequired
      * @return JSONResponse
      */
     public function getAvailableItems() {
@@ -105,10 +228,11 @@ class CharacterController extends Controller {
                 'data' => $itemsData
             ]);
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return new JSONResponse([
                 'status' => 'error',
-                'message' => 'Failed to get available items: ' . $e->getMessage()
+                'message' => 'Failed to get available items: ' . $e->getMessage(),
+                'trace' => $e->getTraceAsString()
             ], 500);
         }
     }
@@ -117,6 +241,7 @@ class CharacterController extends Controller {
      * Get character customization interface data
      *
      * @NoAdminRequired
+     * @NoCSRFRequired
      * @return JSONResponse
      */
     public function getCustomizationData() {
@@ -144,10 +269,11 @@ class CharacterController extends Controller {
                 'data' => $customizationData
             ]);
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return new JSONResponse([
                 'status' => 'error',
-                'message' => 'Failed to get customization data: ' . $e->getMessage()
+                'message' => 'Failed to get customization data: ' . $e->getMessage(),
+                'trace' => $e->getTraceAsString()
             ], 500);
         }
     }
@@ -156,6 +282,7 @@ class CharacterController extends Controller {
      * Update character appearance
      *
      * @NoAdminRequired
+     * @NoCSRFRequired
      * @param string $clothing
      * @param string $weapon
      * @param string $accessory
@@ -221,6 +348,7 @@ class CharacterController extends Controller {
      * Equip a specific item
      *
      * @NoAdminRequired
+     * @NoCSRFRequired
      * @param string $itemKey
      * @return JSONResponse
      */
@@ -288,6 +416,7 @@ class CharacterController extends Controller {
      * Unequip an item from a specific slot
      *
      * @NoAdminRequired
+     * @NoCSRFRequired
      * @param string $slot
      * @return JSONResponse
      */
@@ -350,6 +479,7 @@ class CharacterController extends Controller {
      * Get character ages with progression status
      *
      * @NoAdminRequired
+     * @NoCSRFRequired
      * @return JSONResponse
      */
     public function getAges() {
@@ -400,9 +530,64 @@ class CharacterController extends Controller {
     }
 
     /**
+     * Manually recalculate and update character age based on current level
+     *
+     * @NoAdminRequired
+     * @NoCSRFRequired
+     * @return JSONResponse
+     */
+    public function recalculateAge() {
+        try {
+            $user = $this->userSession->getUser();
+            if (!$user) {
+                return new JSONResponse([
+                    'status' => 'error',
+                    'message' => 'User not found'
+                ], 401);
+            }
+
+            if (!$this->characterService) {
+                return new JSONResponse([
+                    'status' => 'error',
+                    'message' => 'Character service not available'
+                ], 503);
+            }
+
+            $userId = $user->getUID();
+            $questMapper = \OC::$server->get(\OCA\NextcloudQuest\Db\QuestMapper::class);
+            $quest = $questMapper->findByUserId($userId);
+
+            $currentLevel = $quest->getLevel();
+            $lifetimeXp = $quest->getLifetimeXp();
+
+            // Force age progression check
+            $newAge = $this->characterService->checkAgeProgression($userId, $currentLevel, $lifetimeXp);
+
+            return new JSONResponse([
+                'status' => 'success',
+                'message' => 'Age recalculated successfully',
+                'data' => [
+                    'current_level' => $currentLevel,
+                    'lifetime_xp' => $lifetimeXp,
+                    'new_age' => $newAge ? $newAge->jsonSerialize() : null,
+                    'character_data' => $this->characterService->getCharacterData($userId)
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            return new JSONResponse([
+                'status' => 'error',
+                'message' => 'Failed to recalculate age: ' . $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ], 500);
+        }
+    }
+
+    /**
      * Get character progression statistics
      *
      * @NoAdminRequired
+     * @NoCSRFRequired
      * @return JSONResponse
      */
     public function getProgressionStats() {
