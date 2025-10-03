@@ -11,6 +11,7 @@ use OCA\NextcloudQuest\Db\Achievement;
 use OCA\NextcloudQuest\Db\AchievementMapper;
 use OCA\NextcloudQuest\Db\HistoryMapper;
 use OCA\NextcloudQuest\Db\Quest;
+use OCA\NextcloudQuest\Db\QuestMapper;
 use Psr\Log\LoggerInterface;
 use OCP\Notification\IManager as INotificationManager;
 
@@ -23,6 +24,8 @@ class AchievementService {
     private $notificationManager;
     /** @var LoggerInterface */
     private $logger;
+    /** @var QuestMapper */
+    private $questMapper;
     
     // Achievement definitions with categories and rarity levels
     private const ACHIEVEMENTS = [
@@ -877,17 +880,49 @@ class AchievementService {
         AchievementMapper $achievementMapper,
         HistoryMapper $historyMapper,
         INotificationManager $notificationManager,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        QuestMapper $questMapper
     ) {
         $this->achievementMapper = $achievementMapper;
         $this->historyMapper = $historyMapper;
         $this->notificationManager = $notificationManager;
         $this->logger = $logger;
+        $this->questMapper = $questMapper;
     }
     
     /**
+     * Check and unlock achievements for a user (simplified wrapper)
+     *
+     * @param string $userId
+     * @return array Newly unlocked achievements
+     */
+    public function checkAndUnlockAchievements(string $userId): array {
+        try {
+            // Get quest object for user - if it doesn't exist, user hasn't completed any tasks yet
+            try {
+                $quest = $this->questMapper->findByUserId($userId);
+            } catch (\Exception $e) {
+                // User doesn't have a quest record yet, so no achievements to unlock
+                return [];
+            }
+
+            // Use current time for completion time
+            $completionTime = new \DateTime();
+
+            // Call main achievement checking logic
+            return $this->checkAchievements($userId, $quest, $completionTime);
+        } catch (\Exception $e) {
+            $this->logger->error('Failed to check achievements', [
+                'user' => $userId,
+                'error' => $e->getMessage()
+            ]);
+            return [];
+        }
+    }
+
+    /**
      * Check and unlock achievements after task completion
-     * 
+     *
      * @param string $userId
      * @param Quest $quest
      * @param \DateTime $completionTime
@@ -895,97 +930,162 @@ class AchievementService {
      */
     public function checkAchievements(string $userId, Quest $quest, \DateTime $completionTime): array {
         $unlockedAchievements = [];
-        
-        // Check task count achievements
+
+        // Get base statistics
         $stats = $this->historyMapper->getCompletionStats($userId);
         $totalTasks = $stats['total_tasks'];
-        
-        if ($totalTasks === 1) {
-            $unlockedAchievements[] = $this->unlockAchievement($userId, 'first_task');
-        }
-        if ($totalTasks === 10) {
-            $unlockedAchievements[] = $this->unlockAchievement($userId, 'tasks_10');
-        }
-        if ($totalTasks === 100) {
-            $unlockedAchievements[] = $this->unlockAchievement($userId, 'tasks_100');
-        }
-        if ($totalTasks === 1000) {
-            $unlockedAchievements[] = $this->unlockAchievement($userId, 'tasks_1000');
-        }
-        
-        // Check streak achievements
         $currentStreak = $quest->getCurrentStreak();
-        if ($currentStreak === 7) {
-            $unlockedAchievements[] = $this->unlockAchievement($userId, 'streak_7');
-        }
-        if ($currentStreak === 30) {
-            $unlockedAchievements[] = $this->unlockAchievement($userId, 'streak_30');
-        }
-        if ($currentStreak === 100) {
-            $unlockedAchievements[] = $this->unlockAchievement($userId, 'streak_100');
-        }
-        
-        // Check level achievements
         $level = $quest->getLevel();
-        if ($level === 5) {
-            $unlockedAchievements[] = $this->unlockAchievement($userId, 'level_5');
+        $lifetimeXP = $quest->getLifetimeXp();
+
+        // Get already unlocked achievements to skip them
+        $existingAchievements = $this->achievementMapper->findAllByUserId($userId);
+        $unlockedKeys = array_map(fn($a) => $a->getAchievementKey(), $existingAchievements);
+
+        // ===== TASK MASTER CATEGORY - All task count milestones =====
+        $taskMilestones = [1 => 'first_task', 10 => 'tasks_10', 50 => 'tasks_50', 100 => 'tasks_100',
+                          250 => 'tasks_250', 500 => 'tasks_500', 1000 => 'tasks_1000', 2500 => 'tasks_2500',
+                          5000 => 'tasks_5000', 10000 => 'tasks_10000', 25000 => 'tasks_25000', 50000 => 'tasks_50000',
+                          1024 => 'binary_master', 1618 => 'golden_ratio'];
+        foreach ($taskMilestones as $milestone => $achievementKey) {
+            if ($totalTasks >= $milestone && !in_array($achievementKey, $unlockedKeys)) {
+                $unlockedAchievements[] = $this->unlockAchievement($userId, $achievementKey);
+            }
         }
-        if ($level === 10) {
-            $unlockedAchievements[] = $this->unlockAchievement($userId, 'level_10');
+
+        // ===== STREAK KEEPER CATEGORY - All streak milestones =====
+        $streakMilestones = [3 => 'streak_3', 7 => 'streak_7', 14 => 'streak_14', 30 => 'streak_30',
+                            60 => 'streak_60', 100 => 'streak_100', 365 => 'streak_365',
+                            500 => 'streak_500', 1000 => 'streak_1000'];
+        foreach ($streakMilestones as $milestone => $achievementKey) {
+            if ($currentStreak >= $milestone && !in_array($achievementKey, $unlockedKeys)) {
+                $unlockedAchievements[] = $this->unlockAchievement($userId, $achievementKey);
+            }
         }
-        if ($level === 25) {
-            $unlockedAchievements[] = $this->unlockAchievement($userId, 'level_25');
+
+        // ===== LEVEL CHAMPION CATEGORY - All level milestones =====
+        $levelMilestones = [5 => 'level_5', 10 => 'level_10', 25 => 'level_25', 50 => 'level_50',
+                           75 => 'level_75', 100 => 'level_100', 150 => 'level_150', 200 => 'level_200'];
+        foreach ($levelMilestones as $milestone => $achievementKey) {
+            if ($level >= $milestone && !in_array($achievementKey, $unlockedKeys)) {
+                $unlockedAchievements[] = $this->unlockAchievement($userId, $achievementKey);
+            }
         }
-        if ($level === 50) {
-            $unlockedAchievements[] = $this->unlockAchievement($userId, 'level_50');
+
+        // ===== XP LEGENDS CATEGORY =====
+        if ($lifetimeXP === 10000) {
+            $unlockedAchievements[] = $this->unlockAchievement($userId, 'perfect_score');
         }
-        if ($level === 100) {
-            $unlockedAchievements[] = $this->unlockAchievement($userId, 'level_100');
+        if ($lifetimeXP >= 1000000) {
+            $unlockedAchievements[] = $this->unlockAchievement($userId, 'xp_millionaire');
         }
-        
-        // Check time-based achievements
+
+        // ===== TIME MASTER CATEGORY - Time-based achievements =====
         $hour = (int)$completionTime->format('H');
-        if ($hour < 9) {
+        if ($hour < 6) {
+            $unlockedAchievements[] = $this->unlockAchievement($userId, 'dawn_raider');
+        } elseif ($hour < 9) {
             $unlockedAchievements[] = $this->unlockAchievement($userId, 'early_bird');
         }
         if ($hour >= 21) {
             $unlockedAchievements[] = $this->unlockAchievement($userId, 'night_owl');
         }
-        
-        // Check weekend warrior
+        if ($hour >= 0 && $hour < 1) {
+            $unlockedAchievements[] = $this->unlockAchievement($userId, 'midnight_warrior');
+        }
+
+        // ===== WEEKEND WARRIOR =====
         $dayOfWeek = (int)$completionTime->format('w');
         if ($dayOfWeek === 0 || $dayOfWeek === 6) {
-            // Check if completed tasks on both weekend days
             $startOfWeek = clone $completionTime;
             $startOfWeek->modify('last monday');
             $endOfWeek = clone $startOfWeek;
             $endOfWeek->modify('+6 days');
-            
+
             $weekHistory = $this->historyMapper->findByDateRange($userId, $startOfWeek, $endOfWeek);
             $saturdayCompleted = false;
             $sundayCompleted = false;
-            
+
             foreach ($weekHistory as $entry) {
                 $entryDate = new \DateTime($entry->getCompletedAt());
                 $entryDay = (int)$entryDate->format('w');
                 if ($entryDay === 6) $saturdayCompleted = true;
                 if ($entryDay === 0) $sundayCompleted = true;
             }
-            
+
             if ($saturdayCompleted && $sundayCompleted) {
                 $unlockedAchievements[] = $this->unlockAchievement($userId, 'weekend_warrior');
             }
         }
-        
-        // Check speed demon (5 tasks in one hour)
+
+        // ===== SPEED DEMON CATEGORY - Tasks completed within time windows =====
         $oneHourAgo = clone $completionTime;
         $oneHourAgo->modify('-1 hour');
         $recentHistory = $this->historyMapper->findByDateRange($userId, $oneHourAgo, $completionTime);
-        if (count($recentHistory) >= 5) {
-            $unlockedAchievements[] = $this->unlockAchievement($userId, 'speed_demon');
+        $tasksInLastHour = count($recentHistory);
+
+        $speedMilestones = [3 => 'speed_3_in_hour', 5 => 'speed_5_in_hour', 10 => 'speed_10_in_hour',
+                           15 => 'speed_15_in_hour', 20 => 'speed_20_in_hour'];
+        foreach ($speedMilestones as $milestone => $achievementKey) {
+            if ($tasksInLastHour >= $milestone) {
+                $unlockedAchievements[] = $this->unlockAchievement($userId, $achievementKey);
+            }
         }
-        
-        // Filter out already unlocked achievements
+
+        // ===== CONSISTENCY MASTER CATEGORY - Daily achievements =====
+        $startOfDay = clone $completionTime;
+        $startOfDay->setTime(0, 0, 0);
+        $endOfDay = clone $startOfDay;
+        $endOfDay->setTime(23, 59, 59);
+        $todayHistory = $this->historyMapper->findByDateRange($userId, $startOfDay, $endOfDay);
+        $tasksToday = count($todayHistory);
+
+        if ($tasksToday >= 12) {
+            $unlockedAchievements[] = $this->unlockAchievement($userId, 'daily_dozen');
+        }
+        if ($tasksToday >= 50) {
+            $unlockedAchievements[] = $this->unlockAchievement($userId, 'daily_50');
+        }
+
+        // ===== SPECIAL DATE ACHIEVEMENTS =====
+        $month = (int)$completionTime->format('m');
+        $day = (int)$completionTime->format('d');
+
+        // New Year Resolution
+        if ($month === 1 && $day === 1) {
+            $unlockedAchievements[] = $this->unlockAchievement($userId, 'new_year_resolution');
+        }
+
+        // Leap Day Legend
+        if ($month === 2 && $day === 29) {
+            $unlockedAchievements[] = $this->unlockAchievement($userId, 'leap_day_legend');
+        }
+
+        // Friday the 13th
+        if ($day === 13 && $dayOfWeek === 5) {
+            // Check if 13 tasks completed today
+            if ($tasksToday >= 13) {
+                $unlockedAchievements[] = $this->unlockAchievement($userId, 'friday_13th');
+            }
+        }
+
+        // Palindrome dates (MM/DD format like 12/21, 10/01, etc)
+        $dateStr = $completionTime->format('md');
+        if ($dateStr === strrev($dateStr)) {
+            $unlockedAchievements[] = $this->unlockAchievement($userId, 'palindrome_day');
+        }
+
+        // ===== TIME LORD CATEGORY - Extended streak checks =====
+        if ($currentStreak === 90) {
+            $unlockedAchievements[] = $this->unlockAchievement($userId, 'quarterly_champion');
+        }
+
+        // Check for 7 consecutive days with tasks (weekly_warrior already handled above as weekend_warrior)
+        if ($currentStreak >= 7) {
+            $unlockedAchievements[] = $this->unlockAchievement($userId, 'weekly_warrior');
+        }
+
+        // Filter out already unlocked achievements and null values
         return array_filter($unlockedAchievements);
     }
     
@@ -1092,12 +1192,18 @@ class AchievementService {
             $progressPercentage = 0;
             $progressCurrent = 0;
             $progressTarget = $data['milestone'] ?? 0;
-            
+
             if (!$isUnlocked && $data['progress_type'] === 'milestone') {
-                $progress = $this->getAchievementProgress($userId, $key);
-                if ($progress) {
-                    $progressPercentage = $progress['percentage'];
-                    $progressCurrent = $progress['current'];
+                try {
+                    $progress = $this->getAchievementProgress($userId, $key);
+                    if ($progress) {
+                        $progressPercentage = $progress['percentage'];
+                        $progressCurrent = $progress['current'];
+                    }
+                } catch (\Exception $e) {
+                    // If progress calculation fails, just use 0
+                    $progressPercentage = 0;
+                    $progressCurrent = 0;
                 }
             } elseif ($isUnlocked) {
                 $progressPercentage = 100;
@@ -1193,39 +1299,79 @@ class AchievementService {
         if (!isset(self::ACHIEVEMENTS[$achievementKey])) {
             return null;
         }
-        
+
         $achievement = self::ACHIEVEMENTS[$achievementKey];
-        
+
         // Only calculate progress for milestone-based achievements
         if ($achievement['progress_type'] !== 'milestone') {
             return null;
         }
-        
+
         $currentValue = 0;
         $milestone = $achievement['milestone'];
-        
-        switch ($achievementKey) {
-            // Task count achievements
-            case (strpos($achievementKey, 'tasks_') === 0):
-                $stats = $this->historyMapper->getCompletionStats($userId);
-                $currentValue = $stats['total_tasks'];
-                break;
-            
-            // Streak achievements
-            case (strpos($achievementKey, 'streak_') === 0):
-                // Get current streak from user's quest data
-                // This would need to be implemented based on your streak tracking
-                $currentValue = 0; // Placeholder
-                break;
-            
-            // Level achievements
-            case (strpos($achievementKey, 'level_') === 0):
-                // Get current level from user's quest data
-                // This would need to be implemented based on your level system
-                $currentValue = 0; // Placeholder
-                break;
+
+        // Get user's quest data
+        try {
+            $quest = $this->questMapper->findByUserId($userId);
+        } catch (\Exception $e) {
+            // If quest data doesn't exist, return 0 progress
+            return [
+                'current' => 0,
+                'target' => $milestone,
+                'percentage' => 0
+            ];
         }
-        
+
+        // Determine current value based on achievement type
+        if (strpos($achievementKey, 'tasks_') === 0 ||
+            $achievementKey === 'binary_master' ||
+            $achievementKey === 'golden_ratio') {
+            // Task count achievements
+            $stats = $this->historyMapper->getCompletionStats($userId);
+            $currentValue = $stats['total_tasks'];
+
+        } elseif (strpos($achievementKey, 'streak_') === 0) {
+            // Streak achievements - get current or longest streak
+            $currentValue = $quest->getCurrentStreak();
+
+        } elseif (strpos($achievementKey, 'level_') === 0) {
+            // Level achievements
+            $currentValue = $quest->getLevel();
+
+        } elseif ($achievementKey === 'xp_millionaire') {
+            // XP milestone
+            $currentValue = $quest->getLifetimeXp();
+
+        } elseif ($achievementKey === 'xp_healer') {
+            // Health healed using XP (would need tracking)
+            $currentValue = 0; // TODO: Implement health healing tracking
+
+        } elseif (in_array($achievementKey, ['priority_perfectionist', 'priority_master_500'])) {
+            // High priority tasks (would need tracking)
+            $currentValue = 0; // TODO: Implement priority task tracking
+
+        } elseif (in_array($achievementKey, ['urgent_expert', 'deadline_destroyer', 'deadline_ninja'])) {
+            // Tasks completed before deadline (would need tracking)
+            $currentValue = 0; // TODO: Implement deadline tracking
+
+        } elseif ($achievementKey === 'early_completer') {
+            // Tasks completed 3+ days early (would need tracking)
+            $currentValue = 0; // TODO: Implement early completion tracking
+
+        } elseif ($achievementKey === 'overdue_recovery') {
+            // Overdue tasks cleared (would need tracking)
+            $currentValue = 0; // TODO: Implement overdue recovery tracking
+
+        } elseif (in_array($achievementKey, ['personal_master', 'work_warrior', 'fitness_fanatic',
+                                             'creative_genius', 'social_butterfly'])) {
+            // Category-specific task counts (would need category tracking)
+            $currentValue = 0; // TODO: Implement category-based task tracking
+
+        } elseif (in_array($achievementKey, ['helper', 'team_player', 'mentor', 'inspiration'])) {
+            // Community achievements (future feature)
+            $currentValue = 0; // TODO: Implement community features
+        }
+
         return [
             'current' => $currentValue,
             'target' => $milestone,
