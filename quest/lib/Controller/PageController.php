@@ -47,13 +47,13 @@ class PageController extends BasePageController {
     
     /**
      * Adventure Map page
-     * 
+     *
      * @NoAdminRequired
      * @NoCSRFRequired
      * @return TemplateResponse
      */
     public function adventure() {
-        return $this->renderPage('adventure', 'adventure', ['adventure-map', 'adventure-navigation'], ['adventure-map']);
+        return $this->renderPage('adventure', 'adventure', ['adventure-grid-map'], ['adventure-map']);
     }
 
     /**

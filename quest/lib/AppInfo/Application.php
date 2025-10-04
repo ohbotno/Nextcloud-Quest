@@ -213,26 +213,39 @@ class Application extends App implements IBootstrap {
                 $c->get(\OCP\IDBConnection::class)
             );
         });
-        
+
         $context->registerService(PathGenerator::class, function($c) {
             return new PathGenerator(
                 $c->get(WorldGenerator::class)
             );
         });
-        
+
         $context->registerService(LevelObjective::class, function($c) {
             return new LevelObjective(
                 $c->get(\OCP\IDBConnection::class)
             );
         });
-        
+
         // Register Infinite Level Generator
         $context->registerService(\OCA\NextcloudQuest\Service\InfiniteLevelGenerator::class, function($c) {
             return new \OCA\NextcloudQuest\Service\InfiniteLevelGenerator(
                 $c->get(\OCP\IDBConnection::class)
             );
         });
-        
+
+        // Register new Adventure Map services
+        $context->registerService(\OCA\NextcloudQuest\Service\AdventureMapService::class, function($c) {
+            return new \OCA\NextcloudQuest\Service\AdventureMapService(
+                $c->get(\OCP\IDBConnection::class),
+                $c->get(\OCP\IUserSession::class),
+                $c->get(\Psr\Log\LoggerInterface::class)
+            );
+        });
+
+        $context->registerService(\OCA\NextcloudQuest\Service\AdventureThemeService::class, function($c) {
+            return new \OCA\NextcloudQuest\Service\AdventureThemeService();
+        });
+
         // Register Adventure controller
         $context->registerService(AdventureWorldController::class, function($c) {
             return new AdventureWorldController(
@@ -246,6 +259,19 @@ class Application extends App implements IBootstrap {
                 $c->get(\OCA\NextcloudQuest\Integration\TasksApiIntegration::class),
                 $c->get(\OCA\NextcloudQuest\Service\XPService::class),
                 $c->get(\OCA\NextcloudQuest\Service\InfiniteLevelGenerator::class)
+            );
+        });
+
+        // Register new AdventureController
+        $context->registerService(\OCA\NextcloudQuest\Controller\AdventureController::class, function($c) {
+            return new \OCA\NextcloudQuest\Controller\AdventureController(
+                self::APP_ID,
+                $c->get(\OCP\IRequest::class),
+                $c->get(\OCP\IUserSession::class),
+                $c->get(\OCA\NextcloudQuest\Service\AdventureMapService::class),
+                $c->get(\OCA\NextcloudQuest\Service\AdventureThemeService::class),
+                $c->get(\Psr\Log\LoggerInterface::class),
+                $c->get(\OCP\IDBConnection::class)
             );
         });
 

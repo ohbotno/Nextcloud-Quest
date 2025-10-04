@@ -11,38 +11,63 @@ ob_start();
 ?>
 
 <!-- Adventure Map Container -->
-<div id="adventure-map-container" style="display: block;">
-    <!-- World Progress Overlay -->
-    <div class="world-progress-overlay">
-        <h4>World Progress</h4>
-        <div id="current-world-info">
-            <div class="world-info-name">World 1: Grassland Village</div>
-            <div class="progress-bar-container">
-                <div class="progress-bar-fill" id="world-progress-bar" style="width: 0%">
-                    0/10 levels
-                </div>
+<div id="adventure-map-container" class="adventure-grid-container" style="display: block;">
+    <!-- Area Progress Header -->
+    <div class="area-progress-header">
+        <div class="area-info">
+            <h3 id="area-name">Loading...</h3>
+            <p id="area-description">Initializing adventure...</p>
+        </div>
+        <div class="area-stats">
+            <div class="stat-badge">
+                <span class="stat-label">Nodes Explored:</span>
+                <span class="stat-value" id="nodes-explored">0/49</span>
+            </div>
+            <div class="stat-badge">
+                <span class="stat-label">Areas Completed:</span>
+                <span class="stat-value" id="areas-completed">0</span>
             </div>
         </div>
     </div>
 
-    <!-- World Selector -->
-    <div id="world-selector">
-        <!-- World buttons will be populated dynamically -->
+    <!-- Canvas Map -->
+    <div class="map-canvas-wrapper">
+        <canvas id="adventure-grid-canvas"></canvas>
     </div>
 
-    <!-- Adventure Map Canvas will be inserted here -->
-    
-    <!-- Keyboard Instructions -->
-    <div class="keyboard-instructions">
-        <div>Use <kbd>←</kbd><kbd>→</kbd><kbd>↑</kbd><kbd>↓</kbd> to navigate</div>
-        <div>Click on levels to interact</div>
-        <div>Press <kbd>ESC</kbd> to close dialogs</div>
+    <!-- Map Legend -->
+    <div class="map-legend">
+        <div class="legend-item">
+            <span class="legend-icon" style="background: #4CAF50;">▶</span>
+            <span class="legend-label">Start</span>
+        </div>
+        <div class="legend-item">
+            <span class="legend-icon" style="background: #FF5722;">⚔</span>
+            <span class="legend-label">Combat</span>
+        </div>
+        <div class="legend-item">
+            <span class="legend-icon" style="background: #2196F3;">🏪</span>
+            <span class="legend-label">Shop</span>
+        </div>
+        <div class="legend-item">
+            <span class="legend-icon" style="background: #FFD700;">💎</span>
+            <span class="legend-label">Treasure</span>
+        </div>
+        <div class="legend-item">
+            <span class="legend-icon" style="background: #9C27B0;">?</span>
+            <span class="legend-label">Event</span>
+        </div>
+        <div class="legend-item">
+            <span class="legend-icon" style="background: #B71C1C;">👑</span>
+            <span class="legend-label">Boss</span>
+        </div>
     </div>
-</div>
 
-<!-- Level Details Panel -->
-<div id="level-details-panel">
-    <!-- Level details will be populated dynamically -->
+    <!-- Controls -->
+    <div class="map-controls">
+        <button class="btn btn-secondary" id="btn-reset-camera">Reset View</button>
+        <button class="btn btn-primary" id="btn-new-area">New Area</button>
+    </div>
 </div>
 
 <!-- Dashboard Content (fallback when Adventure API fails) -->
@@ -218,6 +243,164 @@ ob_start();
 </div>
 
 <style>
+/* Adventure Grid Map Styles */
+.adventure-grid-container {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.area-progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 20px;
+    background: var(--color-background-hover);
+    border-radius: var(--border-radius-large);
+}
+
+.area-info h3 {
+    margin: 0 0 5px 0;
+    font-size: 24px;
+    color: var(--color-main-text);
+}
+
+.area-info p {
+    margin: 0;
+    color: var(--color-text-maxcontrast);
+    font-size: 14px;
+}
+
+.area-stats {
+    display: flex;
+    gap: 20px;
+}
+
+.stat-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.stat-badge .stat-label {
+    font-size: 12px;
+    color: var(--color-text-maxcontrast);
+    margin-bottom: 5px;
+}
+
+.stat-badge .stat-value {
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--color-primary);
+}
+
+.map-canvas-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: var(--color-background-dark);
+    border-radius: var(--border-radius-large);
+    padding: 20px;
+    margin-bottom: 20px;
+    min-height: 600px;
+}
+
+#adventure-grid-canvas {
+    border: 2px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background: #1a1a1a;
+    cursor: pointer;
+}
+
+.map-legend {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: var(--color-background-hover);
+    border-radius: var(--border-radius);
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.legend-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--border-radius);
+    font-size: 20px;
+    color: white;
+    border: 2px solid white;
+}
+
+.legend-label {
+    font-size: 14px;
+    color: var(--color-main-text);
+    font-weight: 500;
+}
+
+.map-controls {
+    display: flex !important;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+    padding: 20px;
+    background: var(--color-main-background);
+    border-top: 2px solid var(--color-border);
+}
+
+.map-controls .btn {
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+}
+
+.map-controls .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.map-controls .btn-primary {
+    background: var(--color-primary);
+    color: white;
+}
+
+.map-controls .btn-secondary {
+    background: var(--color-background-dark);
+    color: var(--color-main-text);
+    border: 2px solid var(--color-border);
+}
+
+.adventure-generate-prompt {
+    text-align: center;
+    padding: 60px 20px;
+    background: var(--color-background-hover);
+    border-radius: var(--border-radius-large);
+}
+
+.adventure-generate-prompt h2 {
+    margin-bottom: 10px;
+    color: var(--color-main-text);
+}
+
+.adventure-generate-prompt p {
+    margin-bottom: 20px;
+    color: var(--color-text-maxcontrast);
+}
+
 .stats-list {
     display: flex;
     flex-direction: column;

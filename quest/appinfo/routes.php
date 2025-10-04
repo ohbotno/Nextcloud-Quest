@@ -61,8 +61,17 @@ return [
         ['name' => 'progressAnalytics#getProductivityInsights', 'url' => '/api/progress/productivity-insights', 'verb' => 'GET'],
         ['name' => 'progressAnalytics#getLevelProgressionData', 'url' => '/api/progress/level-progression', 'verb' => 'GET'],
         ['name' => 'progressAnalytics#getCharacterTimelineData', 'url' => '/api/progress/character-timeline', 'verb' => 'GET'],
-        
-        // Adventure Path System API routes
+
+        // New Adventure Grid Map API routes (MUST be before legacy routes for priority)
+        ['name' => 'adventure#getMap', 'url' => '/api/adventure-grid/map', 'verb' => 'GET'],
+        ['name' => 'adventure#generateArea', 'url' => '/api/adventure-grid/generate', 'verb' => 'POST'],
+        ['name' => 'adventure#moveToNode', 'url' => '/api/adventure-grid/move', 'verb' => 'POST'],
+        ['name' => 'adventure#getNodeEncounter', 'url' => '/api/adventure-grid/encounter', 'verb' => 'POST'],
+        ['name' => 'adventure#completeNode', 'url' => '/api/adventure-grid/complete-node', 'verb' => 'POST'],
+        ['name' => 'adventure#completeBoss', 'url' => '/api/adventure-grid/complete-boss-node', 'verb' => 'POST'],
+        ['name' => 'adventure#getProgress', 'url' => '/api/adventure-grid/progress', 'verb' => 'GET'],
+
+        // Adventure Path System API routes (Legacy - will be deprecated)
         ['name' => 'adventureWorld#test', 'url' => '/api/adventure/test', 'verb' => 'GET'],
         ['name' => 'adventureWorld#diagnosticPath', 'url' => '/api/adventure/diagnostic-path/{worldNumber}', 'verb' => 'GET'],
         ['name' => 'adventureWorld#debugTaskCompletion', 'url' => '/api/adventure/debug-tasks', 'verb' => 'GET'],
@@ -75,7 +84,7 @@ return [
         ['name' => 'adventureWorld#completeLevel', 'url' => '/api/adventure/complete-level/{levelId}', 'verb' => 'POST'],
         ['name' => 'adventureWorld#getBossChallenge', 'url' => '/api/adventure/boss-challenge/{worldNumber}', 'verb' => 'GET'],
         ['name' => 'adventureWorld#completeBoss', 'url' => '/api/adventure/complete-boss/{worldNumber}', 'verb' => 'POST'],
-        ['name' => 'adventureWorld#getProgress', 'url' => '/api/adventure/progress', 'verb' => 'GET'],
+        ['name' => 'adventureWorld#getProgress', 'url' => '/api/adventure-old/progress', 'verb' => 'GET'],
 
         // Settings routes
         ['name' => 'settings#get', 'url' => '/api/settings', 'verb' => 'GET'],
