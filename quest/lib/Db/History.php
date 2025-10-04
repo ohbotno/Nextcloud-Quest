@@ -24,19 +24,18 @@ use OCP\AppFramework\Db\Entity;
  * @method void setCompletedAt(string $completedAt)
  */
 class History extends Entity {
-    protected ?int $id = null;
-    protected string $userId;
-    protected string $taskId;
-    protected string $taskTitle;
-    protected int $xpEarned;
-    protected string $completedAt;
-    
+    protected string $userId = '';
+    protected string $taskId = '';
+    protected string $taskTitle = '';
+    protected int $xpEarned = 0;
+    protected string $completedAt = '';
+
     public function __construct() {
         $this->addType('id', 'integer');
         $this->addType('userId', 'string');
         $this->addType('taskId', 'string');
         $this->addType('taskTitle', 'string');
         $this->addType('xpEarned', 'integer');
-        $this->addType('completedAt', 'datetime');
+        $this->addType('completedAt', 'string');
     }
 }

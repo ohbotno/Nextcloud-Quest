@@ -27,6 +27,7 @@ return [
         ['name' => 'quest#testPost', 'url' => '/api/test-post', 'verb' => 'POST'],
         ['name' => 'quest#completeTaskFromList', 'url' => '/api/complete-quest', 'verb' => 'POST'],
         ['name' => 'quest#testAchievements', 'url' => '/api/achievements/test', 'verb' => 'GET'],
+        ['name' => 'quest#triggerAchievementCheck', 'url' => '/api/achievements/trigger-check', 'verb' => 'POST'],
         ['name' => 'quest#getAchievements', 'url' => '/api/achievements', 'verb' => 'GET'],
         ['name' => 'quest#getAchievementsByCategory', 'url' => '/api/achievements/categories', 'verb' => 'GET'],
         ['name' => 'quest#getRecentAchievements', 'url' => '/api/achievements/recent', 'verb' => 'GET'],

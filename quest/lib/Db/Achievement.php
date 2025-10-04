@@ -44,7 +44,7 @@ class Achievement extends Entity implements JsonSerializable {
         $this->addType('id', 'integer');
         $this->addType('userId', 'string');
         $this->addType('achievementKey', 'string');
-        $this->addType('unlockedAt', 'datetime');
+        $this->addType('unlockedAt', 'string');
         $this->addType('notified', 'integer');
         $this->addType('achievementPoints', 'integer');
         $this->addType('achievementCategory', 'string');

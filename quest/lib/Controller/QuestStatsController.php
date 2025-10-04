@@ -7,6 +7,7 @@
 
 namespace OCA\NextcloudQuest\Controller;
 
+use OCA\NextcloudQuest\Service\AchievementService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\IRequest;
@@ -18,11 +19,20 @@ class QuestStatsController extends Controller {
     private $userSession;
     /** @var IDBConnection */
     private $db;
-    
-    public function __construct($appName, IRequest $request, IUserSession $userSession, IDBConnection $db) {
+    /** @var AchievementService */
+    private $achievementService;
+
+    public function __construct(
+        $appName,
+        IRequest $request,
+        IUserSession $userSession,
+        IDBConnection $db,
+        AchievementService $achievementService
+    ) {
         parent::__construct($appName, $request);
         $this->userSession = $userSession;
         $this->db = $db;
+        $this->achievementService = $achievementService;
     }
     
     /**
@@ -259,29 +269,12 @@ class QuestStatsController extends Controller {
      */
     private function getAchievementData(string $userId): array {
         try {
-            // Count unlocked achievements
-            $qb = $this->db->getQueryBuilder();
-            $qb->select($qb->func()->count('*', 'unlocked_count'))
-                ->from('ncquest_achievements')
-                ->where($qb->expr()->eq('user_id', $qb->createNamedParameter($userId)));
-            
-            $result = $qb->executeQuery();
-            $unlockedCount = (int)($result->fetchOne() ?: 0);
-            $result->closeCursor();
-            
-            // For now, assume there are 50 total achievements
-            $totalAchievements = 50;
-            $percentage = $totalAchievements > 0 ? round(($unlockedCount / $totalAchievements) * 100, 1) : 0;
-            
-            return [
-                'total' => $totalAchievements,
-                'unlocked' => $unlockedCount,
-                'percentage' => $percentage
-            ];
-            
+            // Use AchievementService to get accurate achievement stats
+            return $this->achievementService->getAchievementStats($userId);
         } catch (\Exception $e) {
+            // Return default values on error
             return [
-                'total' => 50,
+                'total' => 0,
                 'unlocked' => 0,
                 'percentage' => 0
             ];

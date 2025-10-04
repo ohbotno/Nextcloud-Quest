@@ -179,11 +179,32 @@ class QuestController extends Controller {
      */
     public function testAchievements() {
         try {
+            $userId = $this->userSession->getUser()->getUID();
+
+            // Get completion stats from history
+            $historyStats = $this->historyMapper->getCompletionStats($userId);
+
+            // Get unlocked achievements from database
+            $unlockedAchievements = $this->achievementService->getAchievementStats($userId);
+
+            // Get quest data
+            $quest = $this->questMapper->findByUserId($userId);
+
             return new JSONResponse([
                 'status' => 'success',
-                'message' => 'Achievement routing works!',
+                'message' => 'Achievement diagnostic info',
                 'timestamp' => date('Y-m-d H:i:s'),
-                'controller_loaded' => true
+                'user_id' => $userId,
+                'debug' => [
+                    'history_stats' => $historyStats,
+                    'achievement_stats' => $unlockedAchievements,
+                    'quest_data' => [
+                        'level' => $quest->getLevel(),
+                        'xp' => $quest->getCurrentXp(),
+                        'streak' => $quest->getCurrentStreak(),
+                        'total_tasks' => $quest->getTotalTasksCompleted()
+                    ]
+                ]
             ]);
         } catch (\Exception $e) {
             return new JSONResponse([
@@ -195,8 +216,59 @@ class QuestController extends Controller {
     }
 
     /**
+     * Manually trigger achievement checking for current user
+     *
+     * @NoAdminRequired
+     * @return JSONResponse
+     */
+    public function triggerAchievementCheck() {
+        try {
+            $userId = $this->userSession->getUser()->getUID();
+
+            // Get quest data - create if doesn't exist
+            try {
+                $quest = $this->questMapper->findByUserId($userId);
+            } catch (\Exception $e) {
+                // Quest doesn't exist, create a default one
+                $quest = new \OCA\NextcloudQuest\Db\Quest();
+                $quest->setUserId($userId);
+                $quest->setLevel(1);
+                $quest->setCurrentXp(0);
+                $quest->setLifetimeXp(0);
+                $quest->setCurrentStreak(0);
+                $quest->setLongestStreak(0);
+                $quest = $this->questMapper->insert($quest);
+            }
+
+            $completionTime = new \DateTime();
+
+            // Manually trigger achievement check
+            $newAchievements = $this->achievementService->checkAchievements($userId, $quest, $completionTime);
+
+            // Get updated stats
+            $achievementStats = $this->achievementService->getAchievementStats($userId);
+
+            return new JSONResponse([
+                'status' => 'success',
+                'message' => 'Achievement check completed',
+                'new_achievements' => count($newAchievements),
+                'unlocked_achievements' => array_filter($newAchievements), // Remove nulls
+                'achievement_stats' => $achievementStats
+            ]);
+        } catch (\Exception $e) {
+            return new JSONResponse([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ], 500);
+        }
+    }
+
+    /**
      * Get all achievements with unlock status
-     * 
+     *
      * @NoAdminRequired
      * @return JSONResponse
      */

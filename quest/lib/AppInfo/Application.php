@@ -140,7 +140,8 @@ class Application extends App implements IBootstrap {
                 self::APP_ID,
                 $c->get(\OCP\IRequest::class),
                 $c->get(\OCP\IUserSession::class),
-                $c->get(\OCP\IDBConnection::class)
+                $c->get(\OCP\IDBConnection::class),
+                $c->get(\OCA\NextcloudQuest\Service\AchievementService::class)
             );
         });
         
