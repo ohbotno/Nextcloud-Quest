@@ -1,0 +1,35 @@
+{
+    "name": "nextcloud/nextcloud-quest",
+    "description": "Gamification extension for Nextcloud Tasks",
+    "type": "project",
+    "license": "AGPL-3.0-or-later",
+    "authors": [
+        {
+            "name": "Quest Team"
+        }
+    ],
+    "require": {
+        "php": "^8.3"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.0",
+        "nextcloud/ocp": "dev-stable31",
+        "nextcloud/coding-standard": "^1.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "OCA\\NextcloudQuest\\": "lib/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "OCA\\NextcloudQuest\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "cs:check": "php-cs-fixer fix --dry-run --diff",
+        "cs:fix": "php-cs-fixer fix",
+        "test:unit": "phpunit -c phpunit.xml --testsuite unit",
+        "test:integration": "phpunit -c phpunit.xml --testsuite integration"
+    }
+}

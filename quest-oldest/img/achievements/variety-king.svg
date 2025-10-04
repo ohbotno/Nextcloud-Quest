@@ -1,0 +1,17 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="32" cy="32" r="30" fill="#9C27B0" stroke="#6A1B9A" stroke-width="2"/>
+  <polygon points="32,8 38,20 52,20 42,28 46,40 32,34 18,40 22,28 12,20 26,20" fill="#FFD700" stroke="#FFA000" stroke-width="1"/>
+  <polygon points="32,12 36,20 44,20 38,26 40,32 32,28 24,32 26,26 20,20 28,20" fill="#FFC107"/>
+  <rect x="16" y="42" width="32" height="12" fill="#E1BEE7" stroke="#BA68C8" stroke-width="1"/>
+  <rect x="18" y="44" width="28" height="8" fill="#F3E5F5"/>
+  <rect x="20" y="45" width="4" height="6" fill="#F44336"/>
+  <rect x="26" y="45" width="4" height="6" fill="#FF9800"/>
+  <rect x="32" y="45" width="4" height="6" fill="#4CAF50"/>
+  <rect x="38" y="45" width="4" height="6" fill="#2196F3"/>
+  <rect x="44" y="45" width="2" height="6" fill="#E91E63"/>
+  <rect x="26" y="42" width="12" height="8" fill="#8D6E63" stroke="#5D4037" stroke-width="1"/>
+  <rect x="28" y="44" width="8" height="4" fill="#A1887F"/>
+  <polygon points="30,46 32,48 34,46" fill="#FFEB3B"/>
+  <text x="32" y="58" text-anchor="middle" fill="#6A1B9A" font-family="Arial" font-size="6">VARIETY</text>
+  <text x="32" y="7" text-anchor="middle" fill="#6A1B9A" font-family="Arial" font-size="6">KING</text>
+</svg>

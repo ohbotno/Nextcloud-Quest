@@ -1,0 +1,20 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="32" cy="32" r="30" fill="#8BC34A" stroke="#558B2F" stroke-width="2"/>
+  <circle cx="32" cy="20" r="8" fill="#FFA726"/>
+  <circle cx="28" cy="18" r="1.5" fill="#5D4037"/>
+  <circle cx="36" cy="18" r="1.5" fill="#5D4037"/>
+  <arc x="32" y="22" rx="3" ry="2" fill="none" stroke="#5D4037" stroke-width="1"/>
+  <rect x="20" y="28" width="24" height="16" fill="#FFEB3B" stroke="#F57F17" stroke-width="1"/>
+  <rect x="22" y="30" width="20" height="12" fill="#FFF176"/>
+  <line x1="24" y1="33" x2="40" y2="33" stroke="#4CAF50" stroke-width="2"/>
+  <line x1="24" y1="36" x2="38" y2="36" stroke="#4CAF50" stroke-width="2"/>
+  <line x1="24" y1="39" x2="36" y2="39" stroke="#4CAF50" stroke-width="2"/>
+  <circle cx="42" cy="32" r="2" fill="#FF5722"/>
+  <polygon points="42,28 44,30 46,28 44,32 48,34 44,36 46,40 44,38 42,40 40,38 38,40 40,36 36,34 40,32 38,28 40,30" fill="#FFD700"/>
+  <rect x="26" y="44" width="4" height="8" fill="#8D6E63"/>
+  <rect x="34" y="44" width="4" height="8" fill="#8D6E63"/>
+  <ellipse cx="28" cy="53" rx="3" ry="1" fill="#5D4037"/>
+  <ellipse cx="36" cy="53" rx="3" ry="1" fill="#5D4037"/>
+  <text x="32" y="60" text-anchor="middle" fill="#558B2F" font-family="Arial" font-size="6">PRODUCTIVITY</text>
+  <text x="32" y="7" text-anchor="middle" fill="#558B2F" font-family="Arial" font-size="6">GURU</text>
+</svg>

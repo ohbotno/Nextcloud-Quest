@@ -21,6 +21,11 @@ const state = {
             xp_to_next: 100,
             progress_percentage: 0
         },
+        health: {
+            current_health: 100,
+            max_health: 100,
+            percentage: 100
+        },
         streak: {
             current_streak: 0,
             longest_streak: 0,
@@ -149,6 +154,11 @@ const mutations = {
                 xp_to_next: 100,
                 progress_percentage: 0
             },
+            health: {
+                current_health: 100,
+                max_health: 100,
+                percentage: 100
+            },
             streak: {
                 current_streak: 0,
                 longest_streak: 0,
@@ -268,39 +278,46 @@ const actions = {
         try {
             const response = await api.completeTask(taskId, taskTitle, priority)
             if (response.status === 'success') {
-                const { xp, streak, new_achievements } = response.data
-                
+                const { user_stats, streak, achievements, health } = response.data
+
                 // Update stats
                 commit('updateStats', {
-                    level: {
+                    level: user_stats ? {
                         ...state.stats.level,
-                        level: xp.level,
-                        xp: xp.current_xp,
-                        lifetime_xp: xp.lifetime_xp,
-                        progress_percentage: xp.progress_to_next_level,
-                        xp_to_next: xp.next_level_xp - xp.current_xp
-                    },
-                    streak: {
+                        level: user_stats.level,
+                        xp: user_stats.xp,
+                        rank_title: user_stats.rank_title,
+                        xp_to_next: user_stats.xp_to_next,
+                        progress_percentage: user_stats.progress_percentage
+                    } : state.stats.level,
+                    health: health ? {
+                        current_health: health.current_health,
+                        max_health: health.max_health,
+                        percentage: health.percentage
+                    } : state.stats.health,
+                    streak: streak ? {
                         ...state.stats.streak,
                         current_streak: streak.current_streak,
                         longest_streak: streak.longest_streak,
                         last_completion: new Date().toISOString(),
                         is_active_today: true
-                    }
+                    } : state.stats.streak
                 })
                 
                 // Add to history
                 commit('addToHistory', {
                     task_id: taskId,
                     task_title: taskTitle,
-                    xp_earned: xp.xp_earned,
+                    xp_earned: response.data.xp_earned || 0,
                     completed_at: new Date().toISOString()
                 })
-                
+
                 // Unlock new achievements
-                new_achievements.forEach(achievement => {
-                    commit('unlockAchievement', achievement)
-                })
+                if (achievements && Array.isArray(achievements)) {
+                    achievements.forEach(achievement => {
+                        commit('unlockAchievement', achievement)
+                    })
+                }
                 
                 // Refresh full stats
                 dispatch('loadUserStats')

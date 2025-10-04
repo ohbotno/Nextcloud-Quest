@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit bootstrap="tests/bootstrap.php"
+         backupGlobals="false"
+         backupStaticAttributes="false"
+         strict="true"
+         verbose="true"
+         timeoutForSmallTests="900"
+         timeoutForMediumTests="900"
+         timeoutForLargeTests="900"
+         colors="true">
+    
+    <testsuites>
+        <testsuite name="unit">
+            <directory suffix="Test.php">tests/Unit</directory>
+        </testsuite>
+        <testsuite name="integration">
+            <directory suffix="Test.php">tests/Integration</directory>
+        </testsuite>
+    </testsuites>
+    
+    <!-- Code coverage configuration -->
+    <coverage>
+        <include>
+            <directory suffix=".php">lib/</directory>
+        </include>
+        <exclude>
+            <directory suffix=".php">lib/Migration</directory>
+            <file>lib/AppInfo/Application.php</file>
+        </exclude>
+        <report>
+            <html outputDirectory="build/coverage-html"/>
+            <clover outputFile="build/coverage-clover.xml"/>
+        </report>
+    </coverage>
+    
+    <!-- Logging configuration -->
+    <logging>
+        <junit outputFile="build/junit.xml"/>
+    </logging>
+</phpunit>

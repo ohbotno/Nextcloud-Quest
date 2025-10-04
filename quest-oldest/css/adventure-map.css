@@ -1,0 +1,829 @@
+/**
+ * Adventure Map System - Styles
+ * Styling for the Mario-style world map interface
+ */
+
+/* World Completion Overlay */
+.world-completion-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10001;
+    animation: fadeIn 0.3s ease-in;
+}
+
+.world-completion-content {
+    background: var(--color-main-background);
+    border-radius: 16px;
+    padding: 40px;
+    text-align: center;
+    max-width: 500px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    animation: scaleIn 0.4s ease-out;
+}
+
+.world-completion-content h2 {
+    color: var(--color-primary);
+    font-size: 2em;
+    margin-bottom: 20px;
+}
+
+.world-completion-content p {
+    color: var(--color-text-light);
+    font-size: 1.2em;
+    margin-bottom: 30px;
+}
+
+.completion-stats {
+    background: var(--color-background-hover);
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+}
+
+.completion-stats div {
+    margin: 10px 0;
+    font-size: 1.1em;
+    color: var(--color-main-text);
+}
+
+.btn-next-world {
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-element));
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 8px;
+    font-size: 1.2em;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    margin-top: 20px;
+}
+
+.btn-next-world:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(0, 82, 201, 0.4);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+    from { 
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to { 
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Level Details Modal */
+.level-modal {
+    display: none;
+    position: fixed;
+    z-index: 10000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+.level-modal-content {
+    background-color: var(--color-main-background);
+    margin: 5% auto;
+    padding: 0;
+    border: none;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    position: relative;
+    max-height: 85vh;
+    overflow-y: auto;
+}
+
+.level-modal-header {
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-element));
+    color: white;
+    padding: 20px;
+    border-radius: 12px 12px 0 0;
+    position: relative;
+}
+
+.level-modal-header h2 {
+    margin: 0;
+    font-size: 1.5em;
+    font-weight: 600;
+}
+
+.level-modal-close {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    background: none;
+    border: none;
+    color: white;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+
+.level-modal-close:hover {
+    opacity: 1;
+}
+
+.level-modal-body {
+    padding: 24px;
+}
+
+.level-info {
+    margin-bottom: 24px;
+}
+
+.level-info #level-description {
+    font-size: 1.1em;
+    margin-bottom: 12px;
+    color: var(--color-text-light);
+}
+
+.level-type-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-right: 12px;
+}
+
+.level-type-regular {
+    background-color: #e3f2fd;
+    color: #1976d2;
+}
+
+.level-type-mini_boss {
+    background-color: #fff3e0;
+    color: #f57c00;
+}
+
+.level-type-boss {
+    background-color: #ffebee;
+    color: #d32f2f;
+}
+
+.level-reward-xp {
+    font-size: 1.1em;
+    font-weight: 600;
+    color: var(--color-primary);
+}
+
+.level-objectives h3 {
+    margin: 0 0 16px 0;
+    color: var(--color-text-dark);
+    font-size: 1.2em;
+}
+
+.objective-item {
+    display: flex;
+    align-items: flex-start;
+    padding: 12px;
+    margin-bottom: 8px;
+    background-color: var(--color-background-hover);
+    border-radius: 8px;
+    border-left: 4px solid var(--color-primary);
+}
+
+.objective-icon {
+    font-size: 1.2em;
+    margin-right: 12px;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.objective-content {
+    flex: 1;
+}
+
+.objective-description {
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.objective-task-info {
+    font-size: 0.9em;
+    color: var(--color-text-light);
+}
+
+.task-title {
+    font-weight: 500;
+    margin-right: 12px;
+}
+
+.task-due {
+    color: var(--color-error);
+    font-weight: 500;
+}
+
+.no-objectives {
+    text-align: center;
+    color: var(--color-text-light);
+    font-style: italic;
+    padding: 24px;
+}
+
+/* Progress Update Styles */
+.progress-update {
+    padding: 16px;
+}
+
+.progress-update h4 {
+    margin: 0 0 16px 0;
+    color: var(--color-text-dark);
+}
+
+.progress-item {
+    margin-bottom: 16px;
+    padding: 12px;
+    background-color: var(--color-background-hover);
+    border-radius: 8px;
+}
+
+.progress-description {
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+.progress-bar {
+    position: relative;
+    background-color: #e0e0e0;
+    height: 20px;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4CAF50 0%, #8BC34A 100%);
+    transition: width 0.5s ease;
+    position: relative;
+}
+
+.progress-text {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #333;
+    font-size: 12px;
+    font-weight: bold;
+    z-index: 1;
+}
+
+.level-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--color-border);
+}
+
+.level-actions .btn {
+    padding: 10px 20px;
+    border-radius: 6px;
+    border: none;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.level-actions .btn-primary {
+    background-color: var(--color-primary);
+    color: white;
+}
+
+.level-actions .btn-primary:hover {
+    background-color: var(--color-primary-element);
+}
+
+.level-actions .btn-secondary {
+    background-color: var(--color-border);
+    color: var(--color-text-dark);
+}
+
+.level-actions .btn-secondary:hover {
+    background-color: var(--color-background-hover);
+}
+
+/* Adventure Map Container */
+#adventure-map-container {
+    position: relative;
+    width: 100%;
+    height: calc(100vh - 100px);
+    background: linear-gradient(180deg, #87CEEB 0%, #98D8C8 100%);
+    overflow: hidden;
+    display: none;
+}
+
+#adventure-map-container.active {
+    display: block;
+}
+
+/* Canvas Styling */
+#adventure-map-canvas {
+    display: block;
+    margin: 0 auto;
+    cursor: pointer;
+    image-rendering: crisp-edges;
+    image-rendering: pixelated;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* World Selector */
+#world-selector {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 100;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+    backdrop-filter: blur(5px);
+}
+
+.world-selector-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: 2px solid #fff;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: white;
+    font-family: 'Arial', sans-serif;
+    font-weight: bold;
+    min-width: 200px;
+}
+
+.world-selector-btn:hover {
+    transform: translateX(-5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.world-selector-btn.locked {
+    background: linear-gradient(135deg, #666 0%, #444 100%);
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.world-selector-btn.locked:hover {
+    transform: none;
+}
+
+.world-selector-btn.completed {
+    background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%);
+    border-color: #4CAF50;
+}
+
+.world-selector-btn.active {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    animation: pulse 2s infinite;
+    border-color: #FFD700;
+    border-width: 3px;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(255, 215, 0, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); }
+}
+
+.world-icon {
+    font-size: 24px;
+    width: 30px;
+    text-align: center;
+}
+
+.world-name {
+    flex: 1;
+    font-size: 14px;
+}
+
+.world-status {
+    font-size: 12px;
+    opacity: 0.9;
+}
+
+.world-progress {
+    position: absolute;
+    bottom: 4px;
+    left: 50px;
+    right: 16px;
+    font-size: 11px;
+    opacity: 0.8;
+}
+
+/* Level Details Panel */
+#level-details-panel {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100%);
+    background: rgba(255, 255, 255, 0.95);
+    border: 3px solid #333;
+    border-radius: 15px;
+    padding: 20px;
+    min-width: 400px;
+    max-width: 600px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease;
+    z-index: 200;
+}
+
+#level-details-panel.visible {
+    transform: translateX(-50%) translateY(0);
+}
+
+.level-details h3 {
+    margin: 0 0 10px 0;
+    color: #333;
+    font-size: 20px;
+    border-bottom: 2px solid #333;
+    padding-bottom: 5px;
+}
+
+.level-description {
+    color: #666;
+    margin: 10px 0;
+    font-style: italic;
+}
+
+.level-type {
+    display: inline-block;
+    background: #6c757d;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    margin: 5px 0;
+    text-transform: uppercase;
+}
+
+.level-type.boss {
+    background: #8B0000;
+}
+
+.level-type.mini_boss {
+    background: #9400D3;
+}
+
+.level-reward {
+    color: #FFD700;
+    font-weight: bold;
+    margin: 10px 0;
+    font-size: 16px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.level-status {
+    font-size: 14px;
+    margin: 5px 0;
+    color: #666;
+}
+
+.level-status.completed {
+    color: #4CAF50;
+}
+
+.level-status.unlocked {
+    color: #FFA500;
+}
+
+.level-objectives {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.level-objectives h4 {
+    margin: 0 0 10px 0;
+    color: #333;
+    font-size: 16px;
+}
+
+.level-objectives ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.level-objectives li {
+    margin: 5px 0;
+    color: #666;
+}
+
+.start-level-btn {
+    margin-top: 20px;
+    padding: 12px 30px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.start-level-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+/* Adventure Mode Toggle Button - Removed (integrated with navigation) */
+
+/* Adventure Messages */
+.adventure-message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 30px 40px;
+    border-radius: 15px;
+    text-align: center;
+    z-index: 500;
+    animation: slideIn 0.3s ease;
+}
+
+.adventure-message.level-start-success {
+    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+    border: 3px solid #FFD700;
+}
+
+.adventure-message.level-completion-celebration {
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+    border: 3px solid #FF6347;
+    animation: celebration 0.5s ease;
+}
+
+@keyframes celebration {
+    0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+    50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+.adventure-message .btn {
+    margin-top: 15px;
+    padding: 10px 25px;
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid white;
+    border-radius: 25px;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.adventure-message .btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -60%);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
+}
+
+.adventure-message h3 {
+    margin: 0 0 15px 0;
+    color: #FFD700;
+    font-size: 24px;
+}
+
+.adventure-message p {
+    margin: 0;
+    font-size: 16px;
+}
+
+.adventure-message.locked-world {
+    background: linear-gradient(135deg, #8B0000 0%, #FF4500 100%);
+    border: 3px solid #FFD700;
+}
+
+/* Progress Overlay */
+.world-progress-overlay {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 15px;
+    border-radius: 10px;
+    min-width: 300px;
+    backdrop-filter: blur(5px);
+}
+
+.world-progress-overlay h4 {
+    margin: 0 0 10px 0;
+    color: #FFD700;
+    font-size: 18px;
+}
+
+.progress-bar-container {
+    background: #333;
+    height: 20px;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 10px 0;
+    position: relative;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4CAF50 0%, #8BC34A 100%);
+    transition: width 0.5s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+/* Level Node Hover Effects */
+.level-node-hover {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    pointer-events: none;
+    z-index: 300;
+    white-space: nowrap;
+}
+
+/* Keyboard Instructions */
+.keyboard-instructions {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    z-index: 100;
+}
+
+.keyboard-instructions kbd {
+    background: #444;
+    padding: 2px 6px;
+    border-radius: 3px;
+    margin: 0 2px;
+    font-family: monospace;
+}
+
+/* World Theme Specific Styles */
+.world-1 { /* Grassland */
+    --primary-color: #90EE90;
+    --secondary-color: #228B22;
+}
+
+.world-2 { /* Desert */
+    --primary-color: #DEB887;
+    --secondary-color: #D2691E;
+}
+
+.world-3 { /* Mountain */
+    --primary-color: #696969;
+    --secondary-color: #2F4F4F;
+}
+
+.world-4 { /* Forest */
+    --primary-color: #228B22;
+    --secondary-color: #006400;
+}
+
+.world-5 { /* Ice */
+    --primary-color: #B0E0E6;
+    --secondary-color: #4682B4;
+}
+
+.world-6 { /* Sky */
+    --primary-color: #87CEEB;
+    --secondary-color: #4169E1;
+}
+
+.world-7 { /* Volcano */
+    --primary-color: #FF4500;
+    --secondary-color: #8B0000;
+}
+
+.world-8 { /* Shadow */
+    --primary-color: #191970;
+    --secondary-color: #000000;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    #world-selector {
+        top: 10px;
+        right: 10px;
+        max-height: 200px;
+    }
+    
+    .world-selector-btn {
+        min-width: 150px;
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+    
+    #level-details-panel {
+        min-width: 90%;
+        max-width: 90%;
+        padding: 15px;
+        bottom: 10px;
+    }
+    
+    /* Adventure toggle removed - integrated with navigation */
+    
+    .keyboard-instructions {
+        display: none;
+    }
+}
+
+/* Animation for level completion */
+@keyframes levelComplete {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.5);
+        filter: brightness(2);
+    }
+    100% {
+        transform: scale(1);
+        filter: brightness(1);
+    }
+}
+
+.level-completing {
+    animation: levelComplete 1s ease;
+}
+
+/* Star collection animation */
+@keyframes starCollect {
+    0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-50px) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+.star-collect {
+    position: absolute;
+    color: #FFD700;
+    font-size: 30px;
+    animation: starCollect 1s ease forwards;
+    pointer-events: none;
+    z-index: 1000;
+}

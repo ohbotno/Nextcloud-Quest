@@ -1,0 +1,19 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="32" cy="32" r="30" fill="#263238" stroke="#000000" stroke-width="2"/>
+  <rect x="16" y="16" width="32" height="32" fill="#37474F" stroke="#263238" stroke-width="1"/>
+  <rect x="18" y="18" width="28" height="28" fill="#1A1A1A"/>
+  <text x="22" y="26" fill="#00FF00" font-family="monospace" font-size="6">1010</text>
+  <text x="38" y="26" fill="#00FF00" font-family="monospace" font-size="6">1100</text>
+  <text x="22" y="32" fill="#00FF00" font-family="monospace" font-size="6">0110</text>
+  <text x="38" y="32" fill="#00FF00" font-family="monospace" font-size="6">1001</text>
+  <text x="22" y="38" fill="#00FF00" font-family="monospace" font-size="6">1111</text>
+  <text x="38" y="38" fill="#00FF00" font-family="monospace" font-size="6">0000</text>
+  <text x="22" y="44" fill="#00FF00" font-family="monospace" font-size="6">0101</text>
+  <text x="38" y="44" fill="#00FF00" font-family="monospace" font-size="6">1010</text>
+  <circle cx="12" cy="12" r="2" fill="#FFEB3B"/>
+  <circle cx="52" cy="12" r="2" fill="#FFEB3B"/>
+  <circle cx="12" cy="52" r="2" fill="#FFEB3B"/>
+  <circle cx="52" cy="52" r="2" fill="#FFEB3B"/>
+  <text x="32" y="8" text-anchor="middle" fill="#00FF00" font-family="Arial" font-size="6">BINARY</text>
+  <text x="32" y="60" text-anchor="middle" fill="#00FF00" font-family="Arial" font-size="6">MASTER</text>
+</svg>

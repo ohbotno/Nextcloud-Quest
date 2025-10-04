@@ -1169,8 +1169,10 @@ class AchievementService {
      */
     public function getAllAchievements(string $userId): array {
         $unlockedAchievements = $this->achievementMapper->findAllByUserId($userId);
+        $this->logger->info("Found " . count($unlockedAchievements) . " unlocked achievements for user: " . $userId);
         $unlockedKeys = array_map(fn($a) => $a->getAchievementKey(), $unlockedAchievements);
-        
+        $this->logger->info("Unlocked keys: " . json_encode($unlockedKeys));
+
         $achievements = [];
         foreach (self::ACHIEVEMENTS as $key => $data) {
             $isUnlocked = in_array($key, $unlockedKeys);
@@ -1196,12 +1198,14 @@ class AchievementService {
             if (!$isUnlocked && $data['progress_type'] === 'milestone') {
                 try {
                     $progress = $this->getAchievementProgress($userId, $key);
+                    $this->logger->info("Progress for $key: " . json_encode($progress));
                     if ($progress) {
                         $progressPercentage = $progress['percentage'];
                         $progressCurrent = $progress['current'];
                     }
                 } catch (\Exception $e) {
                     // If progress calculation fails, just use 0
+                    $this->logger->error("Progress calculation failed for $key: " . $e->getMessage());
                     $progressPercentage = 0;
                     $progressCurrent = 0;
                 }
@@ -1210,12 +1214,14 @@ class AchievementService {
                 $progressCurrent = $progressTarget;
             }
 
-            // Determine status: locked (in progress), completed (criteria met), or unlocked
+            // Determine status: locked, in-progress, or unlocked
             $status = 'locked';
             if ($isUnlocked) {
                 $status = 'unlocked';
             } elseif ($progressPercentage >= 100) {
-                $status = 'completed';
+                $status = 'unlocked';
+            } elseif ($progressPercentage > 0) {
+                $status = 'in-progress';
             }
 
             $achievements[] = [
@@ -1336,8 +1342,14 @@ class AchievementService {
             $achievementKey === 'binary_master' ||
             $achievementKey === 'golden_ratio') {
             // Task count achievements
-            $stats = $this->historyMapper->getCompletionStats($userId);
-            $currentValue = $stats['total_tasks'];
+            try {
+                $stats = $this->historyMapper->getCompletionStats($userId);
+                $this->logger->info("Task stats for $userId: " . json_encode($stats));
+                $currentValue = $stats['total_tasks'];
+            } catch (\Exception $e) {
+                $this->logger->error("Failed to get task stats for $userId: " . $e->getMessage());
+                $currentValue = 0;
+            }
 
         } elseif (strpos($achievementKey, 'streak_') === 0) {
             // Streak achievements - get current or longest streak

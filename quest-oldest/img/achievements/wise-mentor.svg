@@ -1,0 +1,19 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="32" cy="32" r="30" fill="#607D8B" stroke="#37474F" stroke-width="2"/>
+  <polygon points="32,8 38,20 52,20 42,28 46,40 32,34 18,40 22,28 12,20 26,20" fill="#FFD700" stroke="#FFA000" stroke-width="1"/>
+  <polygon points="32,12 36,20 44,20 38,26 40,32 32,28 24,32 26,26 20,20 28,20" fill="#FFC107"/>
+  <circle cx="32" cy="22" r="6" fill="#FFAB91"/>
+  <circle cx="29" cy="20" r="1" fill="#5D4037"/>
+  <circle cx="35" cy="20" r="1" fill="#5D4037"/>
+  <polygon points="32,24 30,26 34,26" fill="#D84315"/>
+  <rect x="20" y="28" width="24" height="16" fill="#FFEB3B" stroke="#F57F17" stroke-width="1"/>
+  <rect x="22" y="30" width="20" height="12" fill="#FFF176"/>
+  <line x1="24" y1="33" x2="40" y2="33" stroke="#37474F" stroke-width="1"/>
+  <line x1="24" y1="36" x2="38" y2="36" stroke="#37474F" stroke-width="1"/>
+  <line x1="24" y1="39" x2="36" y2="39" stroke="#37474F" stroke-width="1"/>
+  <rect x="28" y="44" width="8" height="8" fill="#8D6E63" stroke="#5D4037" stroke-width="1"/>
+  <rect x="30" y="46" width="4" height="4" fill="#A1887F"/>
+  <ellipse cx="32" cy="53" rx="3" ry="1" fill="#5D4037"/>
+  <text x="32" y="58" text-anchor="middle" fill="#37474F" font-family="Arial" font-size="6">WISE</text>
+  <text x="32" y="7" text-anchor="middle" fill="#37474F" font-family="Arial" font-size="6">MENTOR</text>
+</svg>

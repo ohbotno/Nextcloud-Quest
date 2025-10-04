@@ -62,9 +62,9 @@
                         class="achievement-card"
                         :class="{
                             unlocked: achievement.status === 'unlocked',
-                            completed: achievement.status === 'completed',
                             locked: achievement.status === 'locked',
-                            recent: isRecentlyUnlocked(achievement)
+                            recent: isRecentlyUnlocked(achievement),
+                            'has-progress': achievement.status === 'locked' && achievement.progress_percentage > 0
                         }"
                         @click="showAchievementDetails(achievement)"
                     >
@@ -88,30 +88,30 @@
                             <div v-if="achievement.status === 'unlocked'" class="achievement-date">
                                 {{ t('nextcloudquest', 'Unlocked {date}', { date: formatDate(achievement.unlocked_at) }) }}
                             </div>
-                            <div v-else-if="achievement.status === 'completed'" class="achievement-completed-text">
-                                {{ t('nextcloudquest', 'Completed - Complete a task to unlock!') }}
-                            </div>
                         </div>
 
                         <div class="achievement-status">
                             <div v-if="achievement.status === 'unlocked'" class="status-unlocked">✓</div>
-                            <div v-else-if="achievement.status === 'completed'" class="status-completed">⭐</div>
                             <div v-else class="status-locked">🔒</div>
                         </div>
-                        
+
                         <!-- Progress indicator for locked achievements with progress -->
                         <div
                             v-if="achievement.status === 'locked' && achievement.progress_percentage !== undefined && achievement.progress_percentage > 0"
                             class="achievement-progress"
                         >
+                            <div class="progress-info">
+                                <span class="progress-label">In Progress</span>
+                                <span class="progress-percentage">{{ Math.round(achievement.progress_percentage) }}%</span>
+                            </div>
                             <div class="progress-bar">
                                 <div
                                     class="progress-fill"
                                     :style="{ width: `${achievement.progress_percentage}%` }"
                                 ></div>
                             </div>
-                            <div class="progress-text">
-                                {{ Math.round(achievement.progress_percentage) }}%
+                            <div class="progress-status">
+                                {{ achievement.progress_current }} / {{ achievement.progress_target }}
                             </div>
                         </div>
                         
@@ -488,7 +488,8 @@ export default {
     display: flex;
     align-items: flex-start;
     gap: 12px;
-    padding: 15px 15px 28px;
+    padding: 15px;
+    padding-bottom: 15px;
     min-height: 90px;
     border: 2px solid var(--color-border);
     border-radius: 8px;
@@ -496,6 +497,10 @@ export default {
     cursor: pointer;
     transition: all 0.2s ease;
     overflow: visible;
+}
+
+.achievement-card.has-progress {
+    padding-bottom: 60px;
 }
 
 .achievement-card:hover {
@@ -506,12 +511,6 @@ export default {
 .achievement-card.unlocked {
     border-color: var(--color-success);
     background: var(--color-success-background);
-}
-
-.achievement-card.completed {
-    border-color: #f59e0b;
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(251, 191, 36, 0.05));
-    box-shadow: 0 0 10px rgba(245, 158, 11, 0.2);
 }
 
 .achievement-card.locked {
@@ -571,13 +570,6 @@ export default {
     font-style: italic;
 }
 
-.achievement-completed-text {
-    font-size: 11px;
-    color: #f59e0b;
-    font-weight: 600;
-    font-style: italic;
-}
-
 .achievement-status {
     flex-shrink: 0;
     font-size: 20px;
@@ -585,12 +577,6 @@ export default {
 
 .status-unlocked {
     color: var(--color-success);
-}
-
-.status-completed {
-    color: #f59e0b;
-    font-size: 22px;
-    animation: pulse 2s infinite;
 }
 
 .status-locked {
@@ -602,8 +588,38 @@ export default {
     bottom: 0;
     left: 0;
     right: 0;
+    padding: 6px 10px;
+    background: var(--color-background-dark);
+    border-top: 1px solid var(--color-border);
+}
+
+.progress-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.progress-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.progress-percentage {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-main-text);
+}
+
+.progress-bar {
     height: 4px;
     background: var(--color-border);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 4px;
 }
 
 .progress-fill {
@@ -612,15 +628,10 @@ export default {
     transition: width 0.6s ease-out;
 }
 
-.progress-text {
-    position: absolute;
-    bottom: 8px;
-    right: 10px;
+.progress-status {
     font-size: 10px;
     color: var(--color-text-lighter);
-    background: var(--color-main-background);
-    padding: 2px 4px;
-    border-radius: 2px;
+    text-align: center;
 }
 
 .achievement-rarity {

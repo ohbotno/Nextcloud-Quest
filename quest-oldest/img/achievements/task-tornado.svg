@@ -1,0 +1,12 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="32" cy="32" r="30" fill="#607D8B" stroke="#37474F" stroke-width="2"/>
+  <path d="M 16,16 Q 32,8 48,16 Q 40,24 32,24 Q 40,32 48,32 Q 32,40 16,32 Q 24,24 32,24 Q 24,32 16,32" stroke="#ECEFF1" stroke-width="3" fill="none"/>
+  <path d="M 20,20 Q 32,12 44,20 Q 36,28 32,28 Q 36,36 44,36 Q 32,44 20,36 Q 28,28 32,28 Q 28,36 20,36" stroke="#CFD8DC" stroke-width="2" fill="none"/>
+  <path d="M 24,24 Q 32,16 40,24 Q 36,32 32,32 Q 36,40 40,40 Q 32,48 24,40 Q 28,32 32,32 Q 28,40 24,40" stroke="#B0BEC5" stroke-width="1.5" fill="none"/>
+  <circle cx="32" cy="32" r="4" fill="#90A4AE"/>
+  <polygon points="16,8 12,4 20,6" fill="#FFD700"/>
+  <polygon points="48,8 52,4 44,6" fill="#FFD700"/>
+  <polygon points="32,4 36,10 42,8 38,14 44,16 38,18 42,24 36,22 32,28 28,22 22,24 26,18 20,16 26,14 22,8 28,10" fill="#FFEB3B"/>
+  <text x="32" y="58" text-anchor="middle" fill="#37474F" font-family="Arial" font-size="6">TASK</text>
+  <text x="32" y="7" text-anchor="middle" fill="#37474F" font-family="Arial" font-size="6">TORNADO</text>
+</svg>

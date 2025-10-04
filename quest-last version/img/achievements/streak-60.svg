@@ -1,0 +1,10 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="32" cy="32" r="30" fill="#FF9800" stroke="#E65100" stroke-width="2"/>
+  <polygon points="32,6 38,18 52,18 42,26 46,38 32,32 18,38 22,26 12,18 26,18" fill="#FFD700" stroke="#FFA000" stroke-width="1"/>
+  <polygon points="32,8 36,18 46,18 39,24 42,32 32,28 22,32 25,24 18,18 28,18" fill="#FFC107"/>
+  <polygon points="32,10 34,18 40,18 36,22 38,28 32,25 26,28 28,22 24,18 30,18" fill="#FF9800"/>
+  <polygon points="32,12 33,18 36,18 34,20 35,24 32,22 29,24 30,20 28,18 31,18" fill="#FFA000"/>
+  <circle cx="32" cy="20" r="1" fill="#FF6D00"/>
+  <text x="32" y="44" text-anchor="middle" fill="#E65100" font-family="Arial" font-size="10" font-weight="bold">60</text>
+  <text x="32" y="56" text-anchor="middle" fill="#E65100" font-family="Arial" font-size="8">STREAK</text>
+</svg>

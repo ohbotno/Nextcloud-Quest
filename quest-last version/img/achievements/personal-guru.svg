@@ -1,0 +1,15 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="32" cy="32" r="30" fill="#FF9800" stroke="#E65100" stroke-width="2"/>
+  <circle cx="32" cy="20" r="8" fill="#FFAB91"/>
+  <circle cx="28" cy="18" r="1.5" fill="#5D4037"/>
+  <circle cx="36" cy="18" r="1.5" fill="#5D4037"/>
+  <arc x="32" y="22" rx="3" ry="2" fill="none" stroke="#5D4037" stroke-width="1"/>
+  <rect x="20" y="28" width="24" height="20" fill="#FFEB3B" stroke="#F57F17" stroke-width="1"/>
+  <rect x="22" y="30" width="20" height="16" fill="#FFF176"/>
+  <polygon points="32,32 34,30 38,32 36,36 32,34 28,36 26,32 30,30" fill="#FF5722"/>
+  <circle cx="32" cy="33" r="2" fill="#FFD700"/>
+  <polygon points="28,40 24,36 32,38" fill="#4CAF50"/>
+  <polygon points="36,40 40,36 32,38" fill="#4CAF50"/>
+  <text x="32" y="52" text-anchor="middle" fill="#E65100" font-family="Arial" font-size="6">PERSONAL</text>
+  <text x="32" y="8" text-anchor="middle" fill="#E65100" font-family="Arial" font-size="6">GURU</text>
+</svg>

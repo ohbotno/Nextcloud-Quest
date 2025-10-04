@@ -1,0 +1,7 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="32" cy="32" r="30" fill="#2196F3" stroke="#1976D2" stroke-width="2"/>
+  <polygon points="32,10 37,22 50,22 40,30 44,42 32,36 20,42 24,30 14,22 27,22" fill="#FFD700" stroke="#FFA000" stroke-width="1"/>
+  <polygon points="32,18 34,22 38,22 35,25 36,29 32,27 28,29 29,25 26,22 30,22" fill="#FFA000"/>
+  <text x="32" y="36" text-anchor="middle" fill="#1976D2" font-family="Arial" font-size="11" font-weight="bold">10</text>
+  <text x="32" y="56" text-anchor="middle" fill="#1976D2" font-family="Arial" font-size="8">LEVEL</text>
+</svg>

@@ -1,0 +1,17 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="32" cy="32" r="30" fill="#FF9800" stroke="#E65100" stroke-width="2"/>
+  <rect x="20" y="28" width="24" height="20" fill="#8BC34A" stroke="#558B2F" stroke-width="2"/>
+  <rect x="22" y="30" width="20" height="16" fill="#AED581"/>
+  <rect x="30" y="20" width="4" height="8" fill="#FFEB3B"/>
+  <ellipse cx="32" cy="18" rx="2" ry="3" fill="#FF5722"/>
+  <polygon points="32,14 33,16 35,15 34,17 36,18 34,19 35,21 33,20 32,22 31,20 29,21 30,19 28,18 30,17 29,15 31,16" fill="#FFD700"/>
+  <circle cx="26" cy="36" r="2" fill="#E91E63"/>
+  <circle cx="32" cy="38" r="2" fill="#2196F3"/>
+  <circle cx="38" cy="36" r="2" fill="#9C27B0"/>
+  <rect x="24" y="42" width="16" height="2" fill="#FFC107"/>
+  <polygon points="16,20 12,16 20,18" fill="#FFEB3B"/>
+  <polygon points="48,20 52,16 44,18" fill="#FFEB3B"/>
+  <polygon points="32,58 28,54 36,56" fill="#FFD700"/>
+  <text x="32" y="8" text-anchor="middle" fill="#E65100" font-family="Arial" font-size="6">BIRTHDAY</text>
+  <text x="32" y="62" text-anchor="middle" fill="#E65100" font-family="Arial" font-size="6">BONUS</text>
+</svg>

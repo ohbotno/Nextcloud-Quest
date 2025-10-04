@@ -1,0 +1,18 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="32" cy="32" r="30" fill="#795548" stroke="#5D4037" stroke-width="2"/>
+  <circle cx="32" cy="18" r="6" fill="#FFAB91"/>
+  <ellipse cx="32" cy="28" rx="4" ry="6" fill="#FF7043"/>
+  <ellipse cx="32" cy="38" rx="5" ry="8" fill="#FF5722"/>
+  <rect x="28" y="46" width="3" height="10" fill="#8D6E63"/>
+  <rect x="33" y="46" width="3" height="10" fill="#8D6E63"/>
+  <ellipse cx="29.5" cy="57" rx="2" ry="1" fill="#424242"/>
+  <ellipse cx="34.5" cy="57" rx="2" ry="1" fill="#424242"/>
+  <ellipse cx="25" cy="32" rx="2" ry="4" fill="#FF7043"/>
+  <ellipse cx="39" cy="32" rx="2" ry="4" fill="#FF7043"/>
+  <path d="M 10,15 Q 15,10 20,15 Q 25,20 30,15" stroke="#4CAF50" stroke-width="2" fill="none"/>
+  <path d="M 34,15 Q 39,20 44,15 Q 49,10 54,15" stroke="#4CAF50" stroke-width="2" fill="none"/>
+  <circle cx="16" cy="10" r="1.5" fill="#FFC107"/>
+  <circle cx="48" cy="10" r="1.5" fill="#FFC107"/>
+  <text x="32" y="8" text-anchor="middle" fill="#5D4037" font-family="Arial" font-size="6">MARATHON</text>
+  <text x="32" y="62" text-anchor="middle" fill="#5D4037" font-family="Arial" font-size="6">RUNNER</text>
+</svg>

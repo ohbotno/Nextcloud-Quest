@@ -1,0 +1,19 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="32" cy="32" r="30" fill="#4CAF50" stroke="#2E7D32" stroke-width="2"/>
+  <rect x="18" y="30" width="28" height="4" fill="#263238"/>
+  <circle cx="22" cy="32" r="6" fill="#37474F"/>
+  <circle cx="42" cy="32" r="6" fill="#37474F"/>
+  <circle cx="22" cy="32" r="4" fill="#424242"/>
+  <circle cx="42" cy="32" r="4" fill="#424242"/>
+  <circle cx="32" cy="20" r="6" fill="#FFAB91"/>
+  <ellipse cx="32" cy="28" rx="3" ry="4" fill="#FF7043"/>
+  <ellipse cx="32" cy="36" rx="4" ry="6" fill="#FF5722"/>
+  <rect x="29" y="42" width="2" height="8" fill="#8D6E63"/>
+  <rect x="33" y="42" width="2" height="8" fill="#8D6E63"/>
+  <ellipse cx="30" cy="51" rx="2" ry="1" fill="#5D4037"/>
+  <ellipse cx="34" cy="51" rx="2" ry="1" fill="#5D4037"/>
+  <ellipse cx="26" cy="30" rx="2" ry="3" fill="#FF7043"/>
+  <ellipse cx="38" cy="30" rx="2" ry="3" fill="#FF7043"/>
+  <text x="32" y="8" text-anchor="middle" fill="#2E7D32" font-family="Arial" font-size="6">FITNESS</text>
+  <text x="32" y="60" text-anchor="middle" fill="#2E7D32" font-family="Arial" font-size="6">FANATIC</text>
+</svg>

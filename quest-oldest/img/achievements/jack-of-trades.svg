@@ -1,0 +1,18 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="32" cy="32" r="30" fill="#795548" stroke="#5D4037" stroke-width="2"/>
+  <rect x="20" y="16" width="24" height="16" fill="#8BC34A" stroke="#558B2F" stroke-width="1"/>
+  <rect x="22" y="18" width="20" height="12" fill="#AED581"/>
+  <polygon points="28,24 30,22 34,22 36,24 34,26 30,26" fill="#FF5722"/>
+  <circle cx="26" cy="24" r="1.5" fill="#2196F3"/>
+  <circle cx="38" cy="24" r="1.5" fill="#9C27B0"/>
+  <rect x="24" y="32" width="16" height="8" fill="#FF9800" stroke="#E65100" stroke-width="1"/>
+  <rect x="26" y="34" width="12" height="4" fill="#FFB74D"/>
+  <circle cx="28" cy="36" r="1" fill="#4CAF50"/>
+  <circle cx="32" cy="36" r="1" fill="#F44336"/>
+  <circle cx="36" cy="36" r="1" fill="#FFEB3B"/>
+  <rect x="28" y="40" width="8" height="12" fill="#8D6E63" stroke="#5D4037" stroke-width="1"/>
+  <rect x="30" y="42" width="4" height="8" fill="#A1887F"/>
+  <ellipse cx="32" cy="53" rx="3" ry="1" fill="#5D4037"/>
+  <text x="32" y="8" text-anchor="middle" fill="#5D4037" font-family="Arial" font-size="6">JACK OF</text>
+  <text x="32" y="62" text-anchor="middle" fill="#5D4037" font-family="Arial" font-size="6">TRADES</text>
+</svg>

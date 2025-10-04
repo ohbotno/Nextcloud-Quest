@@ -1,0 +1,19 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="32" cy="32" r="30" fill="#FF5722" stroke="#D84315" stroke-width="2"/>
+  <polygon points="12,32 20,28 20,36" fill="#FFEB3B"/>
+  <polygon points="16,32 24,29 24,35" fill="#FFC107"/>
+  <polygon points="20,32 28,30 28,34" fill="#FF9800"/>
+  <ellipse cx="40" cy="25" rx="8" ry="6" fill="#795548"/>
+  <circle cx="37" cy="23" r="1.5" fill="#F44336"/>
+  <circle cx="43" cy="23" r="1.5" fill="#F44336"/>
+  <polygon points="40,27 38,30 42,30" fill="#D84315"/>
+  <ellipse cx="40" cy="35" rx="10" ry="8" fill="#8D6E63"/>
+  <ellipse cx="40" cy="42" rx="6" ry="4" fill="#A1887F"/>
+  <polygon points="32,45 28,50 36,48" fill="#6D4C41"/>
+  <polygon points="48,45 52,50 44,48" fill="#6D4C41"/>
+  <polygon points="25,20 20,15 30,18" fill="#FFEB3B"/>
+  <polygon points="55,25 60,20 50,23" fill="#FFEB3B"/>
+  <polygon points="28,8 24,3 32,6" fill="#FFC107"/>
+  <text x="32" y="58" text-anchor="middle" fill="#D84315" font-family="Arial" font-size="6">SPEED</text>
+  <text x="32" y="7" text-anchor="middle" fill="#D84315" font-family="Arial" font-size="6">DEMON</text>
+</svg>

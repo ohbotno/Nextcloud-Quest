@@ -1,0 +1,20 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="32" cy="32" r="30" fill="#263238" stroke="#000000" stroke-width="2"/>
+  <rect x="24" y="16" width="16" height="32" fill="#37474F" stroke="#263238" stroke-width="1"/>
+  <circle cx="28" cy="22" r="2" fill="#F44336"/>
+  <circle cx="36" cy="22" r="2" fill="#F44336"/>
+  <rect x="26" y="26" width="12" height="2" fill="#FF5722"/>
+  <rect x="20" y="48" width="24" height="8" fill="#424242" stroke="#212121" stroke-width="1"/>
+  <rect x="18" y="56" width="28" height="4" fill="#616161"/>
+  <polygon points="32,8 28,16 36,16" fill="#FF5722"/>
+  <rect x="30" y="30" width="4" height="12" fill="#F44336"/>
+  <rect x="28" y="32" width="8" height="2" fill="#FF9800"/>
+  <rect x="28" y="36" width="8" height="2" fill="#FF9800"/>
+  <rect x="28" y="40" width="8" height="2" fill="#FF9800"/>
+  <circle cx="12" cy="20" r="3" fill="#FFEB3B"/>
+  <circle cx="52" cy="20" r="3" fill="#FFEB3B"/>
+  <polygon points="12,14 13,18 17,17 14,21 18,22 14,23 17,27 13,26 12,30 11,26 7,27 10,23 6,22 10,21 7,17 11,18" fill="#FFD700"/>
+  <polygon points="52,14 53,18 57,17 54,21 58,22 54,23 57,27 53,26 52,30 51,26 47,27 50,23 46,22 50,21 47,17 51,18" fill="#FFD700"/>
+  <text x="32" y="7" text-anchor="middle" fill="#FFEB3B" font-family="Arial" font-size="6">TASK</text>
+  <text x="32" y="62" text-anchor="middle" fill="#FFEB3B" font-family="Arial" font-size="6">TERMINATOR</text>
+</svg>

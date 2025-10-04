@@ -1,0 +1,17 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="32" cy="32" r="30" fill="#00BCD4" stroke="#006064" stroke-width="2"/>
+  <polygon points="32,8 40,20 52,20 43,29 46,41 32,35 18,41 21,29 12,20 24,20" fill="#FFD700" stroke="#FFA000" stroke-width="1"/>
+  <polygon points="32,12 36,20 42,20 38,24 40,30 32,26 24,30 26,24 22,20 28,20" fill="#FFC107"/>
+  <rect x="20" y="42" width="24" height="3" fill="#4CAF50"/>
+  <rect x="22" y="45" width="20" height="2" fill="#66BB6A"/>
+  <rect x="24" y="47" width="16" height="2" fill="#81C784"/>
+  <rect x="26" y="49" width="12" height="2" fill="#A5D6A7"/>
+  <polygon points="16,30 12,26 20,28" fill="#FF5722"/>
+  <polygon points="48,30 52,26 44,28" fill="#FF5722"/>
+  <circle cx="12" cy="18" r="2" fill="#E91E63"/>
+  <circle cx="52" cy="18" r="2" fill="#E91E63"/>
+  <polygon points="12,14 13,16 15,15 14,17 16,18 14,19 15,21 13,20 12,22 11,20 9,21 10,19 8,18 10,17 9,15 11,16" fill="#FFEB3B"/>
+  <polygon points="52,14 53,16 55,15 54,17 56,18 54,19 55,21 53,20 52,22 51,20 49,21 50,19 48,18 50,17 49,15 51,16" fill="#FFEB3B"/>
+  <text x="32" y="58" text-anchor="middle" fill="#006064" font-family="Arial" font-size="6">EFFICIENCY</text>
+  <text x="32" y="6" text-anchor="middle" fill="#006064" font-family="Arial" font-size="6">EXPERT</text>
+</svg>

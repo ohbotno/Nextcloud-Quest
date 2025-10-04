@@ -1319,7 +1319,7 @@
                                     </div>
                                     <div class="task-meta">
                                         <span class="task-xp">+${this.calculateTaskXP(task.priority)} XP</span>
-                                        ${task.due_date ? `<span class="task-due">Due: ${task.due_date}</span>` : ''}
+                                        ${task.due_date ? `<span class="task-due">Due: ${this.formatDueDate(task.due_date)}</span>` : ''}
                                     </div>
                                 </div>
                                 <div class="task-actions">
@@ -1352,12 +1352,59 @@
         calculateTaskXP: function(priority) {
             const xpMap = {
                 'high': 50,
-                'medium': 25, 
+                'medium': 25,
                 'low': 10
             };
             return xpMap[priority] || 25;
         },
-        
+
+        formatDueDate: function(dueDateString) {
+            if (!dueDateString) return '';
+
+            try {
+                // Parse ISO 8601 format: 20251002T230000Z
+                const year = dueDateString.substring(0, 4);
+                const month = dueDateString.substring(4, 6);
+                const day = dueDateString.substring(6, 8);
+                const hour = dueDateString.substring(9, 11);
+                const minute = dueDateString.substring(11, 13);
+
+                const date = new Date(`${year}-${month}-${day}T${hour}:${minute}:00Z`);
+
+                if (isNaN(date.getTime())) {
+                    return dueDateString; // Return original if parsing fails
+                }
+
+                const now = new Date();
+                const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                const dueDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+                const diffTime = dueDate - today;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                // Format the date
+                const options = { month: 'short', day: 'numeric', year: 'numeric' };
+                const formattedDate = date.toLocaleDateString(undefined, options);
+
+                // Add relative time context
+                if (diffDays === 0) {
+                    return `Today, ${date.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })}`;
+                } else if (diffDays === 1) {
+                    return `Tomorrow, ${date.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })}`;
+                } else if (diffDays === -1) {
+                    return `Yesterday, ${date.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })}`;
+                } else if (diffDays > 0 && diffDays <= 7) {
+                    return `${date.toLocaleDateString(undefined, { weekday: 'long' })}, ${date.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })}`;
+                } else if (diffDays < 0) {
+                    return `${formattedDate} (overdue)`;
+                } else {
+                    return formattedDate;
+                }
+            } catch (error) {
+                console.warn('Error formatting due date:', error);
+                return dueDateString;
+            }
+        },
+
         showMainInterface: function() {
             // Hide loading screen
             const loading = document.getElementById('quest-loading');
@@ -2637,7 +2684,7 @@
                                 ${nextTask.title || 'Untitled Task'}
                             </div>
                             <div class="task-meta">
-                                ${nextTask.due_date ? `<span class="task-due">Due: ${nextTask.due_date}</span>` : ''}
+                                ${nextTask.due_date ? `<span class="task-due">Due: ${this.formatDueDate(nextTask.due_date)}</span>` : ''}
                             </div>
                         </div>
                     `;
@@ -3297,7 +3344,7 @@
                                             ${task.title || 'Untitled Task'}
                                         </div>
                                         <div class="task-meta">
-                                            ${task.due_date ? `<span class="task-due">Due: ${task.due_date}</span>` : ''}
+                                            ${task.due_date ? `<span class="task-due">Due: ${this.formatDueDate(task.due_date)}</span>` : ''}
                                         </div>
                                     </div>
                                 </div>

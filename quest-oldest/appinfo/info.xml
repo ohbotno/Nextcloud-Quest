@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<info xmlns:xsi= "http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
+    <id>quest</id>
+    <name>Quest</name>
+    <summary>Gamify your productivity with Nextcloud Tasks</summary>
+    <description><![CDATA[Transform your task management into an engaging game! Quest adds gamification elements to Nextcloud Tasks, helping you overcome procrastination through:
+
+* **XP & Levels** - Earn experience points and level up by completing tasks
+* **Achievements** - Unlock badges for milestones and special accomplishments
+* **Streaks** - Build and maintain daily completion streaks
+* **Progress Tracking** - Visualize your productivity journey
+
+Perfect for individuals and teams who want to make task completion more engaging and rewarding.]]></description>
+    <version>1.0.1</version>
+    <licence>agpl</licence>
+    <author mail="support@nextcloudquest.com" homepage="https://github.com/nextcloud/nextcloud-quest">Quest Team</author>
+    <namespace>NextcloudQuest</namespace>
+    <category>office</category>
+    <category>organization</category>
+    <bugs>https://github.com/nextcloud/nextcloud-quest/issues</bugs>
+    <dependencies>
+        <nextcloud min-version="28" max-version="32"/>
+        <php min-version="8.3"/>
+    </dependencies>
+    <navigations>
+        <navigation>
+            <name>Quest</name>
+            <route>quest.page.index</route>
+            <icon>app.svg</icon>
+            <order>10</order>
+        </navigation>
+    </navigations>
+    <settings>
+        <personal>OCA\NextcloudQuest\Settings\Personal</personal>
+    </settings>
+</info>

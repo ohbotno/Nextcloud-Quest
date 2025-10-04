@@ -1,0 +1,14 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="32" cy="32" r="30" fill="#F44336" stroke="#C62828" stroke-width="2"/>
+  <polygon points="32,8 38,20 52,20 42,28 46,40 32,34 18,40 22,28 12,20 26,20" fill="#FFD700" stroke="#FFA000" stroke-width="1"/>
+  <polygon points="32,12 36,20 44,20 38,26 40,32 32,28 24,32 26,26 20,20 28,20" fill="#FFC107"/>
+  <circle cx="32" cy="44" r="8" fill="#FFEB3B" stroke="#F57F17" stroke-width="2"/>
+  <circle cx="32" cy="44" r="1.5" fill="#C62828"/>
+  <line x1="32" y1="44" x2="32" y2="38" stroke="#C62828" stroke-width="3"/>
+  <line x1="32" y1="44" x2="38" y2="44" stroke="#C62828" stroke-width="2"/>
+  <text x="32" y="40" text-anchor="middle" fill="#C62828" font-family="Arial" font-size="10" font-weight="bold">!</text>
+  <polygon points="16,48 12,44 20,46" fill="#FFEB3B"/>
+  <polygon points="48,48 52,44 44,46" fill="#FFEB3B"/>
+  <text x="32" y="58" text-anchor="middle" fill="#C62828" font-family="Arial" font-size="6">URGENT</text>
+  <text x="32" y="7" text-anchor="middle" fill="#C62828" font-family="Arial" font-size="6">EXPERT</text>
+</svg>

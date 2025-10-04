@@ -1,0 +1,135 @@
+/**
+ * @copyright Copyright (c) 2025 Quest Team
+ *
+ * @license GNU AGPL version 3 or any later version
+ */
+
+#nextcloud-quest-settings {
+    max-width: 600px;
+}
+
+#nextcloud-quest-settings h2 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+#nextcloud-quest-settings h2::before {
+    content: '🏆';
+    font-size: 1.2em;
+}
+
+.settings-hint {
+    color: var(--color-text-lighter);
+    margin-bottom: 24px;
+    font-style: italic;
+}
+
+.quest-settings-form {
+    margin-top: 24px;
+}
+
+.quest-setting-item {
+    margin-bottom: 20px;
+    padding: 16px;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    background: var(--color-background-hover);
+    transition: all 0.15s ease;
+}
+
+.quest-setting-item:hover {
+    border-color: var(--color-primary);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.quest-setting-item label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    color: var(--color-main-text);
+    cursor: pointer;
+    margin-bottom: 0;
+}
+
+.quest-setting-item label input[type="checkbox"] {
+    margin: 0;
+    transform: scale(1.1);
+}
+
+.quest-setting-item select {
+    margin-top: 8px;
+    width: 200px;
+    padding: 8px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    background: var(--color-main-background);
+    color: var(--color-main-text);
+    font-size: 14px;
+    transition: all 0.15s ease;
+}
+
+.quest-setting-item select:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+    border-color: var(--color-primary);
+}
+
+#quest-save-settings {
+    margin-top: 24px;
+    padding: 12px 24px;
+    background: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    min-height: 44px;
+}
+
+#quest-save-settings:hover:not(:disabled) {
+    background: var(--color-primary-hover);
+    transform: translateY(-1px);
+}
+
+#quest-save-settings:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .quest-setting-item {
+        padding: 12px;
+    }
+    
+    .quest-setting-item select {
+        width: 100%;
+        margin-top: 12px;
+    }
+    
+    #quest-save-settings {
+        width: 100%;
+    }
+}
+
+/* Focus styles for accessibility */
+.quest-setting-item:focus-within {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px rgba(0, 130, 201, 0.1);
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .quest-setting-item {
+        border-width: 2px;
+    }
+    
+    #quest-save-settings {
+        border: 2px solid var(--color-primary);
+    }
+}

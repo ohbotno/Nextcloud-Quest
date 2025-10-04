@@ -1,0 +1,14 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="32" cy="32" r="30" fill="#FFD700" stroke="#FFA000" stroke-width="2"/>
+  <rect x="16" y="16" width="32" height="20" fill="#FFEB3B" stroke="#F57F17" stroke-width="2"/>
+  <rect x="18" y="18" width="20" height="16" fill="#FFF176"/>
+  <rect x="38" y="18" width="8" height="16" fill="#FFE082"/>
+  <line x1="32" y1="18" x2="32" y2="34" stroke="#FF9800" stroke-width="2"/>
+  <line x1="38" y1="18" x2="38" y2="34" stroke="#FF9800" stroke-width="2"/>
+  <arc x1="26" y1="26" x2="38" y2="26" stroke="#FF6D00" stroke-width="1.5" fill="none"/>
+  <text x="28" y="28" text-anchor="middle" fill="#FF6D00" font-family="Arial" font-size="8" font-weight="bold">φ</text>
+  <text x="42" y="28" text-anchor="middle" fill="#FF6D00" font-family="Arial" font-size="6">1.618</text>
+  <polygon points="32,8 36,14 42,12 38,18 44,20 38,22 42,28 36,26 32,32 28,26 22,28 26,22 20,20 26,18 22,12 28,14" fill="#FF9800"/>
+  <text x="32" y="48" text-anchor="middle" fill="#FFA000" font-family="Arial" font-size="6">GOLDEN</text>
+  <text x="32" y="58" text-anchor="middle" fill="#FFA000" font-family="Arial" font-size="6">RATIO</text>
+</svg>

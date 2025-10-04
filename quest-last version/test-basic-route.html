@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quest Basic Route Test</title>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { border: 1px solid #ddd; padding: 15px; margin: 10px 0; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        button { padding: 10px; margin: 5px; }
+        pre { background: #f5f5f5; padding: 10px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>Quest Basic Route Test</h1>
+    <p>This page tests if TaskCompletionController routing works at all.</p>
+    
+    <div class="test-section">
+        <h3>Test -2: Diagnostic Controller Test (New Ultra-Simple)</h3>
+        <button onclick="testDiagnosticRoute()">Test Diagnostic Controller</button>
+        <div id="diagnostic-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test -1: Quest Controller Test (Existing Route)</h3>
+        <button onclick="testQuestControllerRoute()">Test Quest Controller</button>
+        <div id="quest-controller-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test 0: Ultra Minimal Route</h3>
+        <button onclick="testUltraMinimalRoute()">Test Ultra Minimal Route</button>
+        <div id="ultra-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>Test 1: Basic Route (No Dependencies)</h3>
+        <button onclick="testBasicRoute()">Test Basic Route</button>
+        <div id="basic-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>Test 2: Full Test Route (With Dependencies)</h3>
+        <button onclick="testFullRoute()">Test Full Route</button>
+        <div id="full-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>Test 2.4: POST Test (DiagnosticController)</h3>
+        <button onclick="testDiagnosticPost()">Test Diagnostic POST</button>
+        <div id="diagnostic-post-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test 2.5: POST Test (QuestController)</h3>
+        <button onclick="testQuestPost()">Test Quest POST</button>
+        <div id="quest-post-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test 2.6: POST Test (TaskCompletionController)</h3>
+        <button onclick="testPostCompletion()">Test TaskCompletion POST</button>
+        <div id="post-test-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test 3: Quest Completion (POST)</h3>
+        <button onclick="testQuestCompletion()">Test Quest Completion</button>
+        <div id="quest-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>Test 4: Settings API (POST-FIX TEST)</h3>
+        <button onclick="testSettingsAPI()">Test Settings API</button>
+        <div id="settings-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>Test 5: Character API (POST-FIX TEST)</h3>
+        <button onclick="testCharacterAPI()">Test Character API</button>
+        <div id="character-result"></div>
+    </div>
+
+    <script>
+        async function makeRequest(url, method = 'GET', body = null) {
+            try {
+                const options = {
+                    method: method,
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                };
+                
+                if (body) {
+                    options.body = JSON.stringify(body);
+                }
+                
+                console.log(`Making ${method} request to: ${url}`);
+                const response = await fetch(url, options);
+                console.log(`Response status: ${response.status} ${response.statusText}`);
+                
+                const responseText = await response.text();
+                console.log('Response body:', responseText);
+                
+                let data;
+                try {
+                    data = JSON.parse(responseText);
+                } catch (e) {
+                    data = { raw_response: responseText, status: response.status };
+                }
+                
+                return {
+                    success: response.ok,
+                    status: response.status,
+                    data: data,
+                    raw_response: responseText
+                };
+            } catch (error) {
+                console.error('Request failed:', error);
+                return {
+                    success: false,
+                    error: error.message,
+                    status: 'NETWORK_ERROR'
+                };
+            }
+        }
+
+        async function testDiagnosticRoute() {
+            const resultDiv = document.getElementById('diagnostic-result');
+            resultDiv.innerHTML = '<p>Testing diagnostic controller route...</p>';
+            
+            const result = await makeRequest('/nextcloud/apps/quest/api/diagnostic-test');
+            
+            if (result.success) {
+                resultDiv.className = 'success';
+                resultDiv.innerHTML = `
+                    <h4>✅ Diagnostic Controller Route Works!</h4>
+                    <pre>${JSON.stringify(result.data, null, 2)}</pre>
+                `;
+            } else {
+                resultDiv.className = 'error';
+                resultDiv.innerHTML = `
+                    <h4>❌ Diagnostic Controller Route Failed</h4>
+                    <p><strong>Status:</strong> ${result.status}</p>
+                    <p><strong>Error:</strong> ${result.error || 'Unknown error'}</p>
+                    <pre>${result.raw_response || 'No response'}</pre>
+                `;
+            }
+        }
+
+        async function testQuestControllerRoute() {
+            const resultDiv = document.getElementById('quest-controller-result');
+            resultDiv.innerHTML = '<p>Testing existing Quest controller route...</p>';
+            
+            const result = await makeRequest('/nextcloud/apps/quest/api/test-quest');
+            
+            if (result.success) {
+                resultDiv.className = 'success';
+                resultDiv.innerHTML = `
+                    <h4>✅ Quest Controller Route Works!</h4>
+                    <pre>${JSON.stringify(result.data, null, 2)}</pre>
+                `;
+            } else {
+                resultDiv.className = 'error';
+                resultDiv.innerHTML = `
+                    <h4>❌ Quest Controller Route Failed</h4>
+                    <p><strong>Status:</strong> ${result.status}</p>
+                    <p><strong>Error:</strong> ${result.error || 'Unknown error'}</p>
+                    <pre>${result.raw_response || 'No response'}</pre>
+                `;
+            }
+        }
+
+        async function testUltraMinimalRoute() {
+            const resultDiv = document.getElementById('ultra-result');
+            resultDiv.innerHTML = '<p>Testing ultra minimal route...</p>';
+            
+            const result = await makeRequest('/nextcloud/apps/quest/api/ultra-test');
+            
+            if (result.success) {
+                resultDiv.className = 'success';
+                resultDiv.innerHTML = `
+                    <h4>✅ Ultra Minimal Route Works!</h4>
+                    <pre>${JSON.stringify(result.data, null, 2)}</pre>
+                `;
+            } else {
+                resultDiv.className = 'error';
+                resultDiv.innerHTML = `
+                    <h4>❌ Ultra Minimal Route Failed</h4>
+                    <p><strong>Status:</strong> ${result.status}</p>
+                    <p><strong>Error:</strong> ${result.error || 'Unknown error'}</p>
+                    <pre>${result.raw_response || 'No response'}</pre>
+                `;
+            }
+        }
+
+        async function testBasicRoute() {
+            const resultDiv = document.getElementById('basic-result');
+            resultDiv.innerHTML = '<p>Testing basic route...</p>';
+            
+            const result = await makeRequest('/nextcloud/apps/quest/api/basic-test');
+            
+            if (result.success) {
+                resultDiv.className = 'success';
+                resultDiv.innerHTML = `
+                    <h4>✅ Basic Route Works!</h4>
+                    <pre>${JSON.stringify(result.data, null, 2)}</pre>
+                `;
+            } else {
+                resultDiv.className = 'error';
+                resultDiv.innerHTML = `
+                    <h4>❌ Basic Route Failed</h4>
+                    <p><strong>Status:</strong> ${result.status}</p>
+                    <p><strong>Error:</strong> ${result.error || 'Unknown error'}</p>
+                    <pre>${result.raw_response || 'No response'}</pre>
+                `;
+            }
+        }
+
+        async function testFullRoute() {
+            const resultDiv = document.getElementById('full-result');
+            resultDiv.innerHTML = '<p>Testing full route...</p>';
+            
+            const result = await makeRequest('/nextcloud/apps/quest/api/test-task-completion');
+            
+            if (result.success) {
+                resultDiv.className = 'success';
+                resultDiv.innerHTML = `
+                    <h4>✅ Full Route Works!</h4>
+                    <pre>${JSON.stringify(result.data, null, 2)}</pre>
+                `;
+            } else {
+                resultDiv.className = 'error';
+                resultDiv.innerHTML = `
+                    <h4>❌ Full Route Failed</h4>
+                    <p><strong>Status:</strong> ${result.status}</p>
+                    <p><strong>Error:</strong> ${result.error || 'Unknown error'}</p>
+                    <pre>${result.raw_response || 'No response'}</pre>
+                `;
+            }
+        }
+
+        async function testDiagnosticPost() {
+            const resultDiv = document.getElementById('diagnostic-post-result');
+            resultDiv.innerHTML = '<p>Testing DiagnosticController POST...</p>';
+            
+            const testData = {
+                test: 'diagnostic_post_data',
+                timestamp: Date.now()
+            };
+            
+            const result = await makeRequest('/nextcloud/apps/quest/api/diagnostic-post-test', 'POST', testData);
+            
+            if (result.success) {
+                resultDiv.className = 'success';
+                resultDiv.innerHTML = `
+                    <h4>✅ Diagnostic POST Works!</h4>
+                    <pre>${JSON.stringify(result.data, null, 2)}</pre>
+                `;
+            } else {
+                resultDiv.className = 'error';
+                resultDiv.innerHTML = `
+                    <h4>❌ Diagnostic POST Failed</h4>
+                    <p><strong>Status:</strong> ${result.status}</p>
+                    <p><strong>Error:</strong> ${result.error || 'Unknown error'}</p>
+                    <pre>${result.raw_response || 'No response'}</pre>
+                `;
+            }
+        }
+
+        async function testQuestPost() {
+            const resultDiv = document.getElementById('quest-post-result');
+            resultDiv.innerHTML = '<p>Testing QuestController POST...</p>';
+            
+            const testData = {
+                test: 'quest_post_data',
+                timestamp: Date.now()
+            };
+            
+            const result = await makeRequest('/nextcloud/apps/quest/api/test-post', 'POST', testData);
+            
+            if (result.success) {
+                resultDiv.className = 'success';
+                resultDiv.innerHTML = `
+                    <h4>✅ Quest POST Works!</h4>
+                    <pre>${JSON.stringify(result.data, null, 2)}</pre>
+                `;
+            } else {
+                resultDiv.className = 'error';
+                resultDiv.innerHTML = `
+                    <h4>❌ Quest POST Failed</h4>
+                    <p><strong>Status:</strong> ${result.status}</p>
+                    <p><strong>Error:</strong> ${result.error || 'Unknown error'}</p>
+                    <pre>${result.raw_response || 'No response'}</pre>
+                `;
+            }
+        }
+
+        async function testPostCompletion() {
+            const resultDiv = document.getElementById('post-test-result');
+            resultDiv.innerHTML = '<p>Testing POST method...</p>';
+            
+            const testData = {
+                test: 'data',
+                timestamp: Date.now()
+            };
+            
+            const result = await makeRequest('/nextcloud/apps/quest/api/test-post-completion', 'POST', testData);
+            
+            if (result.success) {
+                resultDiv.className = 'success';
+                resultDiv.innerHTML = `
+                    <h4>✅ POST Method Works!</h4>
+                    <pre>${JSON.stringify(result.data, null, 2)}</pre>
+                `;
+            } else {
+                resultDiv.className = 'error';
+                resultDiv.innerHTML = `
+                    <h4>❌ POST Method Failed</h4>
+                    <p><strong>Status:</strong> ${result.status}</p>
+                    <p><strong>Error:</strong> ${result.error || 'Unknown error'}</p>
+                    <pre>${result.raw_response || 'No response'}</pre>
+                `;
+            }
+        }
+
+        async function testQuestCompletion() {
+            const resultDiv = document.getElementById('quest-result');
+            resultDiv.innerHTML = '<p>Testing quest completion...</p>';
+            
+            const testData = {
+                task_id: 123,
+                list_id: 456
+            };
+            
+            const result = await makeRequest('/nextcloud/apps/quest/api/complete-quest', 'POST', testData);
+            
+            if (result.success) {
+                resultDiv.className = 'success';
+                resultDiv.innerHTML = `
+                    <h4>✅ Quest Completion Works!</h4>
+                    <pre>${JSON.stringify(result.data, null, 2)}</pre>
+                `;
+            } else {
+                resultDiv.className = 'error';
+                resultDiv.innerHTML = `
+                    <h4>❌ Quest Completion Failed</h4>
+                    <p><strong>Status:</strong> ${result.status}</p>
+                    <p><strong>Error:</strong> ${result.error || 'Unknown error'}</p>
+                    <pre>${result.raw_response || 'No response'}</pre>
+                `;
+            }
+        }
+
+        async function testSettingsAPI() {
+            const resultDiv = document.getElementById('settings-result');
+            resultDiv.innerHTML = '<p>Testing Settings API endpoint...</p>';
+            
+            const result = await makeRequest('/nextcloud/apps/quest/api/settings');
+            
+            if (result.success) {
+                resultDiv.className = 'success';
+                resultDiv.innerHTML = `
+                    <h4>✅ Settings API Works!</h4>
+                    <pre>${JSON.stringify(result.data, null, 2)}</pre>
+                `;
+            } else {
+                resultDiv.className = 'error';
+                resultDiv.innerHTML = `
+                    <h4>❌ Settings API Failed</h4>
+                    <p><strong>Status:</strong> ${result.status}</p>
+                    <p><strong>Error:</strong> ${result.error || 'Unknown error'}</p>
+                    <pre>${result.raw_response || 'No response'}</pre>
+                `;
+            }
+        }
+
+        async function testCharacterAPI() {
+            const resultDiv = document.getElementById('character-result');
+            resultDiv.innerHTML = '<p>Testing Character API endpoint...</p>';
+            
+            const result = await makeRequest('/nextcloud/apps/quest/api/character');
+            
+            if (result.success) {
+                resultDiv.className = 'success';
+                resultDiv.innerHTML = `
+                    <h4>✅ Character API Works!</h4>
+                    <pre>${JSON.stringify(result.data, null, 2)}</pre>
+                `;
+            } else {
+                resultDiv.className = 'error';
+                resultDiv.innerHTML = `
+                    <h4>❌ Character API Failed</h4>
+                    <p><strong>Status:</strong> ${result.status}</p>
+                    <p><strong>Error:</strong> ${result.error || 'Unknown error'}</p>
+                    <pre>${result.raw_response || 'No response'}</pre>
+                `;
+            }
+        }
+
+        // Auto-test diagnostic route on page load
+        window.addEventListener('load', function() {
+            console.log('Page loaded, auto-testing diagnostic route...');
+            testDiagnosticRoute();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="32" cy="32" r="30" fill="#4CAF50" stroke="#2E7D32" stroke-width="2"/>
+  <rect x="28" y="8" width="8" height="48" fill="#8D6E63" stroke="#5D4037" stroke-width="1"/>
+  <polygon points="36,12 48,18 36,24" fill="#FF5722"/>
+  <polygon points="36,26 48,32 36,38" fill="#FF9800"/>
+  <polygon points="36,40 48,46 36,52" fill="#FFC107"/>
+  <circle cx="32" cy="18" r="3" fill="#FFEB3B"/>
+  <circle cx="32" cy="32" r="3" fill="#FFD700"/>
+  <circle cx="32" cy="46" r="3" fill="#FFA000"/>
+  <text x="50" y="20" text-anchor="middle" fill="#2E7D32" font-family="Arial" font-size="6">1</text>
+  <text x="50" y="34" text-anchor="middle" fill="#2E7D32" font-family="Arial" font-size="6">2</text>
+  <text x="50" y="48" text-anchor="middle" fill="#2E7D32" font-family="Arial" font-size="6">3</text>
+  <polygon points="16,18 12,14 20,16" fill="#4CAF50"/>
+  <polygon points="16,32 12,28 20,30" fill="#66BB6A"/>
+  <polygon points="16,46 12,42 20,44" fill="#81C784"/>
+  <text x="32" y="7" text-anchor="middle" fill="#2E7D32" font-family="Arial" font-size="6">MILESTONE</text>
+  <text x="32" y="62" text-anchor="middle" fill="#2E7D32" font-family="Arial" font-size="6">MASTER</text>
+</svg>

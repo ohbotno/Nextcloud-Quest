@@ -1,0 +1,17 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="32" cy="32" r="30" fill="#FF9800" stroke="#F57C00" stroke-width="2"/>
+  <polygon points="8,32 18,27 18,37" fill="#FFEB3B"/>
+  <polygon points="12,32 22,29 22,35" fill="#FFD700"/>
+  <polygon points="16,32 26,30 26,34" fill="#FFC107"/>
+  <polygon points="20,32 30,31 30,33" fill="#FF9800"/>
+  <circle cx="42" cy="24" r="6" fill="#795548"/>
+  <circle cx="39" cy="22" r="1.5" fill="#F44336"/>
+  <circle cx="45" cy="22" r="1.5" fill="#F44336"/>
+  <polygon points="42,26 40,29 44,29" fill="#D84315"/>
+  <ellipse cx="42" cy="34" rx="8" ry="6" fill="#8D6E63"/>
+  <ellipse cx="42" cy="40" rx="5" ry="4" fill="#A1887F"/>
+  <polygon points="34,44 30,49 38,47" fill="#6D4C41"/>
+  <polygon points="50,44 54,49 46,47" fill="#6D4C41"/>
+  <text x="32" y="44" text-anchor="middle" fill="#F57C00" font-family="Arial" font-size="12" font-weight="bold">5</text>
+  <text x="32" y="56" text-anchor="middle" fill="#F57C00" font-family="Arial" font-size="6">SPEED</text>
+</svg>

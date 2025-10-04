@@ -11,8 +11,12 @@
  * Cache bust: Force new version hash generation
  */
 
+console.log('🏆 achievements.js file loaded!');
+
 (function() {
     'use strict';
+
+    console.log('🏆 achievements.js IIFE executing!');
 
     // QuestAchievements global object
     window.QuestAchievements = {
@@ -235,7 +239,7 @@
                 // Store data in state
                 this.state.achievements = achievementsData.achievements || [];
                 this.state.categories = categoriesData.categories || {};
-                this.state.statistics = statsData || {};
+                this.state.statistics = statsData.data || {};
                 this.state.filteredAchievements = [...this.state.achievements];
                 this.state.isLoading = false;
 
@@ -268,18 +272,27 @@
 
         // Update statistics display
         updateStatistics() {
-            const stats = this.state.statistics;
-            
-            if (this.elements.achievementPercentage && stats.percentage !== undefined) {
-                this.elements.achievementPercentage.textContent = stats.percentage + '%';
-            }
-            
-            if (this.elements.achievementsUnlocked && stats.unlocked !== undefined && stats.total !== undefined) {
-                this.elements.achievementsUnlocked.textContent = `${stats.unlocked} of ${stats.total} unlocked`;
-            }
-            
-            // Find latest achievement
+            console.log('📊 Updating statistics with data:', this.state.statistics);
+            console.log('📊 Total achievements loaded:', this.state.achievements.length);
+
+            // Calculate stats from achievements if API stats are missing or incomplete
             const unlockedAchievements = this.state.achievements.filter(a => a.unlocked);
+            const totalAchievements = this.state.achievements.length;
+            const unlockedCount = unlockedAchievements.length;
+            const percentage = totalAchievements > 0 ? Math.round((unlockedCount / totalAchievements) * 100) : 0;
+
+            // Update overall progress
+            if (this.elements.achievementPercentage) {
+                this.elements.achievementPercentage.textContent = percentage + '%';
+                console.log('📊 Set percentage to:', percentage + '%');
+            }
+
+            if (this.elements.achievementsUnlocked) {
+                this.elements.achievementsUnlocked.textContent = `${unlockedCount} of ${totalAchievements} unlocked`;
+                console.log('📊 Set unlocked to:', `${unlockedCount} of ${totalAchievements} unlocked`);
+            }
+
+            // Find latest achievement
             if (unlockedAchievements.length > 0) {
                 const latest = unlockedAchievements.sort((a, b) => new Date(b.unlocked_at) - new Date(a.unlocked_at))[0];
                 if (this.elements.latestAchievementName) {
@@ -289,23 +302,24 @@
                     this.elements.latestAchievementDate.textContent = this.formatDate(latest.unlocked_at);
                 }
             }
-            
+
             // Count rare achievements
-            const rareCount = this.state.achievements.filter(a => 
-                a.unlocked && ['rare', 'epic', 'legendary', 'mythic'].includes(a.rarity.toLowerCase())
+            const rareCount = unlockedAchievements.filter(a =>
+                ['rare', 'epic', 'legendary', 'mythic'].includes(a.rarity.toLowerCase())
             ).length;
-            
+
             if (this.elements.rareAchievements) {
                 this.elements.rareAchievements.textContent = rareCount.toString();
+                console.log('📊 Set rare count to:', rareCount);
             }
-            
+
             // Calculate total achievement points
-            const totalPoints = this.state.achievements
-                .filter(a => a.unlocked)
+            const totalPoints = unlockedAchievements
                 .reduce((sum, a) => sum + (a.achievement_points || 0), 0);
-            
+
             if (this.elements.achievementPoints) {
                 this.elements.achievementPoints.textContent = totalPoints.toString();
+                console.log('📊 Set points to:', totalPoints);
             }
         },
 
@@ -751,14 +765,23 @@
 
     // Auto-initialize if DOM is ready and on achievements page
     function initIfAchievementsPage() {
+        console.log('🔍 Checking if should initialize achievements...');
+        console.log('🔍 Current pathname:', window.location.pathname);
+        console.log('🔍 achievements-grid element:', document.getElementById('achievements-grid'));
+
         if (window.location.pathname.includes('/achievements') || document.getElementById('achievements-grid')) {
+            console.log('✅ Initializing achievements page!');
             window.QuestAchievements.init();
+        } else {
+            console.log('❌ Not achievements page, skipping initialization');
         }
     }
-    
+
     if (document.readyState === 'loading') {
+        console.log('📄 DOM still loading, waiting for DOMContentLoaded...');
         document.addEventListener('DOMContentLoaded', initIfAchievementsPage);
     } else {
+        console.log('📄 DOM already loaded, initializing immediately...');
         initIfAchievementsPage();
     }
 

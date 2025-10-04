@@ -1,0 +1,13 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="32" cy="32" r="30" fill="#9C27B0" stroke="#6A1B9A" stroke-width="2"/>
+  <polygon points="32,4 38,16 52,16 42,24 46,36 32,30 18,36 22,24 12,16 26,16" fill="#FFD700" stroke="#FFA000" stroke-width="1"/>
+  <polygon points="32,6 36,16 46,16 39,22 42,30 32,26 22,30 25,22 18,16 28,16" fill="#FFC107"/>
+  <polygon points="32,8 34,16 40,16 36,20 38,26 32,23 26,26 28,20 24,16 30,16" fill="#FF9800"/>
+  <polygon points="32,10 33,16 36,16 34,18 35,22 32,20 29,22 30,18 28,16 31,16" fill="#FF6D00"/>
+  <circle cx="32" cy="18" r="2" fill="#FF3D00"/>
+  <polygon points="16,48 12,44 20,46" fill="#FFEB3B"/>
+  <polygon points="48,48 52,44 44,46" fill="#FFEB3B"/>
+  <polygon points="32,58 28,54 36,56" fill="#FFD700"/>
+  <text x="32" y="45" text-anchor="middle" fill="#6A1B9A" font-family="Arial" font-size="6">ASCENDED</text>
+  <text x="32" y="52" text-anchor="middle" fill="#6A1B9A" font-family="Arial" font-size="6">MASTER</text>
+</svg>

@@ -1,0 +1,11 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="32" cy="32" r="30" fill="#E91E63" stroke="#AD1457" stroke-width="2"/>
+  <polygon points="32,8 38,20 52,20 42,28 46,40 32,34 18,40 22,28 12,20 26,20" fill="#FFD700" stroke="#FFA000" stroke-width="1"/>
+  <polygon points="32,12 36,20 44,20 38,26 40,32 32,28 24,32 26,26 20,20 28,20" fill="#FFC107"/>
+  <path d="M 16,48 Q 24,44 32,48 Q 40,52 48,48" stroke="#4CAF50" stroke-width="4" fill="none"/>
+  <polygon points="14,46 18,42 22,46" fill="#66BB6A"/>
+  <polygon points="42,46 46,42 50,46" fill="#66BB6A"/>
+  <circle cx="32" cy="44" r="3" fill="#FF5722"/>
+  <text x="32" y="47" text-anchor="middle" fill="#FFEB3B" font-family="Arial" font-size="8" font-weight="bold">↑</text>
+  <text x="32" y="58" text-anchor="middle" fill="#AD1457" font-family="Arial" font-size="5">NEVER GIVE UP</text>
+</svg>

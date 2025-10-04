@@ -1,0 +1,14 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="32" cy="32" r="30" fill="#FF5722" stroke="#D84315" stroke-width="2"/>
+  <polygon points="32,8 30,18 26,16 28,22 22,24 28,26 26,32 30,30 32,40 34,30 38,32 36,26 42,24 36,22 38,16 34,18" fill="#FFEB3B"/>
+  <polygon points="32,12 31,18 28,17 29,21 26,22 29,23 28,27 31,26 32,32 33,26 36,27 35,23 38,22 35,21 36,17 33,18" fill="#FFD700"/>
+  <polygon points="32,16 31.5,20 29,19 30,22 27,23 30,24 29,27 31.5,26 32,28 32.5,26 35,27 34,24 37,23 34,22 35,19 32.5,20" fill="#FF9800"/>
+  <ellipse cx="22" cy="35" rx="8" ry="6" fill="#795548"/>
+  <ellipse cx="42" cy="35" rx="8" ry="6" fill="#795548"/>
+  <polygon points="22,29 18,25 26,27" fill="#8D6E63"/>
+  <polygon points="42,29 46,25 38,27" fill="#8D6E63"/>
+  <ellipse cx="32" cy="45" rx="12" ry="8" fill="#8D6E63"/>
+  <polygon points="32,50 28,55 36,53" fill="#6D4C41"/>
+  <text x="32" y="58" text-anchor="middle" fill="#D84315" font-family="Arial" font-size="6">PHOENIX</text>
+  <text x="32" y="7" text-anchor="middle" fill="#D84315" font-family="Arial" font-size="6">RISING</text>
+</svg>

@@ -31,7 +31,6 @@ use OCP\AppFramework\Db\Entity;
  * @method void setProgressTarget(int $progressTarget)
  */
 class Achievement extends Entity implements JsonSerializable {
-    protected ?int $id = null;
     protected string $userId = '';
     protected string $achievementKey = '';
     protected string $unlockedAt = '';

@@ -93,7 +93,6 @@ ob_start();
         <select class="filter-select" id="status-filter">
             <option value="all">All Status</option>
             <option value="unlocked">Unlocked</option>
-            <option value="completed">Completed</option>
             <option value="in-progress">In Progress</option>
             <option value="locked">Locked</option>
         </select>
@@ -279,18 +278,6 @@ ob_start();
     border: 2px solid var(--color-success);
 }
 
-.achievement-card.completed {
-    border: 2px solid #f59e0b;
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(251, 191, 36, 0.05));
-    box-shadow: 0 0 15px rgba(245, 158, 11, 0.2);
-    animation: completedPulse 2s ease-in-out infinite;
-}
-
-@keyframes completedPulse {
-    0%, 100% { box-shadow: 0 0 15px rgba(245, 158, 11, 0.2); }
-    50% { box-shadow: 0 0 25px rgba(245, 158, 11, 0.4); }
-}
-
 /* Rarity Borders */
 .achievement-card[data-rarity="common"] {
     border: 2px solid #9e9e9e;
@@ -458,18 +445,6 @@ ob_start();
 .achievement-status.in-progress {
     background: var(--color-primary-light);
     color: var(--color-primary);
-}
-
-.achievement-status.completed {
-    background: #f59e0b;
-    color: white;
-    font-weight: 700;
-    animation: completedTextPulse 2s ease-in-out infinite;
-}
-
-@keyframes completedTextPulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.9; transform: scale(1.02); }
 }
 
 /* Responsive Grid Breakdowns */
@@ -758,12 +733,6 @@ ob_start();
 .achievement-status.in-progress {
     background: var(--color-primary-light);
     color: var(--color-primary);
-}
-
-.achievement-status.completed {
-    background: #f59e0b;
-    color: white;
-    font-weight: 700;
 }
 
 /* Category overview cards */

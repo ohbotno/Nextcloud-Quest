@@ -486,19 +486,38 @@ class QuestController extends Controller {
 
             // Calculate XP reward based on medium priority (simplified)
             $xpReward = 25;
-            
+            $priority = 'medium'; // Default priority
+
             // Get current user data using simple DB operations
             $userData = $this->getSimpleUserData($userId);
             $currentLevel = $userData['level'];
             $currentXP = $userData['xp'];
-            
+
+            // Calculate health regeneration BEFORE database update
+            $currentHealth = (int)($userData['current_health'] ?? 100);
+            $maxHealth = (int)($userData['max_health'] ?? 100);
+
+            // Priority-based regeneration: high=10, medium=5, low=3
+            $healthRegenAmount = 5; // default medium
+            switch ($priority) {
+                case 'high':
+                    $healthRegenAmount = 10;
+                    break;
+                case 'low':
+                    $healthRegenAmount = 3;
+                    break;
+            }
+
+            // Calculate new health (don't exceed max)
+            $newHealth = min($maxHealth, $currentHealth + $healthRegenAmount);
+
             // Award XP and update database
             $newXP = $currentXP + $xpReward;
             $newLevel = $this->calculateLevelFromXP($newXP);
             $levelUp = $newLevel > $currentLevel;
-            
-            // Update user XP in database using simple operations
-            $updateResult = $this->updateSimpleUserXP($userId, $newXP, $newLevel, $xpReward);
+
+            // Update user XP AND HEALTH in database using simple operations
+            $updateResult = $this->updateSimpleUserXP($userId, $newXP, $newLevel, $xpReward, $newHealth, $maxHealth);
             
             // Record XP earned in history table for daily tracking
             error_log("Quest: About to call recordXPHistory - User: $userId, Task: $taskId, XP: $xpReward");
@@ -508,6 +527,20 @@ class QuestController extends Controller {
             error_log("Quest: Updating streak for user: $userId");
             $streakData = $this->updateStreakInUnifiedTable($userId);
             error_log("Quest: Streak updated - current: {$streakData['current_streak']}, longest: {$streakData['longest_streak']}");
+
+            // Check for new achievements (don't fail request if this errors)
+            $newAchievements = [];
+            try {
+                error_log("Quest: Checking achievements for user: $userId");
+                $quest = $this->questMapper->findByUserId($userId);
+                $completionTime = new \DateTime();
+                $newAchievements = $this->achievementService->checkAchievements($userId, $quest, $completionTime);
+                error_log("Quest: Found " . count($newAchievements) . " new achievements");
+            } catch (\Throwable $e) {
+                error_log('Quest: Achievement check failed (non-fatal): ' . $e->getMessage());
+                error_log('Quest: Achievement check stack trace: ' . $e->getTraceAsString());
+                // Continue processing task completion even if achievements fail
+            }
 
             // Get updated data from database including task counts
             $updatedUserData = $this->getSimpleUserData($userId);
@@ -526,6 +559,9 @@ class QuestController extends Controller {
             $xpRequiredForLevel = $xpForNextLevel - $xpForCurrentLevel;
             $progressPercentage = $xpRequiredForLevel > 0 ? ($xpProgressInLevel / $xpRequiredForLevel) * 100 : 0;
 
+            // Calculate health percentage for response
+            $healthPercentage = $maxHealth > 0 ? ($newHealth / $maxHealth) * 100 : 100;
+
             $responseData = [
                 'xp_earned' => $xpReward,
                 'user_stats' => [
@@ -534,6 +570,11 @@ class QuestController extends Controller {
                     'xp_to_next' => $xpToNext,
                     'progress_percentage' => round($progressPercentage, 1),
                     'rank_title' => $this->getRankTitle($finalLevel)
+                ],
+                'health' => [
+                    'current_health' => $newHealth,
+                    'max_health' => $maxHealth,
+                    'percentage' => round($healthPercentage, 1)
                 ],
                 'streak' => [
                     'current_streak' => $streakData['current_streak'],
@@ -545,7 +586,7 @@ class QuestController extends Controller {
                     'total_xp' => $finalXP
                 ]
             ];
-            
+
             if ($levelUp) {
                 $responseData['level_up'] = true;
                 $responseData['new_level'] = $finalLevel;
@@ -637,16 +678,16 @@ class QuestController extends Controller {
     /**
      * Update user XP using simple DB operations
      */
-    private function updateSimpleUserXP(string $userId, int $xp, int $level, int $xpEarned = 0): array {
+    private function updateSimpleUserXP(string $userId, int $xp, int $level, int $xpEarned = 0, int $currentHealth = null, int $maxHealth = null): array {
         try {
             $db = \OC::$server->getDatabaseConnection();
             $qb = $db->getQueryBuilder();
-            
-            // Check if user exists and get current values
-            $qb->select('user_id', 'tasks_completed_today', 'tasks_completed_this_week', 'total_tasks_completed', 'xp_gained_today', 'last_daily_reset')
+
+            // Check if user exists and get current values including health
+            $qb->select('user_id', 'tasks_completed_today', 'tasks_completed_this_week', 'total_tasks_completed', 'xp_gained_today', 'last_daily_reset', 'current_health', 'max_health')
                 ->from('ncquest_users')
                 ->where($qb->expr()->eq('user_id', $qb->createNamedParameter($userId)));
-            
+
             $result = $qb->executeQuery();
             $userData = $result->fetch();
             $result->closeCursor();
@@ -658,26 +699,33 @@ class QuestController extends Controller {
                 $today = date('Y-m-d');
                 $lastReset = $userData['last_daily_reset'];
                 $needsDailyReset = !$lastReset || $lastReset !== $today;
-                
+
                 // Calculate new counters (handle null values)
                 $tasksToday = $needsDailyReset ? 1 : (int)($userData['tasks_completed_today'] ?? 0) + 1;
                 $xpToday = $needsDailyReset ? $xpEarned : (int)($userData['xp_gained_today'] ?? 0) + $xpEarned;
                 $tasksThisWeek = (int)($userData['tasks_completed_this_week'] ?? 0) + 1;
                 $totalTasks = (int)($userData['total_tasks_completed'] ?? 0) + 1;
-                
+
+                // Use provided health values or keep existing
+                $newCurrentHealth = $currentHealth !== null ? max(0, min($currentHealth, $maxHealth ?? 100)) : (int)($userData['current_health'] ?? 100);
+                $newMaxHealth = $maxHealth !== null ? $maxHealth : (int)($userData['max_health'] ?? 100);
+
                 error_log("Quest: XP update calculation - needsDailyReset: " . ($needsDailyReset ? 'true' : 'false'));
                 error_log("Quest: XP update calculation - current xp_gained_today: " . ($userData['xp_gained_today'] ?? 'NULL'));
                 error_log("Quest: XP update calculation - xpEarned: $xpEarned");
                 error_log("Quest: XP update calculation - new xpToday: $xpToday");
-                
+                error_log("Quest: Health update - new health: $newCurrentHealth / $newMaxHealth");
+
                 file_put_contents('/tmp/quest_debug.log', '[' . date('Y-m-d H:i:s') . '] XP calculation - needsDailyReset: ' . ($needsDailyReset ? 'true' : 'false') . ', current_xp_gained_today: ' . ($userData['xp_gained_today'] ?? 'NULL') . ', xpEarned: ' . $xpEarned . ', new_xpToday: ' . $xpToday . PHP_EOL, FILE_APPEND);
-                
-                // Update existing user
+
+                // Update existing user (including health)
                 $qb = $db->getQueryBuilder();
                 $qb->update('ncquest_users')
                     ->set('lifetime_xp', $qb->createNamedParameter($xp))
                     ->set('current_xp', $qb->createNamedParameter($xp))
                     ->set('level', $qb->createNamedParameter($level))
+                    ->set('current_health', $qb->createNamedParameter($newCurrentHealth))
+                    ->set('max_health', $qb->createNamedParameter($newMaxHealth))
                     ->set('tasks_completed_today', $qb->createNamedParameter($tasksToday))
                     ->set('tasks_completed_this_week', $qb->createNamedParameter($tasksThisWeek))
                     ->set('total_tasks_completed', $qb->createNamedParameter($totalTasks))
@@ -689,7 +737,10 @@ class QuestController extends Controller {
                 
                 return ['status' => 'success', 'operation' => 'update'];
             } else {
-                // Insert new
+                // Insert new user with health values
+                $newCurrentHealth = $currentHealth !== null ? max(0, min($currentHealth, $maxHealth ?? 100)) : 100;
+                $newMaxHealth = $maxHealth !== null ? $maxHealth : 100;
+
                 $qb = $db->getQueryBuilder();
                 $qb->insert('ncquest_users')
                     ->values([
@@ -697,6 +748,8 @@ class QuestController extends Controller {
                         'current_xp' => $qb->createNamedParameter($xp),
                         'lifetime_xp' => $qb->createNamedParameter($xp),
                         'level' => $qb->createNamedParameter($level),
+                        'current_health' => $qb->createNamedParameter($newCurrentHealth),
+                        'max_health' => $qb->createNamedParameter($newMaxHealth),
                         'current_streak' => $qb->createNamedParameter(0),
                         'longest_streak' => $qb->createNamedParameter(0),
                         'theme_preference' => $qb->createNamedParameter('game'),
@@ -704,7 +757,7 @@ class QuestController extends Controller {
                         'updated_at' => $qb->createNamedParameter(date('Y-m-d H:i:s'))
                     ]);
                 $qb->executeStatement();
-                
+
                 return ['status' => 'success', 'operation' => 'insert'];
             }
         } catch (\Exception $e) {
